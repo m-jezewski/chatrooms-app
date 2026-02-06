@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  email         String   @unique
+  password      String
+  name          String?
+  role          Role     @default(USER)
+  messages      Message[]
+  textChannels  TextChannel[]
+}
+
+model TextChannel {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  name          String   @unique
+  messages      Message[]
+  users         User[]
+}
+
+model Message {
+  id            Int      @id @default(autoincrement())
+  content       String?
+  author        User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId      Int?
+  createdAt     DateTime @default(now())
+
+  textChannel   TextChannel? @relation(fields: [textChannelId], references: [id], onDelete: Cascade)
+  textChannelId Int?
+}
+
+enum Role {
+  USER
+  ADMIN
+}
