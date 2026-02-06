@@ -7,5 +7,6 @@ import { PrismaModule } from '../prisma/prisma.module';
   imports: [PrismaModule],
   controllers: [TextChannelsController],
   providers: [TextChannelsService],
+  exports: [TextChannelsService],
 })
 export class TextChannelsModule {}

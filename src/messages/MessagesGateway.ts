@@ -7,10 +7,13 @@ import {
   OnGatewayInit,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { PrismaService } from '../prisma/prisma.service';
+import { MessagesService } from './messages.service';
 import { WsSessionGuard } from '../auth/guards/ws-session-guard';
-import { Logger, UseGuards } from '@nestjs/common';
+import { ForbiddenException, Logger, NotFoundException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CurrentWsUser } from './current-ws-user.decorator';
+import { UsersService } from '../users/users.service';
+import { TextChannelsService } from '../textChannels/textChannels.service';
+import { JoinChannelDto, LeaveChannelDto, SendMessageDto } from './dto/messages.dto';
 
 @WebSocketGateway(parseInt(process.env.WEBSOCKET_PORT), {
   cors: {
@@ -23,7 +26,11 @@ export class MessagesGateway implements OnGatewayInit {
   @WebSocketServer() server: Server;
   private readonly logger = new Logger(MessagesGateway.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly messagesService: MessagesService,
+    private readonly usersService: UsersService,
+    private readonly textChannelsService: TextChannelsService,
+  ) {}
 
   async afterInit(server: Server) {
     this.logger.log(`WebSocket Gateway initialized on port ${process.env.WEBSOCKET_PORT}`);
@@ -48,86 +55,80 @@ export class MessagesGateway implements OnGatewayInit {
   @UseGuards(WsSessionGuard)
   @SubscribeMessage('joinChannel')
   async handleJoinChannel(
-    @MessageBody() { channelId }: { channelId: number },
+    @MessageBody() { channelId }: JoinChannelDto,
     @ConnectedSocket() client: Socket,
     @CurrentWsUser() userId: number,
   ) {
     this.logger.log(`User ${userId} is joining channel ${channelId}`);
-    const channel = await this.prisma.textChannel.findUnique({
-      where: { id: channelId },
-      include: { users: true },
-    });
 
-    const recentMessages = await this.prisma.message.findMany({
-      where: { textChannelId: channelId },
-      orderBy: { createdAt: 'asc' },
-      include: {
-        author: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
+    try {
+      const user = await this.usersService.getUser({ userId });
+      await this.textChannelsService.getChannel({ channelId, user });
 
-    if (!channel) {
-      this.logger.warn(`Channel ${channelId} not found`);
-      return client.emit('error', { message: 'Channel not found' });
+      const recentMessages = await this.messagesService.getChannelMessages({ channelId });
+
+      client.join(`channel_${channelId}`);
+      client.emit('joinedChannel', { messages: recentMessages, channelId });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        this.logger.warn(`Channel ${channelId} not found`);
+        return client.emit('error', { message: 'Channel not found' });
+      }
+      if (error instanceof ForbiddenException) {
+        return client.emit('error', { message: 'You are not a member of this channel' });
+      }
+      throw error;
     }
-
-    const isMember = channel.users.some((user) => user.id === userId);
-    if (!isMember) {
-      return client.emit('error', { message: 'You are not a member of this channel' });
-    }
-
-    client.join(`channel_${channelId}`);
-    client.emit('joinedChannel', { messages: recentMessages, channelId: channelId });
   }
 
   @UseGuards(WsSessionGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
-    @MessageBody()
-    { channelId, content }: { channelId: number; userId: number; content: string },
+    @MessageBody() { channelId, content }: SendMessageDto,
     @ConnectedSocket() client: Socket,
     @CurrentWsUser() userId: number,
   ) {
     this.logger.log(`User ${userId} sending message to channel ${channelId}`);
-    const channel = await this.prisma.textChannel.findUnique({
-      where: { id: channelId },
-      include: { users: true },
-    });
 
-    if (!channel) {
-      this.logger.warn(`Channel ${channelId} not found`);
-      return client.emit('error', { message: 'Channel not found' });
+    try {
+      const user = await this.usersService.getUser({ userId });
+      await this.textChannelsService.getChannel({ channelId, user });
+
+      const message = await this.messagesService.createMessage({ channelId, userId, content });
+
+      this.server.to(`channel_${channelId}`).emit('newMessage', message);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        this.logger.warn(`Channel ${channelId} not found`);
+        return client.emit('error', { message: 'Channel not found' });
+      }
+      if (error instanceof ForbiddenException) {
+        return client.emit('error', { message: 'You are not a member of this channel' });
+      }
+      throw error;
     }
-
-    const user = channel.users.find((user) => user.id === userId);
-    if (!user) {
-      return client.emit('error', { message: 'You are not a member of this channel' });
-    }
-
-    const message = await this.prisma.message.create({
-      data: {
-        content,
-        authorId: userId,
-        textChannelId: channelId,
-      },
-    });
-
-    this.server.to(`channel_${channelId}`).emit('newMessage', { ...message, author: { name: user.name } });
   }
 
   @UseGuards(WsSessionGuard)
   @SubscribeMessage('leaveChannel')
   handleLeaveChannel(
-    @MessageBody() { channelId }: { channelId: number },
+    @MessageBody() { channelId }: LeaveChannelDto,
     @ConnectedSocket() client: Socket,
     @CurrentWsUser() userId: number,
   ) {
     this.logger.log(`User ${userId} leaving channel ${channelId}`);
     client.leave(`channel_${channelId}`);
     client.emit('leftChannel', { message: `Left channel ${channelId}` });
+  }
+
+  notifyMessageUpdated(params: { channelId: number; message: any }) {
+    const { channelId, message } = params;
+    this.server.to(`channel_${channelId}`).emit('messageUpdated', message);
+  }
+
+  notifyMessageDeleted(params: { channelId: number; messageId: number }) {
+    const { channelId, messageId } = params;
+    this.server.to(`channel_${channelId}`).emit('messageDeleted', { messageId });
   }
 }
