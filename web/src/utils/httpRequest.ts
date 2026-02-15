@@ -3,10 +3,6 @@ import {logout} from "../features/auth/authSlice.ts";
 
 export const apiUrl = 'http://localhost:3000';
 
-const handleUnauthorized = async (dispatch:AppDispatch) => {
-    await dispatch(logout());
-};
-
 interface apiRequestInterface {
     endpoint: string;
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -24,7 +20,6 @@ export const apiRequest = async (
     apiRequestInterface) => {
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
-
     };
 
     if (body) {
@@ -42,7 +37,8 @@ export const apiRequest = async (
         const response = await fetch(`${apiUrl}${endpoint}`, options);
 
         if (response.status === 401 || response.status === 403) {
-            handleUnauthorized(dispatch);
+            await dispatch(logout());
+            return
         }
 
         if (!response.ok) {

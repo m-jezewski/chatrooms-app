@@ -1,53 +1,73 @@
-import {useDispatch, useSelector} from 'react-redux';
+import { useCallback, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import {
-    connectionOpened,
-    connectionClosed,
-    receivedMessage,
-    connectionError, setMessages,
+  connectionOpened,
+  connectionClosed,
+  receivedMessage,
+  setMessages,
 } from './messagesSlice.ts';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 
+const useWebSocket = (channelId: string | undefined) => {
+  const dispatch = useDispatch();
+  const socketRef = useRef<Socket | null>(null);
 
-const useWebSocket = () => {
-    const dispatch = useDispatch();
-    const socket = io('ws://localhost:3001/', {
-        withCredentials: true,
-        secure: true,
-        port: 3001
+  if (!socketRef.current) {
+    socketRef.current = io('ws://localhost:3001/', {
+      withCredentials: true,
+      secure: true,
+      port: 3001,
     });
+  }
 
-    socket.on('newMessage', (message) => {
-        console.log('New message:', message);
-        dispatch(receivedMessage(message));
-    });
+  useEffect(() => {
+    const socket = socketRef.current;
+    if (!socket) return;
 
-    socket.on('joinedChannel', (data) => {
-        console.log('User joined:', data);
-
-        dispatch(setMessages(data.messages));
-    });
-
-
-    const joinChannel = ({channelId}: { channelId: number }) => {
-        socket.emit('joinChannel', {channelId});
-        dispatch(connectionOpened())
+    const onNewMessage = (message: unknown) => {
+      dispatch(receivedMessage(message));
     };
 
-    const sendMessage = ({content, channelId}: { content: string, channelId: number }) => {
-        socket.emit('sendMessage', {content, channelId});
+    const onJoinedChannel = (data: { messages: unknown[] }) => {
+      dispatch(setMessages(data.messages));
     };
 
-    const leaveChannel = ({channelId}: { channelId: number }) => {
-        socket.emit('leaveChannel', {channelId});
+    const onDisconnect = () => {
+      dispatch(connectionClosed());
     };
 
-    return {
-        isConnected: socket.connected,
-        sendMessage,
-        joinChannel,
-        leaveChannel
+    socket.on('newMessage', onNewMessage);
+    socket.on('joinedChannel', onJoinedChannel);
+    socket.on('disconnect', onDisconnect);
+
+    return () => {
+      socket.off('newMessage', onNewMessage);
+      socket.off('joinedChannel', onJoinedChannel);
+      socket.off('disconnect', onDisconnect);
+      socket.disconnect();
+      socketRef.current = null;
     };
+  }, []);
+
+  useEffect(() => {
+    if (!channelId) return;
+
+    socketRef.current?.emit('joinChannel', { channelId: Number(channelId) });
+    dispatch(connectionOpened());
+
+    return () => {
+      socketRef.current?.emit('leaveChannel', { channelId: Number(channelId) });
+      dispatch(connectionClosed());
+    };
+  }, [channelId]);
+
+  const sendMessage = useCallback(({ content, channelId }: { content: string, channelId: number }) => {
+    socketRef.current?.emit('sendMessage', { content, channelId });
+  }, []);
+
+  return {
+    sendMessage,
+  };
 };
-
 
 export default useWebSocket;

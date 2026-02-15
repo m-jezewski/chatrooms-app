@@ -14,7 +14,7 @@ import {Message} from "../../interfaces.ts";
 import {ChatMessage} from "./ChatMessage.tsx";
 
 export const Chatrooms = () => {
-    const {id} = useParams();
+    const {id: channelId} = useParams();
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const dispatch = useDispatch<AppDispatch>();
     const [channelData, setChannelData] = useState<any | null>(null) // todo: refactor any
@@ -23,53 +23,38 @@ export const Chatrooms = () => {
     const navigate = useNavigate()
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
-    const {
-        isConnected,
-        sendMessage,
-        joinChannel,
-        leaveChannel
-    } = useWebSocket();
+    const {sendMessage} = useWebSocket(channelId);
 
 
     const getChannelData = async () => {
-        const res = await dispatch(getChatroomByIdAction({channelId: Number(id)}))
+        const res = await dispatch(getChatroomByIdAction({channelId: Number(channelId)}))
         if (res.type === "textChannels/getById/fulfilled") {
             setChannelData(res.payload)
         }
     }
 
     useEffect(() => {
-        if (id) {
+        if (channelId) {
             getChannelData()
         }
-    }, [id])
-
-    useEffect(() => {
-        if (id && !isConnected) {
-            joinChannel({channelId: Number(id)})
-        }
-
-        return () => {
-            leaveChannel({channelId: Number(id)})
-        }
-    }, [isConnected, id]);
+    }, [channelId])
 
 
     const handleSendMessage = (message: string) => {
-        sendMessage({channelId: Number(id), content: message});
+        sendMessage({channelId: Number(channelId), content: message});
     };
 
     const handleRemoveClick = async () => {
-        if (!id) {
+        if (!channelId) {
             return
         }
 
         try {
-            navigate("/chatrooms")
             const res = await dispatch(deleteChatroomAction({
-                channelId: Number(id)
+                channelId: Number(channelId)
             }))
             await dispatch(listChatroomsAction());
+            navigate("/chatrooms")
             toast.success('Successfully removed the chatroom!')
         } catch (e) {
             toast.error("Cannot remove channel")
@@ -77,13 +62,13 @@ export const Chatrooms = () => {
     }
 
     useEffect(() => {
-        if (id && chatContainerRef.current) {
+        if (channelId && chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     }, [messages]);
 
 
-    if (!id) {
+    if (!channelId) {
         return <div className={"flex justify-center items-center min-h-full text-center"}>
             <div>
                 <h1 className={"landingLogo text-4xl"}>Welcome to chatrooms</h1>

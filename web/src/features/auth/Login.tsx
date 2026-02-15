@@ -74,7 +74,7 @@ export const Login = () => {
                                 <TextInput name={"email"} type={"email"} placeholder={"youremail@domain.com"}/>
                             </div>
                             <div>
-                                <InputLabel htmlFor={"email"}>Password</InputLabel>
+                                <InputLabel htmlFor={"password"}>Password</InputLabel>
                                 <TextInput name={"password"} type={"password"}/>
                             </div>
                             <AppButton loader={isLoading} className={"mt-2"}>

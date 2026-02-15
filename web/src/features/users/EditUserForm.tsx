@@ -1,16 +1,15 @@
 
 import {Field, FieldProps, Formik, FormikHelpers} from "formik";
-import {array, number, object, string} from "yup";
+import {object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
 import React from "react";
-import {ListboxInput} from "../../shared/ListboxInput.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {selectLoggedUser} from "../auth/authSlice.ts";
 import {AppDispatch} from "../../store.ts";
 import toast from "react-hot-toast";
-import {createUserAction, listUsersAction, updateUserDataAction} from "./usersActions.ts";
+import {listUsersAction, updateUserDataAction} from "./usersActions.ts";
 import {User} from "../../interfaces.ts";
 
 interface ChatroomFormProps {
@@ -69,10 +68,6 @@ export const EditUserForm = (
                 email: string()
                     .email()
                     .required(),
-                password: string()
-                    .required()
-                    .min(5)
-                    .max(50),
                 name: string()
                     .required()
                     .min(3)
