@@ -23,7 +23,7 @@ const usersSlice = createSlice({
             .addCase(listUsersAction.pending, (state) => {
                 state.error = null;
             })
-            .addCase(listUsersAction.fulfilled, (state, action: PayloadAction<any>) => {
+            .addCase(listUsersAction.fulfilled, (state, action: PayloadAction<User[]>) => {
                 state.users = action.payload;
                 state.error = null;
             })

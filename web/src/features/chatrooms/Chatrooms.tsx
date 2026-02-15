@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {MessageForm} from "../messages/MessageForm.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch} from "../../store.ts";
+import {AppDispatch, RootState} from "../../store.ts";
 import {deleteChatroomAction, getChatroomByIdAction, listChatroomsAction} from "./chatroomsActions.ts";
 import {User} from "../../interfaces.ts";
 import {ChatroomFormModal} from "./ChatroomFormModal.tsx";
@@ -17,9 +17,9 @@ export const Chatrooms = () => {
     const {id: channelId} = useParams();
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const dispatch = useDispatch<AppDispatch>();
-    const [channelData, setChannelData] = useState<any | null>(null) // todo: refactor any
+    const [channelData, setChannelData] = useState<{ name: string; id: number; users: { id: number }[] } | null>(null)
     const loggedUser = useSelector(selectLoggedUser);
-    const messages = useSelector((state: any) => state.messages.messages);
+    const messages = useSelector((state: RootState) => state.messages.messages);
     const navigate = useNavigate()
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -99,13 +99,13 @@ export const Chatrooms = () => {
                 ))}
             </div>
             <MessageForm sendMessage={handleSendMessage}/>
-            <ChatroomFormModal
+            {channelData && <ChatroomFormModal
                 onSuccess={() => getChannelData()}
                 isEditing={true}
                 initialValues={channelData}
                 closeModal={() => setIsOpen(false)}
                 isOpen={isOpen}
-            />
+            />}
         </div>
     )
 }

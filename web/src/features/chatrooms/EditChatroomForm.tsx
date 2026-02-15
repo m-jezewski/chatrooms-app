@@ -21,7 +21,7 @@ interface EditChatroomFormProps {
         name: string,
         id: number,
         users: { id: number }[],
-    } | null;
+    };
     closeModal: () => void;
     onSuccess?: () => void;
 }
@@ -32,11 +32,10 @@ interface EditChatroomFormState {
 }
 
 export const EditChatroomForm = ({initialValues, closeModal, onSuccess}: EditChatroomFormProps) => {
-    //todo: refactor
     const dispatch = useDispatch<AppDispatch>();
     const users = useSelector(selectUsersList) || []
 
-    const initialUsers = initialValues ? users.filter(u => initialValues.users.some(user => user.id === u.id)) : []
+    const initialUsers = users.filter(u => initialValues.users.some(user => user.id === u.id))
     const getUsersList = async () => await dispatch(listUsersAction())
 
 
@@ -51,7 +50,7 @@ export const EditChatroomForm = ({initialValues, closeModal, onSuccess}: EditCha
             const res = await dispatch(updateChatroomDataAction({
                 name,
                 users: userIds,
-                id: initialValues!.id
+                id: initialValues.id
             }))
             toast.success('Successfully edited chatroom!')
             dispatch(listChatroomsAction());
@@ -68,8 +67,8 @@ export const EditChatroomForm = ({initialValues, closeModal, onSuccess}: EditCha
         <Formik
             enableReinitialize={true}
             initialValues={{
-                name: initialValues?.name || '',
-                users: initialUsers || [],
+                name: initialValues.name,
+                users: initialUsers,
             }}
             validationSchema={object({
                 name: string()

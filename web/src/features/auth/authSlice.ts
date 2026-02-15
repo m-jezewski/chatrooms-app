@@ -30,7 +30,7 @@ const authSlice = createSlice({
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(logoutAction.fulfilled, (state, action: PayloadAction<any>) => {
+            .addCase(logoutAction.fulfilled, (state) => {
                 state.isLoading = false;
                 state.user = null;
                 state.error = null;
@@ -44,7 +44,7 @@ const authSlice = createSlice({
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(statusAction.fulfilled, (state, action: PayloadAction<any>) => {
+            .addCase(statusAction.fulfilled, (state, action: PayloadAction<User>) => {
                 state.isLoading = false;
                 state.user = action.payload;
                 state.error = null;
@@ -58,7 +58,7 @@ const authSlice = createSlice({
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(loginAction.fulfilled, (state, action: PayloadAction<any>) => {
+            .addCase(loginAction.fulfilled, (state, action: PayloadAction<User>) => {
                 state.isLoading = false;
                 state.user = action.payload;
                 state.error = null;
@@ -72,7 +72,7 @@ const authSlice = createSlice({
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(registerAction.fulfilled, (state, action: PayloadAction<any>) => {
+            .addCase(registerAction.fulfilled, (state, action: PayloadAction<User>) => {
                 state.isLoading = false;
                 state.user = action.payload;
                 state.error = null;

@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Message } from '../../interfaces.ts';
 
 interface MessagesState {
-    messages: any[];
+    messages: Message[];
     isConnected: boolean;
     error: string | null;
 }
@@ -23,13 +24,10 @@ const messagesSlice = createSlice({
         connectionClosed(state) {
             state.isConnected = false;
         },
-        setMessages(state, action: PayloadAction<any>) {
+        setMessages(state, action: PayloadAction<Message[]>) {
             state.messages = action.payload;
         },
-        sendMessage(state, action: PayloadAction<any>) {
-            // state.messages.push(action.payload);
-        },
-        receivedMessage(state, action: PayloadAction<any>) {
+        receivedMessage(state, action: PayloadAction<Message>) {
             state.messages.push(action.payload);
         },
         connectionError(state, action: PayloadAction<string>) {

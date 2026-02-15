@@ -14,14 +14,12 @@ export const Users = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
-    const [bUsers, setbUsers] = useState<User[]>([]); // todo: refactor later
-    const users = useSelector(selectUsersList) || bUsers
+    const users = useSelector(selectUsersList) || []
     const loggedUser = useSelector(selectLoggedUser);
 
 
     const getUsers = async () => {
-        const res = await dispatch(listUsersAction())
-        setbUsers(res.payload)
+        await dispatch(listUsersAction())
     }
 
     useEffect(() => {

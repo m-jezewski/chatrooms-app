@@ -23,7 +23,7 @@ const chatroomsSlice = createSlice({
             .addCase(listChatroomsAction.pending, (state) => {
                 state.error = null;
             })
-            .addCase(listChatroomsAction.fulfilled, (state, action: PayloadAction<any>) => {
+            .addCase(listChatroomsAction.fulfilled, (state, action: PayloadAction<Chatroom[]>) => {
                 state.chatrooms = action.payload;
                 state.error = null;
             })

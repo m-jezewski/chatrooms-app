@@ -34,27 +34,24 @@ export const EditUserForm = (
 
     const handleSubmit = async (values: UserFormValues, formikHelpers: FormikHelpers<UserFormValues>
     ) => {
-        console.log(values)
         const {email, role, name} = values;
         try {
-            const res = await dispatch(updateUserDataAction({
+            await dispatch(updateUserDataAction({
                 id: initialValues.id,
                 email,
                 role,
                 name,
-            }))
+            })).unwrap()
             toast.success('Successfully edited user!')
             dispatch(listUsersAction());
         } catch (error) {
             if (error instanceof Error) {
-                toast.error('Failed to create user. \n ' + error.message);
+                toast.error('Failed to edit user. \n ' + error.message);
             }
         }
         formikHelpers.resetForm();
         closeModal()
     }
-
-    console.log(initialValues)
 
     return (
         <Formik

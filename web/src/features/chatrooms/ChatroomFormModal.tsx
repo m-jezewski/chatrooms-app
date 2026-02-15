@@ -11,7 +11,7 @@ interface ChatroomFormModalProps {
         name: string,
         id: number,
         users: { id: number }[]
-    } | null;
+    };
     onSuccess?: () => void;
 }
 
@@ -38,7 +38,7 @@ export const ChatroomFormModal = ({ onSuccess, isEditing = false, isOpen, closeM
                                 </svg>
                             </AppButton>
                         </div>
-                        {isEditing ? <EditChatroomForm closeModal={() => closeModal()} onSuccess={onSuccess} initialValues={initialValues || null} /> : <ChatroomForm closeModal={() => closeModal()}/>}
+                        {isEditing && initialValues ? <EditChatroomForm closeModal={() => closeModal()} onSuccess={onSuccess} initialValues={initialValues} /> : <ChatroomForm closeModal={() => closeModal()}/>}
                     </DialogPanel>
                 </div>
             </Dialog>

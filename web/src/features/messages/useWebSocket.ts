@@ -6,6 +6,7 @@ import {
   receivedMessage,
   setMessages,
 } from './messagesSlice.ts';
+import {Message} from "../../interfaces.ts";
 import io, { Socket } from 'socket.io-client';
 
 const useWebSocket = (channelId: string | undefined) => {
@@ -24,11 +25,11 @@ const useWebSocket = (channelId: string | undefined) => {
     const socket = socketRef.current;
     if (!socket) return;
 
-    const onNewMessage = (message: unknown) => {
+    const onNewMessage = (message: Message) => {
       dispatch(receivedMessage(message));
     };
 
-    const onJoinedChannel = (data: { messages: unknown[] }) => {
+    const onJoinedChannel = (data: { messages: Message[] }) => {
       dispatch(setMessages(data.messages));
     };
 

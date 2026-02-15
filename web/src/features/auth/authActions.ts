@@ -31,7 +31,7 @@ export const registerAction = createAsyncThunk(
                 body: registerData,
                 dispatch: dispatch
             });
-        } catch (error: any) {
+        } catch (error) {
             let message = 'Unknown Error'
             if (error instanceof Error) message = error.message
             return rejectWithValue(message);

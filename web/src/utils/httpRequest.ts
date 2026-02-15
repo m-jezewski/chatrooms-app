@@ -1,13 +1,13 @@
-import {AppDispatch} from "../store.ts";
 import {logout} from "../features/auth/authSlice.ts";
+import {Dispatch, UnknownAction} from "@reduxjs/toolkit";
 
 export const apiUrl = 'http://localhost:3000';
 
 interface apiRequestInterface {
     endpoint: string;
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-    body?: any
-    dispatch: any
+    body?: Record<string, unknown>
+    dispatch: Dispatch<UnknownAction>
 }
 
 export const apiRequest = async (
@@ -22,14 +22,10 @@ export const apiRequest = async (
         'Content-Type': 'application/json',
     };
 
-    if (body) {
-        body = JSON.stringify(body);
-    }
-
     const options: RequestInit = {
         method,
         headers,
-        body,
+        body: body ? JSON.stringify(body) : undefined,
         credentials: 'include',
     };
 
