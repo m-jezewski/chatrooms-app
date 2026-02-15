@@ -39,7 +39,7 @@ export const listUsersAction = createAsyncThunk(
 );
 
 export const getUserByIdAction = createAsyncThunk(
-    'users/list',
+    'users/getUserById',
     async ({userId}: { userId: number }, {dispatch, rejectWithValue}) => {
         try {
             return await apiRequest({
@@ -57,7 +57,7 @@ export const getUserByIdAction = createAsyncThunk(
 );
 
 export const updateUserDataAction = createAsyncThunk(
-    'users/list',
+    'users/updateUserData',
     async (
         userData: { id: number, name: string; email: string; role: string }, {
         dispatch,

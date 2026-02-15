@@ -81,7 +81,7 @@ export const updateChatroomDataAction = createAsyncThunk(
 );
 
 export const deleteChatroomAction = createAsyncThunk(
-    'users/delete',
+    'textChannels/delete',
     async ({channelId}: { channelId: number }, {dispatch, rejectWithValue}) => {
         try {
             return await apiRequest({
