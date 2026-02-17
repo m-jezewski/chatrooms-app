@@ -4,11 +4,8 @@ import {InputLabel} from "../../shared/InputLabel.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
 import {object, string} from "yup";
 import {useNavigate} from "react-router";
-import {useDispatch, useSelector} from "react-redux";
-import {selectAuthState} from "./authSlice.ts";
 import toast from "react-hot-toast";
-import {AppDispatch} from "../../store.ts";
-import {loginAction} from "./authActions.ts";
+import {useLoginMutation} from "../../services/authApi.ts";
 
 interface formValues {
     email: string;
@@ -16,17 +13,13 @@ interface formValues {
 }
 
 export const Login = () => {
-    const dispatch = useDispatch<AppDispatch>();
-    const {user, error, isLoading} = useSelector(selectAuthState)
-
+    const [login, {isLoading}] = useLoginMutation();
     const navigate = useNavigate();
 
     const handleSubmit = async (values: formValues, formikHelpers: FormikHelpers<formValues>) => {
         try {
-            const res = await dispatch(loginAction(values))
-            if(res.payload){
-                navigate("/chatrooms")
-            }
+            await login(values).unwrap();
+            navigate("/chatrooms");
         } catch (error) {
             toast.error('Failed to log in.')
         }

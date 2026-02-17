@@ -1,37 +1,23 @@
 import './App.css'
-import {Navigate, Route, Routes, useNavigate} from "react-router";
+import {Navigate, Route, Routes} from "react-router";
 import {AuthLayout} from "./features/auth/AuthLayout.tsx";
 import {Login} from "./features/auth/Login.tsx";
 import {Register} from "./features/auth/Register.tsx";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Toaster} from "react-hot-toast";
-import {useDispatch, useSelector, useStore} from "react-redux";
+import {useSelector} from "react-redux";
 import {selectLoggedUser} from "./features/auth/authSlice.ts";
-import {statusAction} from "./features/auth/authActions.ts";
-import {AppDispatch} from "./store.ts";
 import {Loader} from "./shared/Loader.tsx";
 import {LoggedUserLayout} from "./shared/LoggedUserLayout.tsx";
 import {Chatrooms} from "./features/chatrooms/Chatrooms.tsx";
 import {Users} from "./features/users/Users.tsx";
+import {useStatusQuery} from "./services/authApi.ts";
 
 function App() {
-    const [appLoader, setAppLoader] = useState(true)
-    const dispatch = useDispatch<AppDispatch>();
-
-    const checkUserStatus = async () => {
-        setAppLoader(true)
-        const res = await dispatch(statusAction())
-        setAppLoader(false)
-    }
-
-    useEffect(() => {
-        checkUserStatus()
-    }, [])
-
-
+    const {isLoading} = useStatusQuery();
     const user = useSelector(selectLoggedUser)
 
-    if (appLoader) {
+    if (isLoading) {
         return (
             <div className={"flex items-center justify-center w-screen min-h-screen mx-auto bg-blue-950"}>
                 <Loader variant={'large'}/>

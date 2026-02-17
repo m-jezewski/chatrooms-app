@@ -1,17 +1,16 @@
 import {Link, Outlet} from "react-router";
 import {selectLoggedUser} from "../features/auth/authSlice.ts";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {AppButton} from "./AppButton.tsx";
 import {ChatroomFormModal} from "../features/chatrooms/ChatroomFormModal.tsx";
 import React, {useState} from "react";
 import {ChatroomList} from "../features/chatrooms/ChatroomList.tsx";
-import {AppDispatch} from "../store.ts";
-import {logoutAction} from "../features/auth/authActions.ts";
+import {useLogoutMutation} from "../services/authApi.ts";
 
 
 export const LoggedUserLayout = () => {
     const user = useSelector(selectLoggedUser);
-    const dispatch = useDispatch<AppDispatch>();
+    const [logout] = useLogoutMutation();
     const [isOpen, setIsOpen] = useState(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -44,7 +43,7 @@ export const LoggedUserLayout = () => {
                             <div className="text-center p-2 bg-white/5 text-white mb-4">Users</div>
                         </Link>
                     )}
-                    <AppButton className={"mb-4"} onClick={() => {dispatch(logoutAction()); setMobileMenuOpen(false)}}>Logout</AppButton>
+                    <AppButton className={"mb-4"} onClick={() => {logout(); setMobileMenuOpen(false)}}>Logout</AppButton>
                     <AppButton variant={'purple'} className={"mb-4"} onClick={() => {setIsOpen(true); setMobileMenuOpen(false)}}>Add chatroom</AppButton>
                     <ChatroomList/>
                 </div>
@@ -60,7 +59,7 @@ export const LoggedUserLayout = () => {
                             Users
                         </div>
                     </Link>}
-                    <AppButton className={""} onClick={() => dispatch(logoutAction())}>Logout</AppButton>
+                    <AppButton className={""} onClick={() => logout()}>Logout</AppButton>
                     <AppButton variant={'purple'} onClick={() => setIsOpen(true)}>Add chatroom</AppButton>
                     <ChatroomList/>
                 </div>

@@ -1,15 +1,11 @@
 import {Field, FieldProps, Formik, FormikHelpers} from "formik";
-import {array, number, object, string} from "yup";
+import {object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
 import React from "react";
-import {ListboxInput} from "../../shared/ListboxInput.tsx";
-import {useDispatch, useSelector} from "react-redux";
-import {selectLoggedUser} from "../auth/authSlice.ts";
-import {AppDispatch} from "../../store.ts";
 import toast from "react-hot-toast";
-import {createUserAction, listUsersAction, updateUserDataAction} from "./usersActions.ts";
+import {useCreateUserMutation} from "../../services/usersApi.ts";
 
 interface ChatroomFormProps {
     closeModal: () => void;
@@ -28,21 +24,19 @@ export const CreateUserForm = (
         closeModal,
     }: ChatroomFormProps
 ) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const loggedUser = useSelector(selectLoggedUser);
+    const [createUser] = useCreateUserMutation();
 
     const handleSubmit = async (values: UserFormValues, formikHelpers: FormikHelpers<UserFormValues>
     ) => {
         const {email, role, password, name} = values;
         try {
-            const res = await dispatch(createUserAction({
+            await createUser({
                 email,
                 role,
                 password,
                 name,
-            }))
+            }).unwrap()
             toast.success('Successfully created new user!')
-            dispatch(listUsersAction());
         } catch (error) {
             if (error instanceof Error) {
                 toast.error('Failed to create user. \n ' + error.message);

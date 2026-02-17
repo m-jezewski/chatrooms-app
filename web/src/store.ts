@@ -1,18 +1,16 @@
 import {configureStore} from '@reduxjs/toolkit';
 import authSlice from "./features/auth/authSlice.ts";
-import usersSlice from "./features/users/usersSlice.ts";
-import chatroomsSlice from "./features/chatrooms/chatroomsSlice.ts";
 import messagesSlice from "./features/messages/messagesSlice.ts";
+import {api} from "./services/api.ts";
 
 export const store = configureStore({
     reducer: {
         auth: authSlice,
-        users: usersSlice,
-        chatrooms: chatroomsSlice,
         messages: messagesSlice,
+        [api.reducerPath]: api.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware(),
+        getDefaultMiddleware().concat(api.middleware),
 })
 
 export type RootState = ReturnType<typeof store.getState>;

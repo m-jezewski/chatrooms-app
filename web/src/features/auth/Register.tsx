@@ -4,12 +4,8 @@ import {object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
-import {selectAuthState, selectLoggedUser} from "./authSlice.ts";
-import {useDispatch, useSelector} from "react-redux";
 import toast from "react-hot-toast";
-import {useEffect} from "react";
-import {registerAction} from "./authActions.ts";
-import {AppDispatch} from "../../store.ts";
+import {useRegisterMutation} from "../../services/authApi.ts";
 
 interface formValues {
     email: string;
@@ -19,18 +15,14 @@ interface formValues {
 
 
 export const Register = () => {
-    const dispatch = useDispatch<AppDispatch>();
-    const {user, error, isLoading} = useSelector(selectAuthState)
-
+    const [register, {isLoading}] = useRegisterMutation();
     const navigate = useNavigate();
 
     const handleSubmit = async (values: formValues, formikHelpers: FormikHelpers<formValues>) => {
         try {
-            const res = await dispatch(registerAction(values))
-            if(res.payload){
-                navigate("/chatrooms")
-                toast.success('Successfully registered!')
-            }
+            await register(values).unwrap();
+            navigate("/chatrooms")
+            toast.success('Successfully registered!')
         } catch (error) {
             toast.error('Failed to register.')
         }

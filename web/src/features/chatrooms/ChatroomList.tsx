@@ -1,20 +1,10 @@
-import {useDispatch, useSelector} from "react-redux";
-import {listChatroomsAction} from "./chatroomsActions.ts";
-import {selectChatroomsList} from "./chatroomsSlice.ts";
-import React, {useEffect} from "react";
-import {AppDispatch} from "../../store.ts";
-import {Link, useLocation, useParams} from "react-router";
+import React from "react";
+import {Link, useParams} from "react-router";
+import {useGetChatroomsQuery} from "../../services/chatroomsApi.ts";
 
 export const ChatroomList = () => {
     const { id } = useParams();
-    const dispatch = useDispatch<AppDispatch>();
-    const chatrooms = useSelector(selectChatroomsList) || []
-
-    const getChatrooms = async () => await dispatch(listChatroomsAction());
-
-    useEffect(() => {
-        getChatrooms()
-    }, [])
+    const {data: chatrooms = []} = useGetChatroomsQuery();
 
     const activeChatClass = (channelId: number) => channelId === Number(id) ? "bg-white/5 hover:bg-white/10" : "";
 

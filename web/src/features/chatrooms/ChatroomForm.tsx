@@ -1,16 +1,15 @@
 import {Formik, FormikHelpers} from "formik";
-import {array, number, object, string} from "yup";
+import {array, object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
 import React from "react";
 import {ListboxInput} from "../../shared/ListboxInput.tsx";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {selectLoggedUser} from "../auth/authSlice.ts";
-import {AppDispatch} from "../../store.ts";
-import {createChatroomAction, listChatroomsAction} from "./chatroomsActions.ts";
 import toast from "react-hot-toast";
 import {User} from "../../interfaces.ts";
+import {useCreateChatroomMutation} from "../../services/chatroomsApi.ts";
 
 interface ChatroomFormProps {
     closeModal: () => void;
@@ -27,7 +26,7 @@ export const ChatroomForm = (
         closeModal,
     }: ChatroomFormProps
 ) => {
-    const dispatch = useDispatch<AppDispatch>();
+    const [createChatroom] = useCreateChatroomMutation();
     const loggedUser = useSelector(selectLoggedUser);
 
     const handleSubmit = async (values: ChatroomFormValues, formikHelpers: FormikHelpers<ChatroomFormValues>
@@ -35,12 +34,11 @@ export const ChatroomForm = (
         const {users, name} = values;
         const userIds = users.map(u => u.id)
         try {
-            const res = await dispatch(createChatroomAction({
+            await createChatroom({
                 users: userIds,
                 name: name,
-            }))
+            }).unwrap()
             toast.success('Successfully created new chatroom!')
-            dispatch(listChatroomsAction());
         } catch (error) {
             if (error instanceof Error) {
                 toast.error('Failed to create chatroom. \n ' + error.message);

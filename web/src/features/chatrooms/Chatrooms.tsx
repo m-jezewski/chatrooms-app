@@ -2,43 +2,27 @@ import {useNavigate, useParams} from "react-router";
 import React, {useEffect, useRef, useState} from "react";
 import {MessageForm} from "../messages/MessageForm.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../store.ts";
-import {deleteChatroomAction, getChatroomByIdAction, listChatroomsAction} from "./chatroomsActions.ts";
-import {User} from "../../interfaces.ts";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store.ts";
 import {ChatroomFormModal} from "./ChatroomFormModal.tsx";
 import toast from "react-hot-toast";
 import useWebSocket from "../messages/useWebSocket.ts";
 import {selectLoggedUser} from "../auth/authSlice.ts";
 import {Message} from "../../interfaces.ts";
 import {ChatMessage} from "./ChatMessage.tsx";
+import {useGetChatroomByIdQuery, useDeleteChatroomMutation} from "../../services/chatroomsApi.ts";
 
 export const Chatrooms = () => {
     const {id: channelId} = useParams();
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const dispatch = useDispatch<AppDispatch>();
-    const [channelData, setChannelData] = useState<{ name: string; id: number; users: { id: number }[] } | null>(null)
+    const {data: channelData} = useGetChatroomByIdQuery(Number(channelId!), {skip: !channelId});
+    const [deleteChatroom] = useDeleteChatroomMutation();
     const loggedUser = useSelector(selectLoggedUser);
     const messages = useSelector((state: RootState) => state.messages.messages);
     const navigate = useNavigate()
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
     const {sendMessage} = useWebSocket(channelId);
-
-
-    const getChannelData = async () => {
-        const res = await dispatch(getChatroomByIdAction({channelId: Number(channelId)}))
-        if (res.type === "textChannels/getById/fulfilled") {
-            setChannelData(res.payload)
-        }
-    }
-
-    useEffect(() => {
-        if (channelId) {
-            getChannelData()
-        }
-    }, [channelId])
-
 
     const handleSendMessage = (message: string) => {
         sendMessage({channelId: Number(channelId), content: message});
@@ -50,10 +34,7 @@ export const Chatrooms = () => {
         }
 
         try {
-            const res = await dispatch(deleteChatroomAction({
-                channelId: Number(channelId)
-            }))
-            await dispatch(listChatroomsAction());
+            await deleteChatroom(Number(channelId)).unwrap()
             navigate("/chatrooms")
             toast.success('Successfully removed the chatroom!')
         } catch (e) {
@@ -100,7 +81,6 @@ export const Chatrooms = () => {
             </div>
             <MessageForm sendMessage={handleSendMessage}/>
             {channelData && <ChatroomFormModal
-                onSuccess={() => getChannelData()}
                 isEditing={true}
                 initialValues={channelData}
                 closeModal={() => setIsOpen(false)}

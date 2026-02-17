@@ -1,16 +1,12 @@
-
 import {Field, FieldProps, Formik, FormikHelpers} from "formik";
 import {object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
 import React from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {selectLoggedUser} from "../auth/authSlice.ts";
-import {AppDispatch} from "../../store.ts";
 import toast from "react-hot-toast";
-import {listUsersAction, updateUserDataAction} from "./usersActions.ts";
 import {User} from "../../interfaces.ts";
+import {useUpdateUserMutation} from "../../services/usersApi.ts";
 
 interface ChatroomFormProps {
     closeModal: () => void;
@@ -29,21 +25,19 @@ export const EditUserForm = (
         initialValues,
     }: ChatroomFormProps
 ) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const loggedUser = useSelector(selectLoggedUser);
+    const [updateUser] = useUpdateUserMutation();
 
     const handleSubmit = async (values: UserFormValues, formikHelpers: FormikHelpers<UserFormValues>
     ) => {
         const {email, role, name} = values;
         try {
-            await dispatch(updateUserDataAction({
+            await updateUser({
                 id: initialValues.id,
                 email,
                 role,
                 name,
-            })).unwrap()
+            }).unwrap()
             toast.success('Successfully edited user!')
-            dispatch(listUsersAction());
         } catch (error) {
             if (error instanceof Error) {
                 toast.error('Failed to edit user. \n ' + error.message);

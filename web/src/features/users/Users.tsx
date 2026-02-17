@@ -1,51 +1,37 @@
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch} from "../../store.ts";
-import {deleteUserAction, listUsersAction} from "./usersActions.ts";
-import React, {useEffect, useState} from "react";
-import {selectUsersList} from "./usersSlice.ts";
+import {useSelector} from "react-redux";
+import React, {useState} from "react";
 import {AppButton} from "../../shared/AppButton.tsx";
 import {User} from "../../interfaces.ts";
 import toast from "react-hot-toast";
 import {UserFormModal} from "./UserFormModal.tsx";
 import {selectLoggedUser} from "../auth/authSlice.ts";
+import {useGetUsersQuery, useDeleteUserMutation} from "../../services/usersApi.ts";
 
 export const Users = () => {
     const [initialValues, setInitialValues] = useState<User | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    const dispatch = useDispatch<AppDispatch>();
-    const users = useSelector(selectUsersList) || []
+    const {data: users = []} = useGetUsersQuery();
+    const [deleteUser] = useDeleteUserMutation();
     const loggedUser = useSelector(selectLoggedUser);
 
-
-    const getUsers = async () => {
-        await dispatch(listUsersAction())
-    }
-
-    useEffect(() => {
-        getUsers();
-    }, [])
-
     const handleOpenEditUserForm = (user: User) => {
-        // todo: refactor this component later
         setIsEditing(true);
         setIsOpen(true);
         setInitialValues(user)
     }
 
     const handleOpenCreateUserForm = () => {
-        // todo: refactor this component later
         setIsEditing(false);
         setIsOpen(true);
         setInitialValues(null)
     }
 
     const handleDeleteUser = async (id: number) => {
-        const res = await dispatch(deleteUserAction({ userId: id}))
-        if(res.type === "users/delete/fulfilled"){
+        try {
+            await deleteUser(id).unwrap()
             toast.success("User deleted successfully.")
-            dispatch(listUsersAction())
-        } else {
+        } catch (e) {
             toast.error("Something went wrong.")
         }
     }

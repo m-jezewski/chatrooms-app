@@ -1,14 +1,12 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Field, FieldProps} from "formik";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
-import {useDispatch, useSelector} from "react-redux";
-import {selectUsersList} from "../features/users/usersSlice.ts";
-import {listUsersAction} from "../features/users/usersActions.ts";
-import {AppDispatch} from "../store.ts";
+import {useSelector} from "react-redux";
 import {CheckIcon} from "./CheckIcon.tsx";
 import {selectLoggedUser} from "../features/auth/authSlice.ts";
 import {UserIcon} from "./UserIcon.tsx";
 import {User} from "../interfaces.ts";
+import {useGetUsersQuery} from "../services/usersApi.ts";
 
 interface ListboxInputProps {
     name: string
@@ -16,16 +14,8 @@ interface ListboxInputProps {
 }
 
 export const ListboxInput = ({name, disableSelf = true}: ListboxInputProps) => {
-
-    const dispatch = useDispatch<AppDispatch>();
-    const users = useSelector(selectUsersList) || []
-
-    const updateUsers = async () => await dispatch(listUsersAction())
+    const {data: users = []} = useGetUsersQuery();
     const loggedUser = useSelector(selectLoggedUser)!
-
-    useEffect(() => {
-        updateUsers()
-    }, [])
 
     const isInputDisabled = () => {
         return !(loggedUser.role === "ADMIN" && disableSelf === false);

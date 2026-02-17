@@ -13,17 +13,13 @@ const useWebSocket = (channelId: string | undefined) => {
   const dispatch = useDispatch();
   const socketRef = useRef<Socket | null>(null);
 
-  if (!socketRef.current) {
+  useEffect(() => {
     socketRef.current = io('ws://localhost:3001/', {
       withCredentials: true,
       secure: true,
       port: 3001,
     });
-  }
-
-  useEffect(() => {
     const socket = socketRef.current;
-    if (!socket) return;
 
     const onNewMessage = (message: Message) => {
       dispatch(receivedMessage(message));
