@@ -5,6 +5,7 @@ import {TextInput} from "../../shared/TextInput.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
 import React from "react";
 import toast from "react-hot-toast";
+import {getErrorMessage} from "../../shared/getErrorMessage.ts";
 import {useCreateUserMutation} from "../../services/usersApi.ts";
 
 interface ChatroomFormProps {
@@ -38,9 +39,7 @@ export const CreateUserForm = (
             }).unwrap()
             toast.success('Successfully created new user!')
         } catch (error) {
-            if (error instanceof Error) {
-                toast.error('Failed to create user. \n ' + error.message);
-            }
+            toast.error('Failed to create user. ' + (getErrorMessage(error) || ''));
         }
         formikHelpers.resetForm();
     }

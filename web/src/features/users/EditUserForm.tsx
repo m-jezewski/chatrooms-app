@@ -5,6 +5,7 @@ import {TextInput} from "../../shared/TextInput.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
 import React from "react";
 import toast from "react-hot-toast";
+import {getErrorMessage} from "../../shared/getErrorMessage.ts";
 import {User} from "../../interfaces.ts";
 import {useUpdateUserMutation} from "../../services/usersApi.ts";
 
@@ -39,9 +40,7 @@ export const EditUserForm = (
             }).unwrap()
             toast.success('Successfully edited user!')
         } catch (error) {
-            if (error instanceof Error) {
-                toast.error('Failed to edit user. \n ' + error.message);
-            }
+            toast.error('Failed to edit user. ' + (getErrorMessage(error) || ''));
         }
         formikHelpers.resetForm();
         closeModal()

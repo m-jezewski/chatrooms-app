@@ -7,6 +7,7 @@ import {AppButton} from "../../shared/AppButton.tsx";
 import React from "react";
 import {User} from "../../interfaces.ts";
 import toast from "react-hot-toast";
+import {getErrorMessage} from "../../shared/getErrorMessage.ts";
 import {useUpdateChatroomMutation} from "../../services/chatroomsApi.ts";
 import {useGetUsersQuery} from "../../services/usersApi.ts";
 
@@ -43,9 +44,7 @@ export const EditChatroomForm = ({initialValues, closeModal, onSuccess}: EditCha
             toast.success('Successfully edited chatroom!')
             onSuccess && onSuccess()
         } catch (error) {
-            if (error instanceof Error) {
-                toast.error('Failed to edit chatroom. \n ' + error.message);
-            }
+            toast.error('Failed to edit chatroom. ' + (getErrorMessage(error) || ''));
         }
         formikHelpers.resetForm();
     }

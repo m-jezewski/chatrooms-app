@@ -8,6 +8,7 @@ import {ListboxInput} from "../../shared/ListboxInput.tsx";
 import {useSelector} from "react-redux";
 import {selectLoggedUser} from "../auth/authSlice.ts";
 import toast from "react-hot-toast";
+import {getErrorMessage} from "../../shared/getErrorMessage.ts";
 import {User} from "../../interfaces.ts";
 import {useCreateChatroomMutation} from "../../services/chatroomsApi.ts";
 
@@ -40,9 +41,7 @@ export const ChatroomForm = (
             }).unwrap()
             toast.success('Successfully created new chatroom!')
         } catch (error) {
-            if (error instanceof Error) {
-                toast.error('Failed to create chatroom. \n ' + error.message);
-            }
+            toast.error('Failed to create chatroom. ' + (getErrorMessage(error) || ''));
         }
         closeModal()
         formikHelpers.resetForm();
