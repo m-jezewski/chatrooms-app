@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {AppButton} from "../../shared/AppButton.tsx";
 import {Dialog, DialogPanel, DialogTitle} from "@headlessui/react";
 import {EditUserForm} from "./EditUserForm.tsx";
@@ -6,7 +6,7 @@ import {CreateUserForm} from "./CreateUserForm.tsx";
 import {User} from "../../interfaces.ts";
 
 export const UserFormModal = ({initialValues, isEditing, isOpen, closeModal}: {
-    initialValues: User,
+    initialValues: User | null,
     isEditing: boolean,
     isOpen: boolean,
     closeModal: () => void
@@ -33,7 +33,7 @@ export const UserFormModal = ({initialValues, isEditing, isOpen, closeModal}: {
                                 </svg>
                             </AppButton>
                         </div>
-                        {isEditing ?
+                        {isEditing && initialValues ?
                             <EditUserForm
                                 initialValues={initialValues}
                                 closeModal={closeModal}

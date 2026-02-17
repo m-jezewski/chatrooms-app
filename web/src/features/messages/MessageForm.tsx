@@ -1,5 +1,6 @@
 import {TextInput} from "../../shared/TextInput.tsx";
 import {Form, Formik, FormikHelpers} from "formik";
+import {object, string} from "yup";
 import React from "react";
 import {AppButton} from "../../shared/AppButton.tsx";
 
@@ -22,6 +23,9 @@ export const MessageForm = ({sendMessage}: MessageFormProps) => {
             initialValues={{
                 message: "",
             }}
+            validationSchema={object({
+                message: string().required().trim().min(1),
+            })}
             onSubmit={handleSubmit}
         >
             {() => {

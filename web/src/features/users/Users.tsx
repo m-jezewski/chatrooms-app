@@ -70,7 +70,7 @@ export const Users = () => {
                 ))}
                 </tbody>
             </table>
-            <UserFormModal isEditing={isEditing} initialValues={initialValues!} closeModal={() => setIsOpen(false)} isOpen={isOpen} />
+            <UserFormModal isEditing={isEditing} initialValues={initialValues} closeModal={() => setIsOpen(false)} isOpen={isOpen} />
         </div>
     )
 }

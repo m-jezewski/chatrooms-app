@@ -3,7 +3,7 @@ import type {BaseQueryFn, FetchArgs, FetchBaseQueryError} from '@reduxjs/toolkit
 import {logout} from '../features/auth/authSlice.ts';
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: 'http://localhost:3000',
+    baseUrl: import.meta.env.VITE_API_URL,
     credentials: 'include',
 });
 

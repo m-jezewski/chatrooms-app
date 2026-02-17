@@ -14,7 +14,7 @@ const useWebSocket = (channelId: string | undefined) => {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    socketRef.current = io('ws://localhost:3001/', {
+    socketRef.current = io(import.meta.env.VITE_WS_URL, {
       withCredentials: true,
       secure: true,
       port: 3001,

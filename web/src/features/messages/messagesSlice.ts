@@ -14,7 +14,7 @@ const initialState: MessagesState = {
 };
 
 const messagesSlice = createSlice({
-    name: 'websocket',
+    name: 'messages',
     initialState,
     reducers: {
         connectionOpened(state) {

@@ -9,7 +9,7 @@ import {getErrorMessage} from "../../shared/getErrorMessage.ts";
 import {User} from "../../interfaces.ts";
 import {useUpdateUserMutation} from "../../services/usersApi.ts";
 
-interface ChatroomFormProps {
+interface EditUserFormProps {
     closeModal: () => void;
     initialValues: User
 }
@@ -24,7 +24,7 @@ export const EditUserForm = (
     {
         closeModal,
         initialValues,
-    }: ChatroomFormProps
+    }: EditUserFormProps
 ) => {
     const [updateUser] = useUpdateUserMutation();
 

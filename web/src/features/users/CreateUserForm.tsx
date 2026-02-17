@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import {getErrorMessage} from "../../shared/getErrorMessage.ts";
 import {useCreateUserMutation} from "../../services/usersApi.ts";
 
-interface ChatroomFormProps {
+interface UserFormProps {
     closeModal: () => void;
 }
 
@@ -23,7 +23,7 @@ interface UserFormValues {
 export const CreateUserForm = (
     {
         closeModal,
-    }: ChatroomFormProps
+    }: UserFormProps
 ) => {
     const [createUser] = useCreateUserMutation();
 
