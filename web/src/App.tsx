@@ -5,17 +5,16 @@ import {Login} from "./features/auth/Login.tsx";
 import {Register} from "./features/auth/Register.tsx";
 import React from "react";
 import {Toaster} from "react-hot-toast";
-import {useSelector} from "react-redux";
-import {selectLoggedUser} from "./features/auth/authSlice.ts";
 import {Loader} from "./shared/Loader.tsx";
 import {LoggedUserLayout} from "./shared/LoggedUserLayout.tsx";
 import {Chatrooms} from "./features/chatrooms/Chatrooms.tsx";
 import {Users} from "./features/users/Users.tsx";
 import {useStatusQuery} from "./services/authApi.ts";
+import {GuestRoute} from "./shared/GuestRoute.tsx";
+import {ProtectedRoute} from "./shared/ProtectedRoute.tsx";
 
 function App() {
     const {isLoading} = useStatusQuery();
-    const user = useSelector(selectLoggedUser)
 
     if (isLoading) {
         return (
@@ -29,18 +28,24 @@ function App() {
         <>
             <Toaster position={'top-right'} toastOptions={{style: {fontSize: '0.85rem'}}}/>
             <Routes>
-                <Route element={<AuthLayout/>}>
-                    <Route index path="/" element={user ? <Navigate to={"/chatrooms/"} /> : <Login/>}/>
-                    <Route path="register" element={<Register/>}/>
+                <Route element={<GuestRoute/>}>
+                    <Route element={<AuthLayout/>}>
+                        <Route path="/" element={<Login/>}/>
+                        <Route path="register" element={<Register/>}/>
+                    </Route>
                 </Route>
-                {user && <Route element={<LoggedUserLayout/>}>
-                    <Route path={"chatrooms/"} element={<Chatrooms/>}/>
-                    <Route path={"chatrooms/:id"} element={<Chatrooms/>}/>
-                    {user.role === "ADMIN" && <>
-                        <Route path={"dashboard"} element={<Users/>}/>
-                    </>}
-                </Route>}
-                <Route path={"*"} element={<Navigate to="/"/>} />
+                <Route element={<ProtectedRoute/>}>
+                    <Route element={<LoggedUserLayout/>}>
+                        <Route path="chatrooms" element={<Chatrooms/>}/>
+                        <Route path="chatrooms/:id" element={<Chatrooms/>}/>
+                    </Route>
+                </Route>
+                <Route element={<ProtectedRoute requiredRole="ADMIN"/>}>
+                    <Route element={<LoggedUserLayout/>}>
+                        <Route path="dashboard" element={<Users/>}/>
+                    </Route>
+                </Route>
+                <Route path="*" element={<Navigate to="/" replace/>}/>
             </Routes>
         </>
     )
