@@ -1,4 +1,4 @@
-import {Field, FieldProps, Formik, FormikHelpers} from "formik";
+import {Field, FieldProps, Form, Formik, FormikHelpers} from "formik";
 import {object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
@@ -69,13 +69,7 @@ export const EditUserForm = (
             onSubmit={handleSubmit}
         >
             {(formikConfig) => (<div className={"flex flex-col gap-3 w-full mt-2"}>
-                    <form
-                        className={"w-full flex flex-col gap-3 min-w-80 bg-black/20 p-4 rounded"}
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            formikConfig.submitForm();
-                        }}
-                    >
+                    <Form className={"w-full flex flex-col gap-3 min-w-80 bg-black/20 p-4 rounded"}>
                         <div>
                             <InputLabel htmlFor={"email"}>Email</InputLabel>
                             <TextInput name={"email"} type={"email"} placeholder={"useremail@domain.com"}/>
@@ -100,7 +94,7 @@ export const EditUserForm = (
                             }}>Cancel</AppButton>
                             <AppButton type={'submit'} variant={'slate'}>Edit User</AppButton>
                         </div>
-                    </form>
+                    </Form>
                 </div>
             )}
         </Formik>

@@ -1,4 +1,4 @@
-import {Formik, FormikHelpers} from "formik";
+import {Form, Formik, FormikHelpers} from "formik";
 import {array, object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
@@ -62,14 +62,8 @@ export const ChatroomForm = (
             })}
             onSubmit={handleSubmit}
         >
-            {(formikConfig) => (<div className={"flex flex-col gap-3 w-full mt-2"}>
-                    <form
-                        className={"w-full flex flex-col gap-3 min-w-80 bg-black/5 p-4 rounded"}
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            formikConfig.submitForm();
-                        }}
-                    >
+            {() => (<div className={"flex flex-col gap-3 w-full mt-2"}>
+                    <Form className={"w-full flex flex-col gap-3 min-w-80 bg-black/5 p-4 rounded"}>
                         <div>
                             <InputLabel htmlFor={"name"}>Channel name</InputLabel>
                             <TextInput name={"name"} type={"name"} placeholder={"Channel name"}/>
@@ -82,7 +76,7 @@ export const ChatroomForm = (
                             <AppButton onClick={() => closeModal()}>Cancel</AppButton>
                             <AppButton type={'submit'}>Add</AppButton>
                         </div>
-                    </form>
+                    </Form>
                 </div>
             )}
         </Formik>

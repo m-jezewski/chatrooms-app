@@ -1,5 +1,5 @@
 import {TextInput} from "../../shared/TextInput.tsx";
-import {Formik, FormikHelpers} from "formik";
+import {Form, Formik, FormikHelpers} from "formik";
 import React from "react";
 import {AppButton} from "../../shared/AppButton.tsx";
 
@@ -24,12 +24,9 @@ export const MessageForm = ({sendMessage}: MessageFormProps) => {
             }}
             onSubmit={handleSubmit}
         >
-            {formikConfig => {
+            {() => {
                 return (
-                    <form className={"mt-auto"} onSubmit={(e) => {
-                        e.preventDefault();
-                        formikConfig.submitForm();
-                    }}>
+                    <Form className={"mt-auto"}>
                         <div className={"border-t-2 border-slate-900 bg-gray-800 p-4 relative"}>
                             <AppButton variant={'transparent'} rounded={true} style={{
                                 position: 'absolute',
@@ -49,7 +46,7 @@ export const MessageForm = ({sendMessage}: MessageFormProps) => {
                                        placeholder={"Write something..."}/>
 
                         </div>
-                    </form>
+                    </Form>
                 )
             }}
         </Formik>

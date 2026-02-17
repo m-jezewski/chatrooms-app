@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router";
-import {Formik, FormikHelpers} from "formik";
+import {Form, Formik, FormikHelpers} from "formik";
 import {object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
@@ -59,14 +59,8 @@ export const Register = () => {
                 })}
                 onSubmit={handleSubmit}
             >
-                {(formikConfig) => (
-                    <form
-                        className={"flex flex-col gap-3 w-full mt-2"}
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            formikConfig.submitForm()
-                        }}
-                    >
+                {() => (
+                    <Form className={"flex flex-col gap-3 w-full mt-2"}>
                         <div>
                             <InputLabel htmlFor={"email"}>Email</InputLabel>
                             <TextInput name={"email"} type={"email"} placeholder={"youremail@domain.com"}/>
@@ -88,7 +82,7 @@ export const Register = () => {
                                 Login
                             </AppButton>
                         </div>
-                    </form>
+                    </Form>
                 )}
             </Formik>
         </div>

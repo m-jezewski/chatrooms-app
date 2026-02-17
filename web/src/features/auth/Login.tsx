@@ -1,4 +1,4 @@
-import {Formik, FormikHelpers, FormikProps} from "formik";
+import {Form, Formik, FormikHelpers, FormikProps} from "formik";
 import {TextInput} from "../../shared/TextInput.tsx";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
@@ -55,13 +55,7 @@ export const Login = () => {
                 onSubmit={handleSubmit}
             >
                 {(formikConfig) => (<div className={"flex flex-col gap-3 w-full mt-2"}>
-                        <form
-                            className={"w-full flex flex-col gap-3"}
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                formikConfig.submitForm();
-                            }}
-                        >
+                        <Form className={"w-full flex flex-col gap-3"}>
                             <div>
                                 <InputLabel htmlFor={"email"}>Email</InputLabel>
                                 <TextInput name={"email"} type={"email"} placeholder={"youremail@domain.com"}/>
@@ -73,7 +67,7 @@ export const Login = () => {
                             <AppButton loader={isLoading} className={"mt-2"}>
                                 Sign in
                             </AppButton>
-                        </form>
+                        </Form>
                         <p className={"text-sm text-center mt-4 text-gray-300"}>New to Chatrooms?</p>
                         <div className={"flex gap-4"}>
                             <AppButton type={"button"} className={"w-1/2"} onClick={handleRegisterButtonClick}>
