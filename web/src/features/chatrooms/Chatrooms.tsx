@@ -1,53 +1,19 @@
-import {useNavigate, useParams} from "react-router";
-import React, {useEffect, useRef, useState} from "react";
+import {useParams} from "react-router";
+import React from "react";
 import {MessageForm} from "../messages/MessageForm.tsx";
-import {AppButton} from "../../shared/AppButton.tsx";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store.ts";
-import {ChatroomFormModal} from "./ChatroomFormModal.tsx";
-import toast from "react-hot-toast";
 import useWebSocket from "../messages/useWebSocket.ts";
-import {selectLoggedUser} from "../auth/authSlice.ts";
-import {Message} from "../../interfaces.ts";
-import {ChatMessage} from "./ChatMessage.tsx";
-import {useGetChatroomByIdQuery, useDeleteChatroomMutation} from "../../services/chatroomsApi.ts";
+import {useGetChatroomByIdQuery} from "../../services/chatroomsApi.ts";
+import { ChatroomTitlePanel } from './ChatroomTitlePanel.tsx';
+import { Chatroom } from './Chatroom.tsx';
 
 export const Chatrooms = () => {
     const {id: channelId} = useParams();
-    const [isOpen, setIsOpen] = useState<boolean>(false);
     const {data: channelData} = useGetChatroomByIdQuery(Number(channelId!), {skip: !channelId});
-    const [deleteChatroom] = useDeleteChatroomMutation();
-    const loggedUser = useSelector(selectLoggedUser);
-    const messages = useSelector((state: RootState) => state.messages.messages);
-    const navigate = useNavigate()
-    const chatContainerRef = useRef<HTMLDivElement | null>(null);
-
     const {sendMessage} = useWebSocket(channelId);
 
     const handleSendMessage = (message: string) => {
         sendMessage({channelId: Number(channelId), content: message});
     };
-
-    const handleRemoveClick = async () => {
-        if (!channelId) {
-            return
-        }
-
-        try {
-            await deleteChatroom(Number(channelId)).unwrap()
-            navigate("/chatrooms")
-            toast.success('Successfully removed the chatroom!')
-        } catch (e) {
-            toast.error("Cannot remove channel")
-        }
-    }
-
-    useEffect(() => {
-        if (channelId && chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
-    }, [messages]);
-
 
     if (!channelId) {
         return <div className={"flex justify-center items-center min-h-full text-center"}>
@@ -61,31 +27,9 @@ export const Chatrooms = () => {
 
     return (
         <div className={"max-h-full min-h-full flex flex-col"}>
-            <div className={"ml-20 mt-4 mb-4 mr-4 md:ml-4 bg-white/5 p-4 rounded-lg"}>
-                <h1 className={"text-3xl mb-2 border-b-2 pb-1 break-all border-gray-700"}># {channelData?.name}</h1>
-                <div className="flex gap-2 justify-end">
-                    <AppButton variant={'red'} onClick={() => handleRemoveClick()}>
-                        Delete
-                    </AppButton>
-                    <AppButton onClick={() => setIsOpen(true)}>
-                        Edit
-                    </AppButton>
-                </div>
-            </div>
-            <div ref={chatContainerRef} className={"grow flex flex-col gap-2 p-4 overflow-y-auto"}>
-                {messages.map((message: Message, index: number) => (
-                    <ChatMessage key={message.id}
-                                 previousMessageFromThisAuthor={index === 0 ? false : messages[index - 1]?.authorId === message?.authorId}
-                                 message={message}/>
-                ))}
-            </div>
+            <ChatroomTitlePanel channelData={channelData} />
+            <Chatroom />
             <MessageForm sendMessage={handleSendMessage}/>
-            {channelData && <ChatroomFormModal
-                isEditing={true}
-                initialValues={channelData}
-                closeModal={() => setIsOpen(false)}
-                isOpen={isOpen}
-            />}
         </div>
     )
 }

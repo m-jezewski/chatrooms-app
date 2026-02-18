@@ -36,7 +36,7 @@ export const LoggedUserLayout = () => {
     const closeMobile = () => setMobileMenuOpen(false);
 
     return (
-        <div className={"flex flex-row items-stretch h-screen w-screen bg-gradient-to-tr from-slate-900 to-neutral-900 relative"}>
+        <div className={"flex flex-row items-stretch h-screen w-screen bg-dark relative"}>
 
             <div className="md:hidden fixed flex justify-between items-center p-4 pt-12 border-purple-950">
                 <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white p-3 shadow-slate-700 shadow-sm">
@@ -47,7 +47,7 @@ export const LoggedUserLayout = () => {
             </div>
 
             {mobileMenuOpen && (
-                <div className="absolute top-0 left-0 w-full h-full bg-slate-900 bg-opacity-95 z-50 flex flex-col gap-4 p-6">
+                <div className="absolute z-10 top-0 left-0 w-full h-full bg-dark flex flex-col gap-4 p-6">
                     <div className="flex justify-between items-center mb-2">
                         <h2 className="text-white text-2xl select-none">Chatrooms</h2>
                         <button onClick={closeMobile} className="text-white">
@@ -75,7 +75,7 @@ export const LoggedUserLayout = () => {
                     />
                 </div>
             </div>
-            <main className={"basis-4/5 grow from-slate-800 to-neutral-900 bg-gradient-to-tr"}>
+            <main className={"basis-4/5 grow bg-dark-2 bg-gradient-to-tr"}>
                 <Outlet/>
             </main>
             <ChatroomFormModal

@@ -1,6 +1,5 @@
 import {TextInput} from "../../shared/TextInput.tsx";
 import {Form, Formik, FormikHelpers} from "formik";
-import {object, string} from "yup";
 import React from "react";
 import {AppButton} from "../../shared/AppButton.tsx";
 
@@ -14,6 +13,10 @@ interface MessageFormProps {
 
 export const MessageForm = ({sendMessage}: MessageFormProps) => {
     const handleSubmit = (values: MessageFormValues, formikHelpers: FormikHelpers<MessageFormValues>) => {
+        if(values.message.trim().length < 1) {
+            return
+        }
+
         sendMessage(values.message)
         formikHelpers.resetForm()
     }
@@ -23,15 +26,12 @@ export const MessageForm = ({sendMessage}: MessageFormProps) => {
             initialValues={{
                 message: "",
             }}
-            validationSchema={object({
-                message: string().required().trim().min(1),
-            })}
             onSubmit={handleSubmit}
         >
             {() => {
                 return (
                     <Form className={"mt-auto"}>
-                        <div className={"border-t-2 border-slate-900 bg-gray-800 p-4 relative"}>
+                        <div className={"border-t-2 border-slate-900 bg-indigo-900/25 p-4 relative"}>
                             <AppButton variant={'transparent'} rounded={true} style={{
                                 position: 'absolute',
                                 right: '1.25rem',
@@ -46,9 +46,7 @@ export const MessageForm = ({sendMessage}: MessageFormProps) => {
                                 </svg>
                             </AppButton>
 
-                            <TextInput name={'message'} className={'p-3 pr-12 rounded-lg'}
-                                       placeholder={"Write something..."}/>
-
+                            <TextInput name={'message'} className={'p-3 pr-12 rounded-lg bg-slate-900'} placeholder={"Write something..."}/>
                         </div>
                     </Form>
                 )

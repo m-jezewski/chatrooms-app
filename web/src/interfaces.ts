@@ -10,7 +10,7 @@ export interface Chatroom {
     id: number;
     name: string;
     createdAt: Date;
-    users: number[];
+    users: { id: number; }[];
 }
 
 export interface Message {

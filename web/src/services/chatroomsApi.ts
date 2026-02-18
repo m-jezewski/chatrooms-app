@@ -7,7 +7,7 @@ export const chatroomsApi = api.injectEndpoints({
             query: () => '/textChannels/',
             providesTags: ['ChatroomList'],
         }),
-        getChatroomById: builder.query<Chatroom & { users: { id: number }[] }, number>({
+        getChatroomById: builder.query<Chatroom, number>({
             query: (id) => `/textChannels/${id}`,
             providesTags: (_result, _error, id) => [{type: 'Chatroom', id}],
         }),

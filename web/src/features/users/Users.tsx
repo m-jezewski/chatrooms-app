@@ -1,19 +1,15 @@
-import {useSelector} from "react-redux";
 import React, {useState} from "react";
 import {AppButton} from "../../shared/AppButton.tsx";
 import {User} from "../../interfaces.ts";
-import toast from "react-hot-toast";
 import {UserFormModal} from "./UserFormModal.tsx";
-import {selectLoggedUser} from "../auth/authSlice.ts";
-import {useGetUsersQuery, useDeleteUserMutation} from "../../services/usersApi.ts";
+import {useGetUsersQuery} from "../../services/usersApi.ts";
+import { RemoveUserButton } from '../../shared/RemoveUserButton.tsx';
 
 export const Users = () => {
     const [initialValues, setInitialValues] = useState<User | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const {data: users = []} = useGetUsersQuery();
-    const [deleteUser] = useDeleteUserMutation();
-    const loggedUser = useSelector(selectLoggedUser);
 
     const handleOpenEditUserForm = (user: User) => {
         setIsEditing(true);
@@ -25,15 +21,6 @@ export const Users = () => {
         setIsEditing(false);
         setIsOpen(true);
         setInitialValues(null)
-    }
-
-    const handleDeleteUser = async (id: number) => {
-        try {
-            await deleteUser(id).unwrap()
-            toast.success("User deleted successfully.")
-        } catch (e) {
-            toast.error("Something went wrong.")
-        }
     }
 
     return (
@@ -63,7 +50,7 @@ export const Users = () => {
                         <td>
                             <div className={'flex gap-2'}>
                                 <AppButton onClick={() => handleOpenEditUserForm(user)} variant={'slate'}>Edit</AppButton>
-                                <AppButton disabled={user.id === loggedUser?.id} onClick={() => handleDeleteUser(user.id)} variant={'red'}>Delete</AppButton>
+                                <RemoveUserButton userId={user.id} />
                             </div>
                         </td>
                     </tr>
