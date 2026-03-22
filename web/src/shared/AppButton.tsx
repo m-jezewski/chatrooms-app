@@ -23,7 +23,7 @@ export const AppButton = (
     const colors = {
         neutral: "bg-neutral-900",
         slate: "bg-slate-900",
-        purple: "bg-fuchsia-950/60",
+        purple: "bg-fuchsia-950/80",
         transparent: "bg-transparent",
         red: 'bg-rose-900'
     }

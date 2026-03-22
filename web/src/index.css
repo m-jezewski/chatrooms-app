@@ -28,11 +28,7 @@
     }
 
     .bg-modal {
-        background: linear-gradient(
-                to bottom,
-                #1e1b3a,
-                #25224d
-        );
+        background:  rgba(35, 32, 70, 0.88);
     }
 }
 

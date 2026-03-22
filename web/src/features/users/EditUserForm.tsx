@@ -1,4 +1,4 @@
-import {Field, FieldProps, Form, Formik, FormikHelpers} from "formik";
+import {Field, FieldProps, Formik, FormikHelpers} from "formik";
 import {object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 import {getErrorMessage} from "../../shared/getErrorMessage.ts";
 import {User} from "../../interfaces.ts";
 import {useUpdateUserMutation} from "../../services/usersApi.ts";
+import {FormActions} from "../../shared/FormActions.tsx";
+import {FormContainer} from "../../shared/FormContainer.tsx";
 
 interface EditUserFormProps {
     closeModal: () => void;
@@ -67,8 +69,8 @@ export const EditUserForm = (
             })}
             onSubmit={handleSubmit}
         >
-            {(formikConfig) => (<div className={"flex flex-col gap-3 w-full mt-2"}>
-                    <Form className={"w-full flex flex-col gap-3 min-w-80 bg-black/20 p-4 rounded"}>
+            {(formikConfig) => (
+                    <FormContainer className="min-w-80">
                         <div>
                             <InputLabel htmlFor={"email"}>Email</InputLabel>
                             <TextInput name={"email"} type={"email"} placeholder={"useremail@domain.com"}/>
@@ -86,15 +88,14 @@ export const EditUserForm = (
                                 <Field name={'role'}>{({field}: FieldProps) => <input type={'radio'} {...field} value={'ADMIN'} checked={field.value === 'ADMIN'}/>}</Field> Admin
                             </div>
                         </div>
-                        <div className="flex gap-4 justify-end">
+                        <FormActions>
                             <AppButton onClick={() => {
                                 formikConfig.resetForm()
                                 closeModal()
                             }}>Cancel</AppButton>
                             <AppButton type={'submit'} variant={'slate'}>Edit User</AppButton>
-                        </div>
-                    </Form>
-                </div>
+                        </FormActions>
+                    </FormContainer>
             )}
         </Formik>
     )

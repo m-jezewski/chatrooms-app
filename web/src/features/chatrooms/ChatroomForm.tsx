@@ -1,10 +1,12 @@
-import {Form, Formik, FormikHelpers} from "formik";
+import {Formik, FormikHelpers} from "formik";
 import {array, object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
 import React from "react";
 import {ListboxInput} from "../../shared/ListboxInput.tsx";
+import {FormActions} from "../../shared/FormActions.tsx";
+import {FormContainer} from "../../shared/FormContainer.tsx";
 import {useSelector} from "react-redux";
 import {selectLoggedUser} from "../auth/authSlice.ts";
 import toast from "react-hot-toast";
@@ -61,8 +63,8 @@ export const ChatroomForm = (
             })}
             onSubmit={handleSubmit}
         >
-            {() => (<div className={"flex flex-col gap-3 w-full mt-2"}>
-                    <Form className={"w-full flex flex-col gap-3 min-w-80 bg-black/5 p-4 rounded"}>
+            {() => (
+                    <FormContainer className="min-w-80">
                         <div>
                             <InputLabel htmlFor={"name"}>Channel name</InputLabel>
                             <TextInput name={"name"} type={"name"} placeholder={"Channel name"}/>
@@ -71,12 +73,11 @@ export const ChatroomForm = (
                             <InputLabel htmlFor={"users"}>Users</InputLabel><br/>
                             <ListboxInput name={'users'} disableSelf={false} />
                         </div>
-                        <div className="flex gap-4 justify-end">
-                            <AppButton onClick={() => closeModal()}>Cancel</AppButton>
-                            <AppButton type={'submit'}>Add</AppButton>
-                        </div>
-                    </Form>
-                </div>
+                        <FormActions>
+                            <AppButton className={'min-w-10'} onClick={() => closeModal()}>Cancel</AppButton>
+                            <AppButton variant={"purple"} type={'submit'}>Add</AppButton>
+                        </FormActions>
+                    </FormContainer>
             )}
         </Formik>
     )

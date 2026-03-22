@@ -1,10 +1,12 @@
-import { Form, Formik, FormikHelpers } from 'formik';
+import { Formik, FormikHelpers } from 'formik';
 import { array, object, string } from 'yup';
 import { InputLabel } from '../../shared/InputLabel.tsx';
 import { TextInput } from '../../shared/TextInput.tsx';
 import { ListboxInput } from '../../shared/ListboxInput.tsx';
 import { AppButton } from '../../shared/AppButton.tsx';
 import React from 'react';
+import { FormActions } from '../../shared/FormActions.tsx';
+import { FormContainer } from '../../shared/FormContainer.tsx';
 import { Chatroom, User } from '../../interfaces.ts';
 import toast from 'react-hot-toast';
 import { getErrorMessage } from '../../shared/getErrorMessage.ts';
@@ -61,7 +63,7 @@ export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditC
       onSubmit={handleSubmit}
     >
       {() => (
-        <Form className={'w-full flex flex-col gap-4 min-w-80'}>
+        <FormContainer className="min-w-80">
           <div>
             <InputLabel htmlFor={'name'}>Channel name</InputLabel>
             <TextInput name={'name'} type={'name'} placeholder={'Channel name'} />
@@ -70,11 +72,11 @@ export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditC
             <InputLabel htmlFor={'users'}>Users</InputLabel><br />
             <ListboxInput name={'users'} disableSelf={false} />
           </div>
-          <div className="flex gap-4 justify-end">
-            <AppButton onClick={() => closeModal()}>Cancel</AppButton>
-            <AppButton variant={'purple'} type={'submit'}>Edit</AppButton>
-          </div>
-        </Form>
+          <FormActions>
+            <AppButton className={'min-w-20'} onClick={() => closeModal()}>Cancel</AppButton>
+            <AppButton className={'min-w-20'} variant={'purple'} type={'submit'}>Edit</AppButton>
+          </FormActions>
+        </FormContainer>
       )}
     </Formik>
   );

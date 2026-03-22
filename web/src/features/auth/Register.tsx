@@ -1,11 +1,14 @@
 import {useNavigate} from "react-router";
-import {Form, Formik, FormikHelpers} from "formik";
+import {Formik, FormikHelpers} from "formik";
 import {object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
 import {AppButton} from "../../shared/AppButton.tsx";
 import toast from "react-hot-toast";
 import {useRegisterMutation} from "../../services/authApi.ts";
+import {FormHeading} from "../../shared/FormHeading.tsx";
+import {FormActions} from "../../shared/FormActions.tsx";
+import {FormContainer} from "../../shared/FormContainer.tsx";
 
 interface formValues {
     email: string;
@@ -36,8 +39,8 @@ export const Register = () => {
 
     return (
       <div
-        className="rounded-lg min-w-80 flex flex-col justify-center align-middle frounded-lg gap-3 bg-slate-900/30 shadow-sm p-12">
-        <h1 className="font-medium text-2xl mb-5 text-left">Register</h1>
+        className="rounded-lg min-w-80 flex flex-col justify-center align-middle gap-3 bg-slate-800/35 shadow-sm py-11 px-12">
+        <FormHeading as="h1">Register</FormHeading>
         <Formik
           initialValues={{
             email: '',
@@ -60,7 +63,7 @@ export const Register = () => {
           onSubmit={handleSubmit}
         >
           {() => (
-            <Form className={"w-full flex flex-col gap-3 min-w-64"}>
+            <FormContainer>
               <div>
                 <InputLabel htmlFor={"email"}>Email</InputLabel>
                 <TextInput name={"email"} type={"email"} placeholder={"youremail@domain.com"} />
@@ -73,16 +76,16 @@ export const Register = () => {
                 <InputLabel htmlFor={"email"}>Password</InputLabel>
                 <TextInput name={"password"} type={"password"} />
               </div>
-              <AppButton className={"mt-2 bg-slate-800/60"} loader={isLoading} type={'submit'}>
-                Sign up
+              <AppButton className={"mt-2"} variant={'slate'} loader={isLoading} type={'submit'}>
+                Register
               </AppButton>
               <p className={"text-sm text-center mt-4 text-gray-300"}>Already have an account?</p>
-              <div className={"flex gap-4"}>
-                <AppButton variant={'purple'} type={"button"} className={"w-1/2"} onClick={handleGoToLoginClick}>
-                  Login
+              <FormActions className={"mt-0"}>
+                <AppButton variant={'purple'} type={"button"} className={"w-full"} onClick={handleGoToLoginClick}>
+                  Sign in
                 </AppButton>
-              </div>
-            </Form>
+              </FormActions>
+            </FormContainer>
           )}
         </Formik>
       </div>

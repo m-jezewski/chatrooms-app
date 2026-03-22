@@ -1,4 +1,4 @@
-import {Field, FieldProps, Form, Formik, FormikHelpers} from "formik";
+import {Field, FieldProps, Formik, FormikHelpers} from "formik";
 import {object, string} from "yup";
 import {InputLabel} from "../../shared/InputLabel.tsx";
 import {TextInput} from "../../shared/TextInput.tsx";
@@ -7,6 +7,8 @@ import React from "react";
 import toast from "react-hot-toast";
 import {getErrorMessage} from "../../shared/getErrorMessage.ts";
 import {useCreateUserMutation} from "../../services/usersApi.ts";
+import {FormActions} from "../../shared/FormActions.tsx";
+import {FormContainer} from "../../shared/FormContainer.tsx";
 
 interface UserFormProps {
     closeModal: () => void;
@@ -68,8 +70,8 @@ export const CreateUserForm = (
             })}
             onSubmit={handleSubmit}
         >
-            {() => (<div className={"flex flex-col gap-3 w-full mt-2"}>
-                    <Form className={"w-full flex flex-col gap-3 min-w-80 bg-black/20 p-4 rounded"}>
+            {() => (
+                    <FormContainer className="min-w-80">
                         <div>
                             <InputLabel htmlFor={"email"}>Email</InputLabel>
                             <TextInput name={"email"} type={"email"} placeholder={"useremail@domain.com"}/>
@@ -91,12 +93,11 @@ export const CreateUserForm = (
                                 <Field name={'role'}>{({field}: FieldProps) => <input type={'radio'} {...field} value={'ADMIN'}/>}</Field> Admin
                             </div>
                         </div>
-                        <div className="flex gap-4 justify-end">
+                        <FormActions>
                             <AppButton onClick={() => closeModal()}>Cancel</AppButton>
                             <AppButton type={'submit'}>Add</AppButton>
-                        </div>
-                    </Form>
-                </div>
+                        </FormActions>
+                    </FormContainer>
             )}
         </Formik>
     )

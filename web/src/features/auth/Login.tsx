@@ -1,4 +1,4 @@
-import { Form, Formik, FormikHelpers, FormikProps } from 'formik';
+import { Formik, FormikHelpers, FormikProps } from 'formik';
 import { TextInput } from '../../shared/TextInput.tsx';
 import { InputLabel } from '../../shared/InputLabel.tsx';
 import { AppButton } from '../../shared/AppButton.tsx';
@@ -6,6 +6,9 @@ import { object, string } from 'yup';
 import { useNavigate } from 'react-router';
 import toast from 'react-hot-toast';
 import { useLoginMutation } from '../../services/authApi.ts';
+import { FormHeading } from '../../shared/FormHeading.tsx';
+import { FormActions } from '../../shared/FormActions.tsx';
+import { FormContainer } from '../../shared/FormContainer.tsx';
 
 interface formValues {
   email: string;
@@ -39,8 +42,8 @@ export const Login = () => {
 
     return (
         <div
-            className="rounded-lg min-w-80 flex flex-col justify-center align-middle frounded-lg gap-3 bg-fuchsia-900/10 shadow-sm p-12">
-            <h1 className="font-medium text-2xl mb-5 text-left">Sign in</h1>
+            className="rounded-lg min-w-80 flex flex-col justify-center align-middle gap-3 bg-fuchsia-900/15 shadow-sm py-11 px-12">
+            <FormHeading as="h1">Sign in</FormHeading>
             <Formik
                 initialValues={{
                     email: '',
@@ -55,7 +58,7 @@ export const Login = () => {
                 onSubmit={handleSubmit}
             >
                 {(formikConfig) => (<>
-                        <Form className={"w-full flex flex-col gap-3 min-w-64"}>
+                        <FormContainer>
                             <div>
                                 <InputLabel htmlFor={"email"}>Email</InputLabel>
                                 <TextInput name={"email"} type={"email"} placeholder={"youremail@domain.com"}/>
@@ -67,17 +70,17 @@ export const Login = () => {
                             <AppButton variant={'purple'} loader={isLoading} className={"mt-3"}>
                                 Sign in
                             </AppButton>
-                        </Form>
+                        </FormContainer>
                         <p className={"text-sm text-center mt-4 text-gray-300"}>New to Chatrooms?</p>
-                        <div className={"flex gap-4"}>
-                            <AppButton type={"button"} className={"w-1/2 bg-slate-900/80"} onClick={handleRegisterButtonClick}>
+                        <FormActions className={"mt-0"}>
+                            <AppButton type={"button"} variant={'slate'} className={"w-1/2"} onClick={handleRegisterButtonClick}>
                                 Register
                             </AppButton>
                             <AppButton type={"button"} className={"w-1/2 whitespace-nowrap"}
                                        onClick={() => handleDemoButtonClick(formikConfig)}>
                                 Demo account
                             </AppButton>
-                        </div>
+                        </FormActions>
                     </>
                 )}
             </Formik>
