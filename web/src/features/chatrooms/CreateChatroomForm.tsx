@@ -14,25 +14,25 @@ import {getErrorMessage} from "../../shared/getErrorMessage.ts";
 import {User} from "../../interfaces.ts";
 import {useCreateChatroomMutation} from "../../services/chatroomsApi.ts";
 
-interface ChatroomFormProps {
+interface CreateChatroomFormProps {
     closeModal: () => void;
 }
 
-interface ChatroomFormValues {
+interface CreateChatroomFormValues {
     name: string,
     users: User[]
 }
 
 
-export const ChatroomForm = (
+export const CreateChatroomForm = (
     {
         closeModal,
-    }: ChatroomFormProps
+    }: CreateChatroomFormProps
 ) => {
     const [createChatroom] = useCreateChatroomMutation();
     const loggedUser = useSelector(selectLoggedUser);
 
-    const handleSubmit = async (values: ChatroomFormValues, formikHelpers: FormikHelpers<ChatroomFormValues>
+    const handleSubmit = async (values: CreateChatroomFormValues, formikHelpers: FormikHelpers<CreateChatroomFormValues>
     ) => {
         const {users, name} = values;
         const userIds = users.map(u => u.id)

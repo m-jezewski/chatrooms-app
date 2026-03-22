@@ -2,7 +2,7 @@ import { AppButton } from '../../shared/AppButton.tsx';
 import React, { useState } from 'react';
 import { useParams } from 'react-router';
 import { Chatroom } from '../../interfaces.ts';
-import { ChatroomFormModal } from './ChatroomFormModal.tsx';
+import { EditChatroomFormModal } from './EditChatroomFormModal.tsx';
 import { RemoveChatroomButton } from '../../shared/RemoveChatroomButton.tsx';
 
 interface ChatroomTitlePanelProps {
@@ -23,8 +23,7 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
         </AppButton>
       </div>
 
-      {channelData && <ChatroomFormModal
-        isEditing={true}
+      {channelData && <EditChatroomFormModal
         initialValues={channelData}
         closeModal={() => setIsEditFormOpen(false)}
         isOpen={isEditFormOpen}

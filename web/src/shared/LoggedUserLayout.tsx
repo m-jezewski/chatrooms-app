@@ -2,7 +2,7 @@ import {Link, Outlet} from "react-router";
 import {selectLoggedUser} from "../features/auth/authSlice.ts";
 import {useSelector} from "react-redux";
 import {AppButton} from "./AppButton.tsx";
-import {ChatroomFormModal} from "../features/chatrooms/ChatroomFormModal.tsx";
+import {CreateChatroomFormModal} from "../features/chatrooms/CreateChatroomFormModal.tsx";
 import React, {useState} from "react";
 import {ChatroomList} from "../features/chatrooms/ChatroomList.tsx";
 import {useLogoutMutation} from "../services/authApi.ts";
@@ -78,7 +78,7 @@ export const LoggedUserLayout = () => {
             <main className={"basis-4/5 grow bg-dark-2 bg-gradient-to-tr"}>
                 <Outlet/>
             </main>
-            <ChatroomFormModal
+            <CreateChatroomFormModal
                 closeModal={() => setIsOpen(false)}
                 isOpen={isOpen}
             />
