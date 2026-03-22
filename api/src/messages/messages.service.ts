@@ -42,7 +42,7 @@ export class MessagesService {
       },
     });
 
-    return messages;
+    return messages.reverse();
   }
 
   async createMessage(params: { channelId: number; userId: number; content: string }): Promise<MessageWithAuthor> {

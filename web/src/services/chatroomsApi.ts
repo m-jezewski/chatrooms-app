@@ -1,5 +1,5 @@
 import {api} from './api.ts';
-import {Chatroom} from '../interfaces.ts';
+import {Chatroom, Message} from '../interfaces.ts';
 
 export const chatroomsApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -34,6 +34,13 @@ export const chatroomsApi = api.injectEndpoints({
             }),
             invalidatesTags: ['ChatroomList'],
         }),
+        getOlderMessages: builder.query<
+            { messages: Message[], hasMore: boolean },
+            { channelId: number, before: number, limit?: number }
+        >({
+            query: ({ channelId, before, limit = 20 }) =>
+                `/textChannels/${channelId}/messages?before=${before}&limit=${limit}`,
+        }),
     }),
 });
 
@@ -43,4 +50,5 @@ export const {
     useCreateChatroomMutation,
     useUpdateChatroomMutation,
     useDeleteChatroomMutation,
+    useLazyGetOlderMessagesQuery,
 } = chatroomsApi;
