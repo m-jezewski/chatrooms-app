@@ -73,8 +73,8 @@ export const CreateChatroomForm = (
                             <InputLabel htmlFor={"users"}>Users</InputLabel><br/>
                             <ListboxInput name={'users'} disableSelf={false} />
                         </div>
-                        <FormActions>
-                            <AppButton className={'min-w-10'} onClick={() => closeModal()}>Cancel</AppButton>
+                        <FormActions equalWidth>
+                            <AppButton onClick={() => closeModal()}>Cancel</AppButton>
                             <AppButton variant={"purple"} type={'submit'}>Add</AppButton>
                         </FormActions>
                     </FormContainer>

@@ -88,7 +88,7 @@ export const EditUserForm = (
                                 <Field name={'role'}>{({field}: FieldProps) => <input type={'radio'} {...field} value={'ADMIN'} checked={field.value === 'ADMIN'}/>}</Field> Admin
                             </div>
                         </div>
-                        <FormActions>
+                        <FormActions equalWidth>
                             <AppButton onClick={() => {
                                 formikConfig.resetForm()
                                 closeModal()

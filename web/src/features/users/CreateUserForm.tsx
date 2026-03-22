@@ -93,7 +93,7 @@ export const CreateUserForm = (
                                 <Field name={'role'}>{({field}: FieldProps) => <input type={'radio'} {...field} value={'ADMIN'}/>}</Field> Admin
                             </div>
                         </div>
-                        <FormActions>
+                        <FormActions equalWidth>
                             <AppButton onClick={() => closeModal()}>Cancel</AppButton>
                             <AppButton type={'submit'}>Add</AppButton>
                         </FormActions>

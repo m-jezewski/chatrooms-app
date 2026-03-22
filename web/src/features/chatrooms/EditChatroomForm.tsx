@@ -72,9 +72,9 @@ export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditC
             <InputLabel htmlFor={'users'}>Users</InputLabel><br />
             <ListboxInput name={'users'} disableSelf={false} />
           </div>
-          <FormActions>
-            <AppButton className={'min-w-20'} onClick={() => closeModal()}>Cancel</AppButton>
-            <AppButton className={'min-w-20'} variant={'purple'} type={'submit'}>Edit</AppButton>
+          <FormActions equalWidth>
+            <AppButton onClick={() => closeModal()}>Cancel</AppButton>
+            <AppButton variant={'purple'} type={'submit'}>Edit</AppButton>
           </FormActions>
         </FormContainer>
       )}
