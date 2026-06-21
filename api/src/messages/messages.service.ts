@@ -10,7 +10,7 @@ export type MessageWithAuthor = Message & {
 export class MessagesService {
   constructor(private prisma: PrismaService) {}
 
-  async getMessage(params: { messageId: number }): Promise<Message> {
+  async getMessage(params: { messageId: string }): Promise<Message> {
     const { messageId } = params;
     const message = await this.prisma.message.findUnique({ where: { id: messageId } });
 
@@ -22,8 +22,8 @@ export class MessagesService {
   }
 
   async getChannelMessages(params: {
-    channelId: number;
-    before?: number;
+    channelId: string;
+    before?: string;
     limit?: number;
   }): Promise<MessageWithAuthor[]> {
     const { channelId, before, limit = 20 } = params;
@@ -45,7 +45,7 @@ export class MessagesService {
     return messages.reverse();
   }
 
-  async createMessage(params: { channelId: number; userId: number; content: string }): Promise<MessageWithAuthor> {
+  async createMessage(params: { channelId: string; userId: string; content: string }): Promise<MessageWithAuthor> {
     const { channelId, userId, content } = params;
 
     const user = await this.prisma.user.findUnique({
@@ -64,7 +64,7 @@ export class MessagesService {
     return { ...message, author: { name: user?.name ?? '' } };
   }
 
-  async updateMessage(params: { messageId: number; user: User; content: string }): Promise<Message> {
+  async updateMessage(params: { messageId: string; user: User; content: string }): Promise<Message> {
     const { messageId, user, content } = params;
     const message = await this.getMessage({ messageId });
 
@@ -78,7 +78,7 @@ export class MessagesService {
     });
   }
 
-  async deleteMessage(params: { messageId: number; user: User }): Promise<Message> {
+  async deleteMessage(params: { messageId: string; user: User }): Promise<Message> {
     const { messageId, user } = params;
     const message = await this.getMessage({ messageId });
 

@@ -7,7 +7,7 @@ export const usersApi = api.injectEndpoints({
             query: () => '/users/',
             providesTags: ['UserList'],
         }),
-        getUserById: builder.query<User, number>({
+        getUserById: builder.query<User, string>({
             query: (id) => `/users/${id}`,
             providesTags: (_result, _error, id) => [{type: 'User', id}],
         }),
@@ -19,7 +19,7 @@ export const usersApi = api.injectEndpoints({
             }),
             invalidatesTags: ['UserList'],
         }),
-        updateUser: builder.mutation<User, { id: number; name: string; email: string; role: string }>({
+        updateUser: builder.mutation<User, { id: string; name: string; email: string; role: string }>({
             query: ({id, ...body}) => ({
                 url: `/users/${id}`,
                 method: 'PATCH',
@@ -27,7 +27,7 @@ export const usersApi = api.injectEndpoints({
             }),
             invalidatesTags: ['UserList'],
         }),
-        deleteUser: builder.mutation<void, number>({
+        deleteUser: builder.mutation<void, string>({
             query: (id) => ({
                 url: `/users/${id}`,
                 method: 'DELETE',

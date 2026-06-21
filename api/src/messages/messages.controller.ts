@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Query,
   Req,
@@ -33,11 +32,7 @@ export class MessagesController {
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async getMessages(
-    @Param('channelId', ParseIntPipe) channelId: number,
-    @Query() query: GetMessagesQueryDto,
-    @Req() req: Request,
-  ) {
+  async getMessages(@Param('channelId') channelId: string, @Query() query: GetMessagesQueryDto, @Req() req: Request) {
     const user = req.user as User;
     await this.textChannelsService.getChannel({ channelId, user });
 
@@ -59,8 +54,8 @@ export class MessagesController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Patch(':messageId')
   async updateMessage(
-    @Param('channelId', ParseIntPipe) channelId: number,
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('channelId') channelId: string,
+    @Param('messageId') messageId: string,
     @Body() body: UpdateMessageDto,
     @Req() req: Request,
   ) {
@@ -77,8 +72,8 @@ export class MessagesController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':messageId')
   async deleteMessage(
-    @Param('channelId', ParseIntPipe) channelId: number,
-    @Param('messageId', ParseIntPipe) messageId: number,
+    @Param('channelId') channelId: string,
+    @Param('messageId') messageId: string,
     @Req() req: Request,
   ) {
     const user = req.user as User;

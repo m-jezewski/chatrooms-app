@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
+  id            String   @id @default(uuid()) @db.Uuid
   createdAt     DateTime @default(now())
   email         String   @unique
   password      String
@@ -25,7 +25,7 @@ model User {
 }
 
 model TextChannel {
-  id            Int      @id @default(autoincrement())
+  id            String   @id @default(uuid()) @db.Uuid
   createdAt     DateTime @default(now())
   name          String   @unique
   messages      Message[]
@@ -33,14 +33,14 @@ model TextChannel {
 }
 
 model Message {
-  id            Int      @id @default(autoincrement())
+  id            String   @id @default(uuid()) @db.Uuid
   content       String?
   author        User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorId      Int?
+  authorId      String?  @db.Uuid
   createdAt     DateTime @default(now())
 
   textChannel   TextChannel? @relation(fields: [textChannelId], references: [id], onDelete: Cascade)
-  textChannelId Int?
+  textChannelId String?  @db.Uuid
 }
 
 enum Role {

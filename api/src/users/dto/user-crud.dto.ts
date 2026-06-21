@@ -1,13 +1,13 @@
-import { IsDate, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 import { OmitType, PartialType, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
 export class UserDto implements User {
-  @ApiProperty({ example: 1 })
-  @IsInt()
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @IsUUID()
   @IsNotEmpty()
-  id: number;
+  id: string;
 
   @ApiProperty({ example: 'user@email.com' })
   @IsString()
@@ -51,7 +51,7 @@ export class UpdateUserDto extends OmitType(PartialUserDto, ['password'] as cons
 
 // with password omitted
 export class UserEntity implements Omit<User, 'password'> {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: 'USER' | 'ADMIN';

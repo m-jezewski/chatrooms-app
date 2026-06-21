@@ -9,7 +9,7 @@ import { EmailInUseError } from '../utils/customExceptions';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  private canModifyUser(targetUserId: number, loggedUser: User): boolean {
+  private canModifyUser(targetUserId: string, loggedUser: User): boolean {
     return loggedUser.role === 'ADMIN' || loggedUser.id === targetUserId;
   }
 
@@ -17,7 +17,7 @@ export class UsersService {
     return this.prisma.user.findMany(params.findParams);
   }
 
-  async getUser(params: { userId: number }): Promise<User> {
+  async getUser(params: { userId: string }): Promise<User> {
     const { userId } = params;
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
@@ -59,7 +59,7 @@ export class UsersService {
     }
   }
 
-  async updateUser(params: { userId: number; loggedUser: User; data: UpdateUserDto }): Promise<User> {
+  async updateUser(params: { userId: string; loggedUser: User; data: UpdateUserDto }): Promise<User> {
     const { userId, loggedUser, data } = params;
     await this.getUser({ userId });
 
@@ -84,7 +84,7 @@ export class UsersService {
     }
   }
 
-  async deleteUser(params: { userId: number; loggedUser: User }): Promise<User> {
+  async deleteUser(params: { userId: string; loggedUser: User }): Promise<User> {
     const { userId, loggedUser } = params;
     await this.getUser({ userId });
 

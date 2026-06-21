@@ -5,7 +5,7 @@ import { ChannelWithProvidedNameExistError } from '../utils/customExceptions';
 import { CreateTextChannelDto, UpdateTextChannelDto } from './dto/textChannels-crud.dto';
 
 export type TextChannelWithUsers = TextChannel & {
-  users: { id: number }[];
+  users: { id: string }[];
 };
 
 @Injectable()
@@ -36,7 +36,7 @@ export class TextChannelsService {
     });
   }
 
-  async getChannel(params: { channelId: number; user: User }): Promise<TextChannelWithUsers> {
+  async getChannel(params: { channelId: string; user: User }): Promise<TextChannelWithUsers> {
     const { channelId, user } = params;
     const channel = await this.prisma.textChannel.findUnique({
       where: { id: channelId },
@@ -81,7 +81,7 @@ export class TextChannelsService {
   }
 
   async updateTextChannel(params: {
-    channelId: number;
+    channelId: string;
     user: User;
     textChannel: UpdateTextChannelDto;
   }): Promise<TextChannel> {
@@ -104,13 +104,13 @@ export class TextChannelsService {
     }
   }
 
-  async deleteTextChannel(params: { channelId: number; user: User }): Promise<TextChannel> {
+  async deleteTextChannel(params: { channelId: string; user: User }): Promise<TextChannel> {
     const { channelId, user } = params;
     await this.getChannel({ channelId, user });
     return this.prisma.textChannel.delete({ where: { id: channelId } });
   }
 
-  async updateUsersInChannel(params: { userIds: number[]; channelId: number; user: User }) {
+  async updateUsersInChannel(params: { userIds: string[]; channelId: string; user: User }) {
     const { userIds, channelId, user } = params;
     await this.getChannel({ channelId, user });
 

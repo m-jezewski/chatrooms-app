@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Put,
@@ -40,7 +39,7 @@ export class TextChannelsController {
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  async getTextChannelById(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+  async getTextChannelById(@Param('id') id: string, @Req() req: Request) {
     const user = req.user as User;
 
     return this.textChannelsService.getChannel({ channelId: id, user: user });
@@ -56,11 +55,7 @@ export class TextChannelsController {
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Patch(':id')
-  async updateChannelUsers(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() { users }: UpdateChannelUsersDto,
-    @Req() req: Request,
-  ) {
+  async updateChannelUsers(@Param('id') id: string, @Body() { users }: UpdateChannelUsersDto, @Req() req: Request) {
     const user = req.user as User;
 
     return this.textChannelsService.updateUsersInChannel({
@@ -73,11 +68,7 @@ export class TextChannelsController {
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
-  async updateTextChannel(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: UpdateTextChannelDto,
-    @Req() req: Request,
-  ) {
+  async updateTextChannel(@Param('id') id: string, @Body() data: UpdateTextChannelDto, @Req() req: Request) {
     const user = req.user as User;
 
     return this.textChannelsService.updateTextChannel({
@@ -90,7 +81,7 @@ export class TextChannelsController {
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
-  async deleteTextChannel(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+  async deleteTextChannel(@Param('id') id: string, @Req() req: Request) {
     const user = req.user as User;
 
     return this.textChannelsService.deleteTextChannel({

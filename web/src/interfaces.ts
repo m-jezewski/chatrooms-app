@@ -1,5 +1,5 @@
 export interface User {
-    id: number;
+    id: string;
     name: string;
     email: string;
     createdAt: Date;
@@ -7,17 +7,17 @@ export interface User {
 }
 
 export interface Chatroom {
-    id: number;
+    id: string;
     name: string;
     createdAt: Date;
-    users: { id: number; }[];
+    users: { id: string; }[];
 }
 
 export interface Message {
-    id: number;
+    id: string;
     author: { name: string }
     content: string;
     createdAt: Date;
-    textChannelId: number;
-    authorId: number;
+    textChannelId: string;
+    authorId: string;
 }

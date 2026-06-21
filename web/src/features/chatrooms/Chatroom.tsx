@@ -14,7 +14,7 @@ export const Chatroom = () => {
   const messages = useSelector((state: RootState) => state.messages.messages);
   const hasMore = useSelector((state: RootState) => state.messages.hasMore);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
-  const prevLastMessageIdRef = useRef<number | null>(null);
+  const prevLastMessageIdRef = useRef<string | null>(null);
   const prevScrollHeightRef = useRef(0);
   const isLoadingOlderRef = useRef(false);
 
@@ -52,7 +52,7 @@ export const Chatroom = () => {
 
     try {
       const result = await fetchOlderMessages({
-        channelId: Number(channelId),
+        channelId: channelId,
         before: oldestMessageId,
       }).unwrap();
       dispatch(prependMessages({ messages: result.messages, hasMore: result.hasMore }));

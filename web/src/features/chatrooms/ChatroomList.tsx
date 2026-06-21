@@ -6,7 +6,7 @@ export const ChatroomList = () => {
   const { id } = useParams();
   const { data: chatrooms = [] } = useGetChatroomsQuery();
 
-  const activeChatClass = (channelId: number) => channelId === Number(id) ? 'bg-white/5 hover:bg-white/10' : '';
+  const activeChatClass = (channelId: string) => channelId === id ? 'bg-white/5 hover:bg-white/10' : '';
 
   return (
     <div className={'flex flex-col gap-2 border-t-2 border-neutral-700'}>

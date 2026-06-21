@@ -5,7 +5,7 @@ import { useDeleteChatroomMutation } from '../services/chatroomsApi.ts';
 import { useNavigate } from 'react-router';
 
 interface RemoveChatroomButtonProps {
-  channelId?: string | number;
+  channelId?: string;
 }
 
 export const RemoveChatroomButton = ({channelId}: RemoveChatroomButtonProps) => {
@@ -18,7 +18,7 @@ export const RemoveChatroomButton = ({channelId}: RemoveChatroomButtonProps) => 
     }
 
     try {
-      await deleteChatroom(Number(channelId)).unwrap()
+      await deleteChatroom(channelId).unwrap()
       navigate("/chatrooms")
       toast.success('Successfully removed the chatroom!')
     } catch (e) {

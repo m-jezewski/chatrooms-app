@@ -57,7 +57,7 @@ export class MessagesGateway implements OnGatewayInit {
   async handleJoinChannel(
     @MessageBody() { channelId }: JoinChannelDto,
     @ConnectedSocket() client: Socket,
-    @CurrentWsUser() userId: number,
+    @CurrentWsUser() userId: string,
   ) {
     this.logger.log(`User ${userId} is joining channel ${channelId}`);
 
@@ -87,7 +87,7 @@ export class MessagesGateway implements OnGatewayInit {
   async handleSendMessage(
     @MessageBody() { channelId, content }: SendMessageDto,
     @ConnectedSocket() client: Socket,
-    @CurrentWsUser() userId: number,
+    @CurrentWsUser() userId: string,
   ) {
     this.logger.log(`User ${userId} sending message to channel ${channelId}`);
 
@@ -115,19 +115,19 @@ export class MessagesGateway implements OnGatewayInit {
   handleLeaveChannel(
     @MessageBody() { channelId }: LeaveChannelDto,
     @ConnectedSocket() client: Socket,
-    @CurrentWsUser() userId: number,
+    @CurrentWsUser() userId: string,
   ) {
     this.logger.log(`User ${userId} leaving channel ${channelId}`);
     client.leave(`channel_${channelId}`);
     client.emit('leftChannel', { message: `Left channel ${channelId}` });
   }
 
-  notifyMessageUpdated(params: { channelId: number; message: any }) {
+  notifyMessageUpdated(params: { channelId: string; message: any }) {
     const { channelId, message } = params;
     this.server.to(`channel_${channelId}`).emit('messageUpdated', message);
   }
 
-  notifyMessageDeleted(params: { channelId: number; messageId: number }) {
+  notifyMessageDeleted(params: { channelId: string; messageId: string }) {
     const { channelId, messageId } = params;
     this.server.to(`channel_${channelId}`).emit('messageDeleted', { messageId });
   }

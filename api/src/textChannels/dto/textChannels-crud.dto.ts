@@ -1,12 +1,12 @@
 import { TextChannel } from '@prisma/client';
-import { IsArray, IsDate, IsInt, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsDate, IsNotEmpty, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 import { OmitType, PartialType, ApiProperty } from '@nestjs/swagger';
 
 export class TextChannelDto implements TextChannel {
-  @ApiProperty({ example: 1 })
-  @IsInt()
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @IsUUID()
   @IsNotEmpty()
-  id: number;
+  id: string;
 
   @ApiProperty({ example: 'name', minLength: 3, maxLength: 50 })
   @IsString()
@@ -19,11 +19,11 @@ export class TextChannelDto implements TextChannel {
   @IsDate()
   createdAt: Date;
 
-  @ApiProperty({ example: [1, 2, 3], type: [Number] })
+  @ApiProperty({ example: ['a1b2c3d4-...', 'e5f6...'], type: [String] })
   @IsArray()
   @IsNotEmpty()
-  @IsInt({ each: true })
-  users: number[];
+  @IsUUID('all', { each: true })
+  users: string[];
 }
 
 export class CreateTextChannelDto extends OmitType(TextChannelDto, ['id', 'createdAt'] as const) {}

@@ -8,11 +8,11 @@ import { Chatroom } from './Chatroom.tsx';
 
 export const Chatrooms = () => {
     const {id: channelId} = useParams();
-    const {data: channelData} = useGetChatroomByIdQuery(Number(channelId!), {skip: !channelId});
+    const {data: channelData} = useGetChatroomByIdQuery(channelId!, {skip: !channelId});
     const {sendMessage} = useWebSocket(channelId);
 
     const handleSendMessage = (message: string) => {
-        sendMessage({channelId: Number(channelId), content: message});
+        sendMessage({channelId: channelId!, content: message});
     };
 
     if (!channelId) {

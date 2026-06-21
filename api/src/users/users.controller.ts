@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Req,
@@ -36,7 +35,7 @@ export class UsersController {
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<UserEntity> {
+  async getUserById(@Param('id') id: string): Promise<UserEntity> {
     const user = await this.usersService.getUser({ userId: id });
     return new UserEntity(user);
   }
@@ -52,11 +51,7 @@ export class UsersController {
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Patch(':id')
-  async updateUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: UpdateUserDto,
-    @Req() request: Request,
-  ): Promise<UserEntity> {
+  async updateUser(@Param('id') id: string, @Body() data: UpdateUserDto, @Req() request: Request): Promise<UserEntity> {
     const loggedUser = request.user as User;
     const updated = await this.usersService.updateUser({ userId: id, loggedUser, data });
     return new UserEntity(updated);
@@ -65,7 +60,7 @@ export class UsersController {
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
-  async deleteUser(@Param('id', ParseIntPipe) id: number, @Req() request: Request): Promise<UserEntity> {
+  async deleteUser(@Param('id') id: string, @Req() request: Request): Promise<UserEntity> {
     const loggedUser = request.user as User;
     const deleted = await this.usersService.deleteUser({ userId: id, loggedUser });
     return new UserEntity(deleted);

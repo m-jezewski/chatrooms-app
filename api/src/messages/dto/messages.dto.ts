@@ -1,13 +1,13 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Max, MaxLength, Min, MinLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { Message } from '@prisma/client';
 
 export class MessageDto implements Message {
-  @ApiProperty({ example: 1 })
-  @IsInt()
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @IsUUID()
   @IsNotEmpty()
-  id: number;
+  id: string;
 
   @ApiProperty({ example: 'Hello world!', minLength: 1, maxLength: 5000 })
   @IsString()
@@ -16,14 +16,14 @@ export class MessageDto implements Message {
   @MaxLength(5000, { message: 'Message cannot exceed 5000 characters' })
   content: string;
 
-  @ApiProperty({ example: 1 })
-  @IsInt()
-  authorId: number;
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @IsUUID()
+  authorId: string;
 
-  @ApiProperty({ example: 1 })
-  @IsInt()
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @IsUUID()
   @IsNotEmpty()
-  textChannelId: number;
+  textChannelId: string;
 
   @ApiProperty()
   createdAt: Date;
@@ -33,11 +33,10 @@ export class MessageDto implements Message {
 export class UpdateMessageDto extends PickType(MessageDto, ['content'] as const) {}
 
 export class GetMessagesQueryDto {
-  @ApiPropertyOptional({ example: 100 })
+  @ApiPropertyOptional({ example: 'a1b2c3d4-...' })
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  before?: number;
+  @IsUUID()
+  before?: string;
 
   @ApiPropertyOptional({ example: 20, minimum: 1, maximum: 100, default: 20 })
   @IsOptional()
@@ -50,10 +49,10 @@ export class GetMessagesQueryDto {
 
 // WebSocket DTOs
 export class JoinChannelDto {
-  @ApiProperty({ example: 1 })
-  @IsInt()
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @IsUUID()
   @IsNotEmpty()
-  channelId: number;
+  channelId: string;
 }
 
 export class LeaveChannelDto extends JoinChannelDto {}

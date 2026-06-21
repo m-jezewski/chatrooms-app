@@ -49,16 +49,16 @@ const useWebSocket = (channelId: string | undefined) => {
   useEffect(() => {
     if (!channelId) return;
 
-    socketRef.current?.emit('joinChannel', { channelId: Number(channelId) });
+    socketRef.current?.emit('joinChannel', { channelId });
     dispatch(connectionOpened());
 
     return () => {
-      socketRef.current?.emit('leaveChannel', { channelId: Number(channelId) });
+      socketRef.current?.emit('leaveChannel', { channelId });
       dispatch(connectionClosed());
     };
   }, [channelId]);
 
-  const sendMessage = useCallback(({ content, channelId }: { content: string, channelId: number }) => {
+  const sendMessage = useCallback(({ content, channelId }: { content: string, channelId: string }) => {
     socketRef.current?.emit('sendMessage', { content, channelId });
   }, []);
 

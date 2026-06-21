@@ -6,14 +6,14 @@ import { useSelector } from 'react-redux';
 import { selectLoggedUser } from '../features/auth/authSlice.ts';
 
 interface RemoveUserButtonProps {
-  userId: number;
+  userId: string;
 }
 
 export const RemoveUserButton = ({userId}: RemoveUserButtonProps) => {
   const [deleteUser] = useDeleteUserMutation();
   const loggedUser = useSelector(selectLoggedUser);
 
-  const handleDeleteUser = async (id: number) => {
+  const handleDeleteUser = async (id: string) => {
     try {
       await deleteUser(id).unwrap()
       toast.success("User deleted successfully.")
