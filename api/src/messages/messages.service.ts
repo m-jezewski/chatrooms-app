@@ -8,7 +8,8 @@ export type MessageWithAuthor = Message & {
 
 @Injectable()
 export class MessagesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {
+  }
 
   async getMessage(params: { messageId: string }): Promise<Message> {
     const { messageId } = params;
@@ -29,11 +30,9 @@ export class MessagesService {
     const { channelId, before, limit = 20 } = params;
 
     const messages = await this.prisma.message.findMany({
-      where: {
-        textChannelId: channelId,
-        ...(before && { id: { lt: before } }),
-      },
-      orderBy: { createdAt: 'desc' },
+      ...(before && { cursor: { id: before }, skip: 1 }),
+      where: { textChannelId: channelId },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: limit,
       include: {
         author: {
