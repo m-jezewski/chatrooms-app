@@ -68,7 +68,7 @@ export class MessagesService {
     const { messageId, user, content } = params;
     const message = await this.getMessage({ messageId });
 
-    if (user.role !== 'ADMIN' && message.authorId !== user.id) {
+    if (message.authorId !== user.id) {
       throw new ForbiddenException('You can only edit your own messages');
     }
 
@@ -82,7 +82,7 @@ export class MessagesService {
     const { messageId, user } = params;
     const message = await this.getMessage({ messageId });
 
-    if (user.role !== 'ADMIN' && message.authorId !== user.id) {
+    if (message.authorId !== user.id) {
       throw new ForbiddenException('You can only delete your own messages');
     }
 

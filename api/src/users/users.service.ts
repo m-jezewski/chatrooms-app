@@ -10,7 +10,7 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   private canModifyUser(targetUserId: string, loggedUser: User): boolean {
-    return loggedUser.role === 'ADMIN' || loggedUser.id === targetUserId;
+    return loggedUser.id === targetUserId;
   }
 
   async findUsers(params: { findParams: Prisma.UserFindManyArgs }): Promise<User[]> {
@@ -40,13 +40,12 @@ export class UsersService {
   }
 
   async createUser(params: CreateUserDto): Promise<User> {
-    const { role, password, name, email } = params;
+    const { password, name, email } = params;
 
     try {
       return await this.prisma.user.create({
         data: {
           name: name,
-          role: role,
           email: email,
           password: getHashedPassword(password),
         },
@@ -65,10 +64,6 @@ export class UsersService {
 
     if (!this.canModifyUser(userId, loggedUser)) {
       throw new ForbiddenException('You can only update your own account');
-    }
-
-    if (data.role && loggedUser.role !== 'ADMIN') {
-      throw new ForbiddenException('Only admins can change user roles');
     }
 
     try {

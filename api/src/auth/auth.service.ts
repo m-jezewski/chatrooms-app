@@ -29,7 +29,7 @@ export class AuthService {
   }
 
   async register(email: string, password: string, name: string): Promise<User> {
-    return await this.usersService.createUser({ name, email, password, role: 'USER' });
+    return await this.usersService.createUser({ name, email, password });
   }
 
   async validateUser(email: string, password: string): Promise<any> {

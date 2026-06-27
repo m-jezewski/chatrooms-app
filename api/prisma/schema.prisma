@@ -19,7 +19,6 @@ model User {
   email         String   @unique
   password      String
   name          String?
-  role          Role     @default(USER)
   messages      Message[]
   textChannels  TextChannel[]
 }
@@ -41,9 +40,4 @@ model Message {
 
   textChannel   TextChannel? @relation(fields: [textChannelId], references: [id], onDelete: Cascade)
   textChannelId String?  @db.Uuid
-}
-
-enum Role {
-  USER
-  ADMIN
 }

@@ -3,7 +3,6 @@ export interface User {
     name: string;
     email: string;
     createdAt: Date;
-    role: 'USER' | 'ADMIN';
 }
 
 export interface Chatroom {

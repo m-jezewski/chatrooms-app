@@ -15,7 +15,6 @@ import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto, UserEntity } from './dto/user-crud.dto';
 import { SessionGuard } from '../auth/guards/session-guard';
-import { AdminGuard } from '../auth/guards/admin.guard';
 import { Request } from 'express';
 import { User } from '@prisma/client';
 
@@ -40,7 +39,7 @@ export class UsersController {
     return new UserEntity(user);
   }
 
-  @UseGuards(SessionGuard, AdminGuard)
+  @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('create')
   async create(@Body() user: CreateUserDto): Promise<UserEntity> {

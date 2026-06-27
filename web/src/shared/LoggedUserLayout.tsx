@@ -1,26 +1,16 @@
 import {Link, Outlet} from "react-router";
-import {selectLoggedUser} from "../features/auth/authSlice.ts";
-import {useSelector} from "react-redux";
 import {AppButton} from "./AppButton.tsx";
 import {CreateChatroomFormModal} from "../features/chatrooms/CreateChatroomFormModal.tsx";
 import React, {useState} from "react";
 import {ChatroomList} from "../features/chatrooms/ChatroomList.tsx";
 import {useLogoutMutation} from "../services/authApi.ts";
 
-const SidebarContent = ({onLogout, onAddChatroom, onNavigate}: {
+const SidebarContent = ({onLogout, onAddChatroom}: {
     onLogout: () => void;
     onAddChatroom: () => void;
-    onNavigate?: () => void;
 }) => {
-    const user = useSelector(selectLoggedUser);
-
     return (
         <>
-            {user?.role === "ADMIN" && (
-                <Link to="/dashboard" onClick={onNavigate}>
-                    <div className="text-center p-2 bg-white/5">Users</div>
-                </Link>
-            )}
             <AppButton onClick={onLogout}>Logout</AppButton>
             <AppButton variant={'purple'} onClick={onAddChatroom}>Add chatroom</AppButton>
             <ChatroomList/>
@@ -59,7 +49,6 @@ export const LoggedUserLayout = () => {
                     <SidebarContent
                         onLogout={() => { logout(); closeMobile(); }}
                         onAddChatroom={() => { setIsOpen(true); closeMobile(); }}
-                        onNavigate={closeMobile}
                     />
                 </div>
             )}

@@ -13,15 +13,11 @@ export class TextChannelsService {
   constructor(private prisma: PrismaService) {}
 
   private canAccessChannel(channel: TextChannelWithUsers, user: User): boolean {
-    return user.role === 'ADMIN' || channel.users.some((channelUser) => channelUser.id === user.id);
+    return channel.users.some((channelUser) => channelUser.id === user.id);
   }
 
   async findChannelsByUser(params: { findParams: Prisma.TextChannelFindManyArgs; user: User }): Promise<TextChannel[]> {
     const { findParams, user } = params;
-
-    if (user.role === 'ADMIN') {
-      return this.prisma.textChannel.findMany(findParams);
-    }
 
     return this.prisma.textChannel.findMany({
       ...findParams,

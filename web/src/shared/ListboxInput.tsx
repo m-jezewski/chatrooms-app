@@ -17,10 +17,6 @@ export const ListboxInput = ({name, disableSelf = true}: ListboxInputProps) => {
     const {data: users = []} = useGetUsersQuery();
     const loggedUser = useSelector(selectLoggedUser)!
 
-    const isInputDisabled = () => {
-        return !(loggedUser.role === "ADMIN" && disableSelf === false);
-    }
-
     return (
         <Field name={name}>
             {({field, form, meta}: FieldProps) => (
@@ -41,7 +37,7 @@ export const ListboxInput = ({name, disableSelf = true}: ListboxInputProps) => {
                                 className={"p-2 cursor-pointer flex bg-neutral-900 text-gray-300/90 text-sm font-normal rounded w-72 data-[focus]:bg-slate-800 data-[selected]:bg-slate-900 hover:bg-slate-900 data-[disabled]:bg-gray-950"}
                                 key={user.id}
                                 value={user}
-                                disabled={user.id === loggedUser?.id && isInputDisabled()}
+                                disabled={user.id === loggedUser?.id && disableSelf}
                             >
                                 <UserIcon />
                                 <CheckIcon className="invisible size-5 group-data-[selected]:visible" />
