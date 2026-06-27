@@ -1,6 +1,6 @@
 import { TextChannel } from '@prisma/client';
-import { IsArray, IsDate, IsNotEmpty, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
-import { OmitType, PartialType, ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsDate, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { OmitType, PartialType, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class TextChannelDto implements TextChannel {
   @ApiProperty({ example: 'a1b2c3d4-...' })
@@ -19,6 +19,11 @@ export class TextChannelDto implements TextChannel {
   @IsDate()
   createdAt: Date;
 
+  @ApiPropertyOptional({ example: 'a1b2c3d4-...', nullable: true })
+  @IsOptional()
+  @IsUUID()
+  ownerId: string | null;
+
   @ApiProperty({ example: ['a1b2c3d4-...', 'e5f6...'], type: [String] })
   @IsArray()
   @IsNotEmpty()
@@ -26,8 +31,8 @@ export class TextChannelDto implements TextChannel {
   users: string[];
 }
 
-export class CreateTextChannelDto extends OmitType(TextChannelDto, ['id', 'createdAt'] as const) {}
+export class CreateTextChannelDto extends OmitType(TextChannelDto, ['id', 'createdAt', 'ownerId'] as const) {}
 
 export class UpdateTextChannelDto extends PartialType(CreateTextChannelDto) {}
 
-export class UpdateChannelUsersDto extends OmitType(TextChannelDto, ['name', 'id', 'createdAt'] as const) {}
+export class UpdateChannelUsersDto extends OmitType(TextChannelDto, ['name', 'id', 'createdAt', 'ownerId'] as const) {}

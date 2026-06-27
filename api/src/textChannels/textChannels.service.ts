@@ -16,6 +16,12 @@ export class TextChannelsService {
     return channel.users.some((channelUser) => channelUser.id === user.id);
   }
 
+  private assertChannelOwner(channel: TextChannelWithUsers, user: User): void {
+    if (channel.ownerId !== user.id) {
+      throw new ForbiddenException('Only the channel owner can perform this action');
+    }
+  }
+
   async findChannelsByUser(params: { findParams: Prisma.TextChannelFindManyArgs; user: User }): Promise<TextChannel[]> {
     const { findParams, user } = params;
 
@@ -56,15 +62,17 @@ export class TextChannelsService {
     return channel;
   }
 
-  async createTextChannel(params: { textChannel: CreateTextChannelDto }): Promise<TextChannel> {
-    const { textChannel } = params;
+  async createTextChannel(params: { textChannel: CreateTextChannelDto; user: User }): Promise<TextChannel> {
+    const { textChannel, user } = params;
+    const memberIds = Array.from(new Set([...textChannel.users, user.id]));
 
     try {
       return await this.prisma.textChannel.create({
         data: {
           ...textChannel,
+          owner: { connect: { id: user.id } },
           users: {
-            connect: textChannel.users.map((userId) => ({ id: userId })),
+            connect: memberIds.map((userId) => ({ id: userId })),
           },
         },
       });
@@ -82,7 +90,8 @@ export class TextChannelsService {
     textChannel: UpdateTextChannelDto;
   }): Promise<TextChannel> {
     const { textChannel, channelId, user } = params;
-    await this.getChannel({ channelId, user });
+    const channel = await this.getChannel({ channelId, user });
+    this.assertChannelOwner(channel, user);
 
     try {
       return await this.prisma.textChannel.update({
@@ -102,13 +111,15 @@ export class TextChannelsService {
 
   async deleteTextChannel(params: { channelId: string; user: User }): Promise<TextChannel> {
     const { channelId, user } = params;
-    await this.getChannel({ channelId, user });
+    const channel = await this.getChannel({ channelId, user });
+    this.assertChannelOwner(channel, user);
     return this.prisma.textChannel.delete({ where: { id: channelId } });
   }
 
   async updateUsersInChannel(params: { userIds: string[]; channelId: string; user: User }) {
     const { userIds, channelId, user } = params;
-    await this.getChannel({ channelId, user });
+    const channel = await this.getChannel({ channelId, user });
+    this.assertChannelOwner(channel, user);
 
     await this.prisma.textChannel.update({
       where: { id: channelId },

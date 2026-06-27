@@ -20,15 +20,18 @@ model User {
   password      String
   name          String?
   messages      Message[]
-  textChannels  TextChannel[]
+  textChannels  TextChannel[] @relation("ChannelMembers")
+  ownedChannels TextChannel[] @relation("ChannelOwner")
 }
 
 model TextChannel {
   id            String   @id @default(uuid()) @db.Uuid
   createdAt     DateTime @default(now())
   name          String   @unique
+  owner         User?    @relation("ChannelOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId       String?  @db.Uuid
   messages      Message[]
-  users         User[]
+  users         User[]   @relation("ChannelMembers")
 }
 
 model Message {

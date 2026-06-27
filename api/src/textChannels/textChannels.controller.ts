@@ -48,8 +48,10 @@ export class TextChannelsController {
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('create')
-  async create(@Body() textChannel: CreateTextChannelDto) {
-    return this.textChannelsService.createTextChannel({ textChannel });
+  async create(@Body() textChannel: CreateTextChannelDto, @Req() req: Request) {
+    const user = req.user as User;
+
+    return this.textChannelsService.createTextChannel({ textChannel, user });
   }
 
   @UseGuards(SessionGuard)

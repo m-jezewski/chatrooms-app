@@ -9,6 +9,7 @@ export interface Chatroom {
     id: string;
     name: string;
     createdAt: Date;
+    ownerId: string | null;
     users: { id: string; }[];
 }
 
