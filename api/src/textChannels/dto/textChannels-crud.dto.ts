@@ -15,6 +15,16 @@ export class TextChannelDto implements TextChannel {
   @MaxLength(50)
   name: string;
 
+  @ApiProperty({ example: 'base64 salt', description: 'Per-room salt' })
+  @IsString()
+  @IsNotEmpty()
+  salt: string;
+
+  @ApiProperty({ example: 'base64 blob', description: 'Lets clients confirm a derived key.' })
+  @IsString()
+  @IsNotEmpty()
+  verificationToken: string;
+
   @ApiProperty()
   @IsDate()
   createdAt: Date;
@@ -31,8 +41,11 @@ export class TextChannelDto implements TextChannel {
   users: string[];
 }
 
-export class CreateTextChannelDto extends OmitType(TextChannelDto, ['id', 'createdAt', 'ownerId'] as const) {}
+export class CreateTextChannelDto extends OmitType(TextChannelDto, ['id', 'createdAt', 'ownerId'] as const) {
+}
 
-export class UpdateTextChannelDto extends PartialType(CreateTextChannelDto) {}
+export class UpdateTextChannelDto extends PartialType(CreateTextChannelDto) {
+}
 
-export class UpdateChannelUsersDto extends OmitType(TextChannelDto, ['name', 'id', 'createdAt', 'ownerId'] as const) {}
+export class UpdateChannelUsersDto extends OmitType(TextChannelDto, ['name', 'id', 'createdAt', 'ownerId'] as const) {
+}

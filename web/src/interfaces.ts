@@ -11,13 +11,14 @@ export interface Chatroom {
     createdAt: Date;
     ownerId: string | null;
     users: { id: string; }[];
+    salt: string;
+    verificationToken: string;
 }
 
 export interface Message {
     id: string;
-    author: { name: string }
-    content: string;
+    payload: string;
+    senderId: string;
     createdAt: Date;
     textChannelId: string;
-    authorId: string;
 }

@@ -10,6 +10,7 @@ done
 echo "DB available. Running migrations and adding default data"
 
 npx prisma migrate deploy
+npx prisma generate
 npx prisma db seed
 
 echo "Starting dev"

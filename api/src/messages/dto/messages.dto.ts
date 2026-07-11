@@ -1,5 +1,5 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Max, MaxLength, Min, MinLength } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
+import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { Message } from '@prisma/client';
 
@@ -9,16 +9,15 @@ export class MessageDto implements Message {
   @IsNotEmpty()
   id: string;
 
-  @ApiProperty({ example: 'Hello world!', minLength: 1, maxLength: 5000 })
+  @ApiProperty({ example: 'base64 value', description: 'Client-side encrypted message blob.' })
   @IsString()
   @IsNotEmpty()
-  @MinLength(1, { message: 'Message cannot be empty' })
-  @MaxLength(5000, { message: 'Message cannot exceed 5000 characters' })
-  content: string;
+  payload: string;
 
-  @ApiProperty({ example: 'a1b2c3d4-...' })
-  @IsUUID()
-  authorId: string;
+  @ApiProperty({ example: '...', description: 'Per-session sender token.' })
+  @IsString()
+  @IsNotEmpty()
+  senderId: string;
 
   @ApiProperty({ example: 'a1b2c3d4-...' })
   @IsUUID()
@@ -30,8 +29,6 @@ export class MessageDto implements Message {
 }
 
 // REST DTOs
-export class UpdateMessageDto extends PickType(MessageDto, ['content'] as const) {}
-
 export class GetMessagesQueryDto {
   @ApiPropertyOptional({ example: 'a1b2c3d4-...' })
   @IsOptional()
@@ -58,10 +55,13 @@ export class JoinChannelDto {
 export class LeaveChannelDto extends JoinChannelDto {}
 
 export class SendMessageDto extends JoinChannelDto {
-  @ApiProperty({ example: 'Hello world!', minLength: 1, maxLength: 5000 })
+  @ApiProperty({ example: 'base64(IV ‖ ciphertext ‖ authTag)' })
   @IsString()
   @IsNotEmpty()
-  @MinLength(1, { message: 'Message cannot be empty' })
-  @MaxLength(5000, { message: 'Message cannot exceed 5000 characters' })
-  content: string;
+  payload: string;
+
+  @ApiProperty({ example: 'kQ8f...' })
+  @IsString()
+  @IsNotEmpty()
+  senderId: string;
 }

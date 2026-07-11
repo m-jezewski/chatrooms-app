@@ -11,7 +11,12 @@ export const chatroomsApi = api.injectEndpoints({
             query: (id) => `/textChannels/${id}`,
             providesTags: (_result, _error, id) => [{type: 'Chatroom', id}],
         }),
-        createChatroom: builder.mutation<Chatroom, { name: string; users: string[] }>({
+        createChatroom: builder.mutation<Chatroom, {
+            name: string;
+            users: string[];
+            salt: string;
+            verificationToken: string;
+        }>({
             query: (channelData) => ({
                 url: '/textChannels/create',
                 method: 'POST',

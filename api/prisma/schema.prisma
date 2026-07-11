@@ -19,27 +19,27 @@ model User {
   email         String   @unique
   password      String
   name          String?
-  messages      Message[]
   textChannels  TextChannel[] @relation("ChannelMembers")
   ownedChannels TextChannel[] @relation("ChannelOwner")
 }
 
 model TextChannel {
-  id            String   @id @default(uuid()) @db.Uuid
-  createdAt     DateTime @default(now())
-  name          String   @unique
-  owner         User?    @relation("ChannelOwner", fields: [ownerId], references: [id], onDelete: SetNull)
-  ownerId       String?  @db.Uuid
-  messages      Message[]
-  users         User[]   @relation("ChannelMembers")
+  id                String   @id @default(uuid()) @db.Uuid
+  createdAt         DateTime @default(now())
+  name              String
+  salt              String
+  verificationToken String
+  owner             User?    @relation("ChannelOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId           String?  @db.Uuid
+  messages          Message[]
+  users             User[]   @relation("ChannelMembers")
 }
 
 model Message {
-  id            String   @id @default(uuid()) @db.Uuid
-  content       String?
-  author        User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorId      String?  @db.Uuid
-  createdAt     DateTime @default(now())
+  id               String   @id @default(uuid()) @db.Uuid
+  payload          String
+  senderId         String
+  createdAt        DateTime @default(now())
 
   textChannel   TextChannel? @relation(fields: [textChannelId], references: [id], onDelete: Cascade)
   textChannelId String?  @db.Uuid

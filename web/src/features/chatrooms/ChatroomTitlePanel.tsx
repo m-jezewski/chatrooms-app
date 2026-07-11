@@ -20,7 +20,9 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
 
   return (
     <div className={"ml-20 mt-4 mb-4 mr-4 md:ml-4 bg-indigo-900/25 backdrop-blur-xl p-4 rounded-lg"}>
-      <h1 className={"text-3xl mb-2 border-b-2 pb-1 break-all border-gray-700"}># {channelData?.name}</h1>
+      <div className={"flex items-center gap-2 mb-2 border-b-2 pb-1 border-gray-700"}>
+        <h1 className={"text-3xl break-all"}># {channelData?.name}</h1>
+      </div>
       {isOwner && (
         <div className="flex gap-2 justify-end">
          <RemoveChatroomButton channelId={channelId} />

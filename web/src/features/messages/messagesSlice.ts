@@ -43,7 +43,13 @@ const messagesSlice = createSlice({
     },
 });
 
-export const { connectionOpened, connectionClosed, receivedMessage, connectionError, setMessages, prependMessages } =
-    messagesSlice.actions;
+export const {
+    connectionOpened,
+    connectionClosed,
+    receivedMessage,
+    connectionError,
+    setMessages,
+    prependMessages,
+} = messagesSlice.actions;
 
 export default messagesSlice.reducer;

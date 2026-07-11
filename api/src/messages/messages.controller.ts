@@ -1,11 +1,8 @@
 import {
-  Body,
   ClassSerializerInterceptor,
   Controller,
-  Delete,
   Get,
   Param,
-  Patch,
   Query,
   Req,
   UseGuards,
@@ -16,7 +13,7 @@ import { MessagesService } from './messages.service';
 import { SessionGuard } from '../auth/guards/session-guard';
 import { User } from '@prisma/client';
 import { Request } from 'express';
-import { UpdateMessageDto, GetMessagesQueryDto } from './dto/messages.dto';
+import { GetMessagesQueryDto } from './dto/messages.dto';
 import { TextChannelsService } from '../textChannels/textChannels.service';
 import { MessagesGateway } from './MessagesGateway';
 
@@ -48,40 +45,5 @@ export class MessagesController {
       messages: hasMore ? messages.slice(0, -1) : messages,
       hasMore,
     };
-  }
-
-  @UseGuards(SessionGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Patch(':messageId')
-  async updateMessage(
-    @Param('channelId') channelId: string,
-    @Param('messageId') messageId: string,
-    @Body() body: UpdateMessageDto,
-    @Req() req: Request,
-  ) {
-    const user = req.user as User;
-    await this.textChannelsService.getChannel({ channelId, user });
-
-    const message = await this.messagesService.updateMessage({ messageId, user, content: body.content });
-    this.messagesGateway.notifyMessageUpdated({ channelId, message });
-
-    return message;
-  }
-
-  @UseGuards(SessionGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Delete(':messageId')
-  async deleteMessage(
-    @Param('channelId') channelId: string,
-    @Param('messageId') messageId: string,
-    @Req() req: Request,
-  ) {
-    const user = req.user as User;
-    await this.textChannelsService.getChannel({ channelId, user });
-
-    const message = await this.messagesService.deleteMessage({ messageId, user });
-    this.messagesGateway.notifyMessageDeleted({ channelId, messageId });
-
-    return message;
   }
 }

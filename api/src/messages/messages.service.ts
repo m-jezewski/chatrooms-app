@@ -1,32 +1,17 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Message, User } from '@prisma/client';
-
-export type MessageWithAuthor = Message & {
-  author: { name: string };
-};
+import { Message } from '@prisma/client';
 
 @Injectable()
 export class MessagesService {
   constructor(private prisma: PrismaService) {
   }
 
-  async getMessage(params: { messageId: string }): Promise<Message> {
-    const { messageId } = params;
-    const message = await this.prisma.message.findUnique({ where: { id: messageId } });
-
-    if (!message) {
-      throw new NotFoundException('Message not found');
-    }
-
-    return message;
-  }
-
   async getChannelMessages(params: {
     channelId: string;
     before?: string;
     limit?: number;
-  }): Promise<MessageWithAuthor[]> {
+  }): Promise<Message[]> {
     const { channelId, before, limit = 20 } = params;
 
     const messages = await this.prisma.message.findMany({
@@ -34,57 +19,20 @@ export class MessagesService {
       where: { textChannelId: channelId },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: limit,
-      include: {
-        author: {
-          select: { name: true },
-        },
-      },
     });
 
     return messages.reverse();
   }
 
-  async createMessage(params: { channelId: string; userId: string; content: string }): Promise<MessageWithAuthor> {
-    const { channelId, userId, content } = params;
+  async createMessage(params: { channelId: string; payload: string; senderId: string }): Promise<Message> {
+    const { channelId, payload, senderId } = params;
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { name: true },
-    });
-
-    const message = await this.prisma.message.create({
+    return this.prisma.message.create({
       data: {
-        content,
-        authorId: userId,
+        payload,
+        senderId,
         textChannelId: channelId,
       },
     });
-
-    return { ...message, author: { name: user?.name ?? '' } };
-  }
-
-  async updateMessage(params: { messageId: string; user: User; content: string }): Promise<Message> {
-    const { messageId, user, content } = params;
-    const message = await this.getMessage({ messageId });
-
-    if (message.authorId !== user.id) {
-      throw new ForbiddenException('You can only edit your own messages');
-    }
-
-    return this.prisma.message.update({
-      where: { id: messageId },
-      data: { content },
-    });
-  }
-
-  async deleteMessage(params: { messageId: string; user: User }): Promise<Message> {
-    const { messageId, user } = params;
-    const message = await this.getMessage({ messageId });
-
-    if (message.authorId !== user.id) {
-      throw new ForbiddenException('You can only delete your own messages');
-    }
-
-    return this.prisma.message.delete({ where: { id: messageId } });
   }
 }

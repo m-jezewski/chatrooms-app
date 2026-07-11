@@ -5,14 +5,21 @@ import useWebSocket from "../messages/useWebSocket.ts";
 import {useGetChatroomByIdQuery} from "../../services/chatroomsApi.ts";
 import { ChatroomTitlePanel } from './ChatroomTitlePanel.tsx';
 import { Chatroom } from './Chatroom.tsx';
+import { RoomPasswordGate } from './RoomPasswordGate.tsx';
+import { useRoomKey } from './RoomKeyContext.tsx';
+import { encrypt } from '../../utils/roomCrypto.ts';
+import { getNickname, getSenderId } from '../../utils/session.ts';
 
 export const Chatrooms = () => {
     const {id: channelId} = useParams();
     const {data: channelData} = useGetChatroomByIdQuery(channelId!, {skip: !channelId});
     const {sendMessage} = useWebSocket(channelId);
+    const { key, setKey } = useRoomKey(channelId);
 
-    const handleSendMessage = (message: string) => {
-        sendMessage({channelId: channelId!, content: message});
+    const handleSendMessage = async (text: string) => {
+        if (!channelId || !key) return;
+        const payload = await encrypt(key, JSON.stringify({ nickname: getNickname(), text }));
+        sendMessage({ channelId, payload, senderId: getSenderId() });
     };
 
     if (!channelId) {
@@ -28,8 +35,14 @@ export const Chatrooms = () => {
     return (
         <div className={"max-h-full min-h-full flex flex-col"}>
             <ChatroomTitlePanel channelData={channelData} />
-            <Chatroom />
-            <MessageForm sendMessage={handleSendMessage}/>
+            {key ? (
+                <>
+                    <Chatroom />
+                    <MessageForm sendMessage={handleSendMessage}/>
+                </>
+            ) : (
+                <RoomPasswordGate channelData={channelData} onUnlock={setKey} />
+            )}
         </div>
     )
 }

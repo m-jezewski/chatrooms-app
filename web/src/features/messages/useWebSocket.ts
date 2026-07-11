@@ -58,9 +58,12 @@ const useWebSocket = (channelId: string | undefined) => {
     };
   }, [channelId]);
 
-  const sendMessage = useCallback(({ content, channelId }: { content: string, channelId: string }) => {
-    socketRef.current?.emit('sendMessage', { content, channelId });
-  }, []);
+  const sendMessage = useCallback(
+    ({ channelId, payload, senderId }: { channelId: string; payload: string; senderId: string }) => {
+      socketRef.current?.emit('sendMessage', { channelId, payload, senderId });
+    },
+    [],
+  );
 
   return {
     sendMessage,

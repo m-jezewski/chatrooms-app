@@ -85,7 +85,7 @@ export class MessagesGateway implements OnGatewayInit {
   @UsePipes(new ValidationPipe({ whitelist: true }))
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
-    @MessageBody() { channelId, content }: SendMessageDto,
+    @MessageBody() { channelId, payload, senderId }: SendMessageDto,
     @ConnectedSocket() client: Socket,
     @CurrentWsUser() userId: string,
   ) {
@@ -95,7 +95,7 @@ export class MessagesGateway implements OnGatewayInit {
       const user = await this.usersService.getUser({ userId });
       await this.textChannelsService.getChannel({ channelId, user });
 
-      const message = await this.messagesService.createMessage({ channelId, userId, content });
+      const message = await this.messagesService.createMessage({ channelId, payload, senderId });
 
       this.server.to(`channel_${channelId}`).emit('newMessage', message);
     } catch (error) {
@@ -120,15 +120,5 @@ export class MessagesGateway implements OnGatewayInit {
     this.logger.log(`User ${userId} leaving channel ${channelId}`);
     client.leave(`channel_${channelId}`);
     client.emit('leftChannel', { message: `Left channel ${channelId}` });
-  }
-
-  notifyMessageUpdated(params: { channelId: string; message: any }) {
-    const { channelId, message } = params;
-    this.server.to(`channel_${channelId}`).emit('messageUpdated', message);
-  }
-
-  notifyMessageDeleted(params: { channelId: string; messageId: string }) {
-    const { channelId, messageId } = params;
-    this.server.to(`channel_${channelId}`).emit('messageDeleted', { messageId });
   }
 }
