@@ -2,15 +2,16 @@ import { describe, it, expect } from 'vitest';
 import {
   base64ToUint8,
   decrypt,
-  deriveRoomKey,
+  deriveRoomSecrets,
   encrypt,
   generateSalt,
   generateSenderId, IV_BYTES,
-  makeVerificationToken,
-  verifyKey,
 } from './roomCrypto';
 
 const TAG_BYTES = 16;
+
+const deriveKey = async (password: string, salt: Uint8Array<ArrayBuffer>) =>
+  (await deriveRoomSecrets(password, salt)).key;
 
 describe('generateSalt', () => {
   it('returns 16 random bytes', () => {
@@ -36,7 +37,7 @@ describe('generateSenderId', () => {
 
 describe('encrypt / decrypt', () => {
   it('encrypting and decrypting does not change the value', async () => {
-    const key = await deriveRoomKey('foobar', generateSalt());
+    const key = await deriveKey('foobar', generateSalt());
     const plaintext = JSON.stringify({ foo: 'foo', text: 'bar' });
 
     const blob = await encrypt(key, plaintext);
@@ -44,12 +45,12 @@ describe('encrypt / decrypt', () => {
   });
 
   it('produces a fresh initialization vector each time', async () => {
-    const key = await deriveRoomKey('pw', generateSalt());
+    const key = await deriveKey('pw', generateSalt());
     expect(await encrypt(key, 'same')).not.toBe(await encrypt(key, 'same'));
   });
 
   it('blob is base64( IV[12] ‖ ciphertext ‖ tag[16] )', async () => {
-    const key = await deriveRoomKey('pw', generateSalt());
+    const key = await deriveKey('pw', generateSalt());
     const text = 'hi'; // 2 ASCII bytes
 
     const bytes = base64ToUint8(await encrypt(key, text));
@@ -57,7 +58,7 @@ describe('encrypt / decrypt', () => {
   });
 
   it('rejects a tampered blob', async () => {
-    const key = await deriveRoomKey('pw', generateSalt());
+    const key = await deriveKey('pw', generateSalt());
     const bytes = base64ToUint8(await encrypt(key, 'secret'));
     bytes[bytes.length - 1] ^= 0xff; // flip a tag byte
 
@@ -65,38 +66,46 @@ describe('encrypt / decrypt', () => {
   });
 });
 
-describe('deriveKey', () => {
+describe('deriveRoomSecrets', () => {
   it('is deterministic for the same password + salt', async () => {
     const salt = generateSalt();
-    const a = await deriveRoomKey('shared-password', salt);
-    const b = await deriveRoomKey('shared-password', salt);
+    const a = await deriveRoomSecrets('shared-password', salt);
+    const b = await deriveRoomSecrets('shared-password', salt);
 
+    expect(a.authKey).toBe(b.authKey);
     // non-extractable keys can't be compared directly — prove equality by cross-decrypting
-    expect(await decrypt(b, await encrypt(a, 'cross'))).toBe('cross');
+    expect(await decrypt(b.key, await encrypt(a.key, 'cross'))).toBe('cross');
   });
 
-  it('a different salt yields an incompatible key', async () => {
-    const a = await deriveRoomKey('pw', generateSalt());
-    const b = await deriveRoomKey('pw', generateSalt());
-
-    await expect(decrypt(b, await encrypt(a, 'nope'))).rejects.toThrow();
-  });
-});
-
-describe('verifyKey', () => {
-  it('accepts the key that built the token', async () => {
+  it('a different password yields a different authKey and an incompatible key', async () => {
     const salt = generateSalt();
-    const token = await makeVerificationToken(await deriveRoomKey('correct', salt));
+    const a = await deriveRoomSecrets('correct', salt);
+    const b = await deriveRoomSecrets('wrong', salt);
 
-    const reDerived = await deriveRoomKey('correct', salt);
-    expect(await verifyKey(reDerived, token)).toBe(true);
+    expect(a.authKey).not.toBe(b.authKey);
+    await expect(decrypt(b.key, await encrypt(a.key, 'nope'))).rejects.toThrow();
   });
 
-  it('rejects a wrong password', async () => {
-    const salt = generateSalt();
-    const token = await makeVerificationToken(await deriveRoomKey('correct', salt));
+  it('a different salt yields a different authKey and an incompatible key', async () => {
+    const a = await deriveRoomSecrets('pw', generateSalt());
+    const b = await deriveRoomSecrets('pw', generateSalt());
 
-    const wrong = await deriveRoomKey('wrong', salt);
-    expect(await verifyKey(wrong, token)).toBe(false);
+    expect(a.authKey).not.toBe(b.authKey);
+    await expect(decrypt(b.key, await encrypt(a.key, 'nope'))).rejects.toThrow();
+  });
+
+  it('authKey is base64 of 32 bytes', async () => {
+    const { authKey } = await deriveRoomSecrets('pw', generateSalt());
+    expect(base64ToUint8(authKey)).toHaveLength(32);
+  });
+
+  // Pins the whole derivation (PBKDF2 params, HKDF labels). If this test breaks, the change
+  // locks every existing room out of its history — bump the info labels to /v2 instead.
+  it('matches the pinned vector', async () => {
+    const salt = new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+    const { key, authKey } = await deriveRoomSecrets('fixed-vector-password', salt);
+
+    expect(authKey).toBe('sHPM7Gh/gDVn/vIYZjtyDytYKh+lFb188nUDw0Eg/so=');
+    expect(await decrypt(key, 'ZGVmZ2hpamtsbW5vxCw7r9V4JRWSBxxnMHuR+HtCu5jmi5b66U0nXw==')).toBe('fixed-vector');
   });
 });

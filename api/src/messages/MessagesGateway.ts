@@ -10,6 +10,7 @@ import { Server, Socket } from 'socket.io';
 import { MessagesService } from './messages.service';
 import { WsSessionGuard } from '../auth/guards/ws-session-guard';
 import { ForbiddenException, Logger, NotFoundException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { SessionData } from 'express-session';
 import { CurrentWsUser } from './current-ws-user.decorator';
 import { UsersService } from '../users/users.service';
 import { TextChannelsService } from '../textChannels/textChannels.service';
@@ -22,6 +23,7 @@ import { JoinChannelDto, LeaveChannelDto, SendMessageDto } from './dto/messages.
   },
   cookie: true,
 })
+@UsePipes(new ValidationPipe({ whitelist: true }))
 export class MessagesGateway implements OnGatewayInit {
   @WebSocketServer() server: Server;
   private readonly logger = new Logger(MessagesGateway.name);
@@ -52,6 +54,16 @@ export class MessagesGateway implements OnGatewayInit {
     });
   }
 
+  private reloadSession(client: Socket): Promise<SessionData | undefined> {
+    const session = (client.handshake as any)?.session;
+    if (!session) {
+      return Promise.resolve(undefined);
+    }
+    return new Promise((resolve) => {
+      session.reload((error: unknown) => resolve(error ? undefined : session));
+    });
+  }
+
   @UseGuards(WsSessionGuard)
   @SubscribeMessage('joinChannel')
   async handleJoinChannel(
@@ -64,6 +76,11 @@ export class MessagesGateway implements OnGatewayInit {
     try {
       const user = await this.usersService.getUser({ userId });
       await this.textChannelsService.getChannel({ channelId, user });
+
+      const session = await this.reloadSession(client);
+      if (!session?.joinedChannels?.includes(channelId)) {
+        return client.emit('error', { message: 'Unauthorized' });
+      }
 
       const recentMessages = await this.messagesService.getChannelMessages({ channelId });
 
@@ -82,7 +99,6 @@ export class MessagesGateway implements OnGatewayInit {
   }
 
   @UseGuards(WsSessionGuard)
-  @UsePipes(new ValidationPipe({ whitelist: true }))
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
     @MessageBody() { channelId, payload, senderId }: SendMessageDto,
@@ -91,22 +107,16 @@ export class MessagesGateway implements OnGatewayInit {
   ) {
     this.logger.log(`User ${userId} sending message to channel ${channelId}`);
 
-    try {
-      const user = await this.usersService.getUser({ userId });
-      await this.textChannelsService.getChannel({ channelId, user });
+    if (!client.rooms.has(`channel_${channelId}`)) {
+      return client.emit('error', { message: 'Access denied' });
+    }
 
+    try {
       const message = await this.messagesService.createMessage({ channelId, payload, senderId });
 
       this.server.to(`channel_${channelId}`).emit('newMessage', message);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        this.logger.warn(`Channel ${channelId} not found`);
-        return client.emit('error', { message: 'Channel not found' });
-      }
-      if (error instanceof ForbiddenException) {
-        return client.emit('error', { message: 'You are not a member of this channel' });
-      }
-      throw error;
+    } catch {
+      client.emit('error', { message: 'Failed to send message' });
     }
   }
 

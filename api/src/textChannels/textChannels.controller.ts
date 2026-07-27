@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -13,10 +15,17 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { TextChannelsService } from './textChannels.service';
 import { SessionGuard } from '../auth/guards/session-guard';
-import { TextChannel, User } from '@prisma/client';
-import { CreateTextChannelDto, UpdateChannelUsersDto, UpdateTextChannelDto } from './dto/textChannels-crud.dto';
+import { User } from '@prisma/client';
+import {
+  CreateTextChannelDto,
+  JoinTextChannelDto,
+  TextChannelPublicDto,
+  UpdateChannelUsersDto,
+  UpdateTextChannelDto,
+} from './dto/textChannels-crud.dto';
 import { Request } from 'express';
 
 @ApiTags('Text Channels')
@@ -27,7 +36,7 @@ export class TextChannelsController {
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async getAllTextChannels(@Req() req: Request): Promise<TextChannel[]> {
+  async getAllTextChannels(@Req() req: Request): Promise<TextChannelPublicDto[]> {
     const user = req.user as User;
 
     return this.textChannelsService.findChannelsByUser({
@@ -51,7 +60,22 @@ export class TextChannelsController {
   async create(@Body() textChannel: CreateTextChannelDto, @Req() req: Request) {
     const user = req.user as User;
 
-    return this.textChannelsService.createTextChannel({ textChannel, user });
+    const channel = await this.textChannelsService.createTextChannel({ textChannel, user });
+    req.session.joinedChannels = [...(req.session.joinedChannels ?? []), channel.id];
+    return channel;
+  }
+
+  @UseGuards(SessionGuard, ThrottlerGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post(':id/join')
+  async join(@Param('id') id: string, @Body() { authKey }: JoinTextChannelDto, @Req() req: Request) {
+    await this.textChannelsService.verifyChannelAuthKey({ channelId: id, authKey });
+
+    const joinedChannels = req.session.joinedChannels ?? [];
+    if (!joinedChannels.includes(id)) {
+      req.session.joinedChannels = [...joinedChannels, id];
+    }
+    return { joined: true };
   }
 
   @UseGuards(SessionGuard)

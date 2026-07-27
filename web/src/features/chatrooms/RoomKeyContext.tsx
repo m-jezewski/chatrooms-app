@@ -1,17 +1,18 @@
 import { createContext, useCallback, useContext, useMemo, useState, ReactNode } from 'react';
+import { RoomSecrets } from '../../utils/roomCrypto.ts';
 
 interface RoomKeyCtx {
-  keys: Map<string, CryptoKey>;
-  setKey: (roomId: string, key: CryptoKey) => void;
+  keys: Map<string, RoomSecrets>;
+  setKey: (roomId: string, secrets: RoomSecrets) => void;
 }
 
 const RoomKeyContext = createContext<RoomKeyCtx | null>(null);
 
 export const RoomKeyContextProvider = ({ children }: { children: ReactNode }) => {
-  const [keys, setKeys] = useState(new Map());
+  const [keys, setKeys] = useState(new Map<string, RoomSecrets>());
 
-  const setKey = useCallback((roomId: string, key: CryptoKey) => {
-    setKeys((prev) => new Map(prev).set(roomId, key));
+  const setKey = useCallback((roomId: string, secrets: RoomSecrets) => {
+    setKeys((prev) => new Map(prev).set(roomId, secrets));
   }, []);
 
   const value = useMemo<RoomKeyCtx>(() => ({ keys, setKey }), [keys, setKey]);
@@ -29,13 +30,13 @@ export const useRoomKeyContext = () => {
 
 export const useRoomKey = (roomId: string | undefined) => {
   const context = useRoomKeyContext();
-  const key = roomId ? context.keys.get(roomId) : undefined;
+  const secrets = roomId ? context.keys.get(roomId) : undefined;
 
-  const setKey = (roomKey: CryptoKey) => {
+  const setSecrets = (roomSecrets: RoomSecrets) => {
     if (roomId) {
-      context.setKey(roomId, roomKey);
+      context.setKey(roomId, roomSecrets);
     }
   };
 
-  return { key, setKey };
+  return { secrets, setSecrets };
 };

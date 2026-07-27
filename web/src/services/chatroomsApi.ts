@@ -15,7 +15,7 @@ export const chatroomsApi = api.injectEndpoints({
             name: string;
             users: string[];
             salt: string;
-            verificationToken: string;
+            authKey: string;
         }>({
             query: (channelData) => ({
                 url: '/textChannels/create',
@@ -23,6 +23,13 @@ export const chatroomsApi = api.injectEndpoints({
                 body: channelData,
             }),
             invalidatesTags: ['ChatroomList'],
+        }),
+        joinChatroom: builder.mutation<{ joined: boolean }, { channelId: string; authKey: string }>({
+            query: ({channelId, authKey}) => ({
+                url: `/textChannels/${channelId}/join`,
+                method: 'POST',
+                body: {authKey},
+            }),
         }),
         updateChatroom: builder.mutation<Chatroom, { id: string; name: string; users: string[] }>({
             query: ({id, ...body}) => ({
@@ -53,6 +60,7 @@ export const {
     useGetChatroomsQuery,
     useGetChatroomByIdQuery,
     useCreateChatroomMutation,
+    useJoinChatroomMutation,
     useUpdateChatroomMutation,
     useDeleteChatroomMutation,
     useLazyGetOlderMessagesQuery,

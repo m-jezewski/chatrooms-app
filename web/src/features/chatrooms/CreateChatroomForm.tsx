@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 import {getErrorMessage} from "../../shared/getErrorMessage.ts";
 import {User} from "../../interfaces.ts";
 import {useCreateChatroomMutation} from "../../services/chatroomsApi.ts";
-import {deriveRoomKey, generateSalt, makeVerificationToken, uint8ToBase64} from "../../utils/roomCrypto.ts";
+import {deriveRoomSecrets, generateSalt, uint8ToBase64} from "../../utils/roomCrypto.ts";
 import { useRoomKeyContext } from './RoomKeyContext.tsx';
 
 interface CreateChatroomFormProps {
@@ -42,17 +42,16 @@ export const CreateChatroomForm = (
         const userIds = users.map(u => u.id)
         try {
             const salt = generateSalt();
-            const key = await deriveRoomKey(password, salt);
-            const verificationToken = await makeVerificationToken(key);
+            const secrets = await deriveRoomSecrets(password, salt);
 
             const room = await createChatroom({
                 users: userIds,
                 name: name,
                 salt: uint8ToBase64(salt),
-                verificationToken,
+                authKey: secrets.authKey,
             }).unwrap()
 
-            setKey(room.id, key); // unlocking room immediately after creation
+            setKey(room.id, secrets); // the server marked the creator's session as joined on create
             toast.success('Successfully created new chatroom!')
         } catch (error) {
             toast.error('Failed to create chatroom. ' + (getErrorMessage(error) || ''));

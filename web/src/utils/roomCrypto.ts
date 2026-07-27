@@ -1,12 +1,16 @@
-// Pipeline: password + per-room salt --PBKDF2-SHA256(310k)--> AES-256-GCM key.
+// Pipeline: password + per-room salt --PBKDF2-SHA256(310k)--> 256 base bits --HKDF-SHA256-->
+//   K_enc  ("chatrooms/enc/v1")  — non-extractable AES-256-GCM key, never leaves the browser
+//   K_auth ("chatrooms/auth/v1") — 32B base64 proof of the password, sent to the server
+// The branches are one-way: the server can't reach K_enc from K_auth.
 // Message blob format: base64( IV[12B] ‖ ciphertext ‖ authTag[16B] ).
 // WebCrypto appends the GCM auth tag to the ciphertext automatically.
 
 const PBKDF2_ITERATIONS = 310_000;
+const HKDF_ENC_INFO = 'chatrooms/enc/v1';
+const HKDF_AUTH_INFO = 'chatrooms/auth/v1';
 export const SALT_BYTES = 16;
 export const IV_BYTES = 12;
 const SENDER_ID_BYTES = 16;
-const VERIFICATION_PLAINTEXT = 'room-key-verification';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -20,25 +24,42 @@ export function generateSalt(): Uint8Array<ArrayBuffer> {
   return salt;
 }
 
-// Derive a non-extractable AES-256-GCM key from the room password and salt.
-export async function deriveRoomKey(password: string, salt: Uint8Array<ArrayBuffer>): Promise<CryptoKey> {
-  const utf8Password = encoder.encode(password);
+export interface RoomSecrets {
+  key: CryptoKey;
+  authKey: string;
+}
 
+// Derive both room secrets from the password and per-room salt.
+export async function deriveRoomSecrets(password: string, salt: Uint8Array<ArrayBuffer>): Promise<RoomSecrets> {
   const baseKey = await crypto.subtle.importKey(
     'raw',
-    utf8Password,
+    encoder.encode(password),
     'PBKDF2',
     false,
-    ['deriveKey'],
+    ['deriveBits'],
   );
-
-  return crypto.subtle.deriveKey(
+  const baseBits = await crypto.subtle.deriveBits(
     { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
     baseKey,
+    256,
+  );
+  const hkdfKey = await crypto.subtle.importKey('raw', baseBits, 'HKDF', false, ['deriveKey', 'deriveBits']);
+
+  const key = await crypto.subtle.deriveKey(
+    hkdfParams(HKDF_ENC_INFO),
+    hkdfKey,
     { name: 'AES-GCM', length: 256 },
     false,
     ['encrypt', 'decrypt'],
   );
+  const authBits = await crypto.subtle.deriveBits(hkdfParams(HKDF_AUTH_INFO), hkdfKey, 256);
+
+  return { key, authKey: uint8ToBase64(new Uint8Array(authBits)) };
+}
+
+function hkdfParams(info: string): HkdfParams {
+  // PBKDF2 already consumed the per-room salt; the distinct labels are what separates the branches.
+  return { name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(0), info: encoder.encode(info) };
 }
 
 
@@ -80,20 +101,6 @@ export async function decrypt(key: CryptoKey, blob: string): Promise<string> {
   const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
 
   return decoder.decode(plaintext);
-}
-
-// Encrypt a known plaintext so others can later prove they derived the same key. Stored on the room (public).
-export async function makeVerificationToken(key: CryptoKey): Promise<string> {
-  return encrypt(key, VERIFICATION_PLAINTEXT);
-}
-
-// True if the key correctly decrypts the room's verification token (i.e. the password was right).
-export async function verifyKey(key: CryptoKey, token: string): Promise<boolean> {
-  try {
-    return (await decrypt(key, token)) === VERIFICATION_PLAINTEXT;
-  } catch {
-    return false;
-  }
 }
 
 export function uint8ToBase64(bytes: Uint8Array): string {

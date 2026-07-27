@@ -28,7 +28,7 @@ model TextChannel {
   createdAt         DateTime @default(now())
   name              String
   salt              String
-  verificationToken String
+  authKeyHash       String
   owner             User?    @relation("ChannelOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   ownerId           String?  @db.Uuid
   messages          Message[]

@@ -21,7 +21,8 @@ export interface DecryptedMessage {
 export const Chatroom = () => {
   const { id: channelId } = useParams();
   const dispatch = useDispatch();
-  const { key } = useRoomKey(channelId);
+  const { secrets } = useRoomKey(channelId);
+  const key = secrets?.key;
   const senderId = getSenderId();
   const messages = useSelector((state: RootState) => state.messages.messages);
   const hasMore = useSelector((state: RootState) => state.messages.hasMore);

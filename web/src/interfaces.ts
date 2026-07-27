@@ -12,7 +12,6 @@ export interface Chatroom {
     ownerId: string | null;
     users: { id: string; }[];
     salt: string;
-    verificationToken: string;
 }
 
 export interface Message {

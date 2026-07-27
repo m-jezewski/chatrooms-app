@@ -15,6 +15,7 @@ import { User } from '@prisma/client';
 import { Request } from 'express';
 import { GetMessagesQueryDto } from './dto/messages.dto';
 import { TextChannelsService } from '../textChannels/textChannels.service';
+import { ChannelJoinedGuard } from '../textChannels/guards/channel-joined.guard';
 import { MessagesGateway } from './MessagesGateway';
 
 @ApiTags('Messages')
@@ -26,7 +27,7 @@ export class MessagesController {
     private readonly messagesGateway: MessagesGateway,
   ) {}
 
-  @UseGuards(SessionGuard)
+  @UseGuards(SessionGuard, ChannelJoinedGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   async getMessages(@Param('channelId') channelId: string, @Query() query: GetMessagesQueryDto, @Req() req: Request) {

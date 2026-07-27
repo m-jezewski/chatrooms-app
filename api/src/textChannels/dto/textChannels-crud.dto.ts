@@ -1,6 +1,6 @@
 import { TextChannel } from '@prisma/client';
 import { IsArray, IsDate, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
-import { OmitType, PartialType, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { OmitType, PartialType, PickType, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class TextChannelDto implements TextChannel {
   @ApiProperty({ example: 'a1b2c3d4-...' })
@@ -20,10 +20,10 @@ export class TextChannelDto implements TextChannel {
   @IsNotEmpty()
   salt: string;
 
-  @ApiProperty({ example: 'base64 blob', description: 'Lets clients confirm a derived key.' })
+  @ApiProperty({ description: 'bcrypt hash of the room auth key.' })
   @IsString()
   @IsNotEmpty()
-  verificationToken: string;
+  authKeyHash: string;
 
   @ApiProperty()
   @IsDate()
@@ -41,11 +41,32 @@ export class TextChannelDto implements TextChannel {
   users: string[];
 }
 
-export class CreateTextChannelDto extends OmitType(TextChannelDto, ['id', 'createdAt', 'ownerId'] as const) {
+export class CreateTextChannelDto extends OmitType(TextChannelDto, ['id', 'createdAt', 'ownerId', 'authKeyHash'] as const) {
+  @ApiProperty({ example: 'base64(32B)', description: 'Client-derived proof of the room password. Hashed server-side, never stored raw.' })
+  @IsString()
+  @IsNotEmpty()
+  authKey: string;
 }
 
-export class UpdateTextChannelDto extends PartialType(CreateTextChannelDto) {
+export class UpdateTextChannelDto extends PartialType(OmitType(CreateTextChannelDto, ['salt', 'authKey'] as const)) {
 }
 
-export class UpdateChannelUsersDto extends OmitType(TextChannelDto, ['name', 'id', 'createdAt', 'ownerId'] as const) {
+export class JoinTextChannelDto extends PickType(CreateTextChannelDto, ['authKey'] as const) {
+}
+
+export class UpdateChannelUsersDto extends PickType(TextChannelDto, ['users'] as const) {
+}
+
+export class TextChannelPublicDto extends OmitType(TextChannelDto, ['authKeyHash', 'users'] as const) {
+}
+
+export class ChannelMemberDto {
+  @ApiProperty({ example: 'a1b2c3d4-...' })
+  @IsUUID()
+  id: string;
+}
+
+export class TextChannelWithUsersDto extends TextChannelPublicDto {
+  @ApiProperty({ type: [ChannelMemberDto] })
+  users: ChannelMemberDto[];
 }
