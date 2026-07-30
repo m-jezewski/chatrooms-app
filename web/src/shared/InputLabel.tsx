@@ -1,4 +1,5 @@
 import {HTMLProps} from "react";
+import styles from "./InputLabel.module.scss";
 
 interface InputLabelProps extends HTMLProps<HTMLLabelElement> {
     children: React.ReactNode;
@@ -6,7 +7,7 @@ interface InputLabelProps extends HTMLProps<HTMLLabelElement> {
 
 export const InputLabel = ({ children, ...otherProps }: InputLabelProps) => {
     return (
-        <label {...otherProps} className={"text-xs text-gray-300 tracking-wide"} >
+        <label {...otherProps} className={styles.label} >
             {children}
         </label>
     )

@@ -1,0 +1,56 @@
+@use '../../styles/tokens' as *;
+
+.row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.wrap {
+  width: fit-content;
+}
+
+.mine {
+  margin-left: auto;
+}
+
+.theirs {
+  margin-right: auto;
+}
+
+.label {
+  color: $gray-500;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.labelMine {
+  text-align: right;
+  padding-right: 0.5rem;
+}
+
+.labelTheirs {
+  text-align: left;
+  padding-left: 0.5rem;
+}
+
+.bubble {
+  width: fit-content;
+  max-width: 18rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+}
+
+.bubbleMine {
+  background-color: $purple-900;
+}
+
+.bubbleTheirs {
+  background-color: $blue-900;
+}
+
+.text {
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}

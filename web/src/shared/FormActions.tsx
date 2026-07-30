@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './FormActions.module.scss';
 
 export const FormActions = (
   {
@@ -11,7 +12,7 @@ export const FormActions = (
     equalWidth?: boolean;
   }) => {
   return (
-    <div className={`flex gap-4 justify-end mt-4 ${equalWidth ? '[&>*]:flex-1' : ''} ${className}`}>
+    <div className={[styles.actions, equalWidth ? styles.equalWidth : '', className].join(' ')}>
       {children}
     </div>
   );

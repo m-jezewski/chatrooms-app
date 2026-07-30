@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './FormHeading.module.scss';
 
 export const FormHeading = (
   {
@@ -9,7 +10,7 @@ export const FormHeading = (
     as?: 'h1' | 'h2' | 'h3';
   }) => {
   return (
-    <Tag className="font-medium text-2xl mb-5 text-left text-gray-300">
+    <Tag className={styles.heading}>
       {children}
     </Tag>
   );

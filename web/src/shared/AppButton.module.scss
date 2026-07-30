@@ -1,0 +1,23 @@
+@use '../styles/tokens' as *;
+
+.button {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba($gray-300, 0.9);
+}
+
+.neutral { background-color: $neutral-900; }
+.slate { background-color: $slate-900; }
+.purple { background-color: rgba($fuchsia-950, 0.8); }
+.transparent { background-color: transparent; }
+.red { background-color: $rose-900; }
+
+.rounded { border-radius: $radius; }
+
+.round {
+  border-radius: 9999px;
+  aspect-ratio: 1;
+}
+
+.disabled { opacity: 0.5; }

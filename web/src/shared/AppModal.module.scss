@@ -1,0 +1,39 @@
+@use '../styles/tokens' as *;
+
+.dialog {
+  position: relative;
+  z-index: 50;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.panel {
+  max-width: 32rem;
+  padding: 2.75rem 3rem;
+  border-radius: $radius-lg;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(40px);
+  @include bg-modal;
+
+  & > * + * {
+    margin-top: 1rem;
+  }
+}
+
+.title {
+  font-weight: 500;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
+  color: $gray-300;
+}

@@ -1,0 +1,11 @@
+@use '../../styles/tokens' as *;
+
+.form {
+  min-width: 20rem;
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: $gray-400;
+  padding-top: 0.25rem;
+}

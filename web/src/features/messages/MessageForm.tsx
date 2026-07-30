@@ -2,6 +2,7 @@ import {TextInput} from "../../shared/TextInput.tsx";
 import {Form, Formik, FormikHelpers} from "formik";
 import React from "react";
 import {AppButton} from "../../shared/AppButton.tsx";
+import styles from "./MessageForm.module.scss";
 
 interface MessageFormValues {
     message: string;
@@ -30,8 +31,8 @@ export const MessageForm = ({sendMessage}: MessageFormProps) => {
         >
             {() => {
                 return (
-                    <Form className={"mt-auto"}>
-                        <div className={"border-t-2 border-slate-900 bg-indigo-900/25 p-4 relative"}>
+                    <Form className={styles.form}>
+                        <div className={styles.bar}>
                             <AppButton variant={'transparent'} rounded={true} style={{
                                 position: 'absolute',
                                 right: '1.25rem',
@@ -46,7 +47,7 @@ export const MessageForm = ({sendMessage}: MessageFormProps) => {
                                 </svg>
                             </AppButton>
 
-                            <TextInput name={'message'} className={'p-3 pr-12 rounded-lg bg-slate-900'} placeholder={"Write something..."}/>
+                            <TextInput name={'message'} className={styles.input} placeholder={"Write something..."}/>
                         </div>
                     </Form>
                 )

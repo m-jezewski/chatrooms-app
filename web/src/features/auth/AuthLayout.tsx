@@ -1,10 +1,11 @@
 import {Outlet} from "react-router";
+import styles from "./AuthLayout.module.scss";
 
 
 export const AuthLayout = () => {
     return (
-        <main className={"flex flex-col items-center justify-center gap-16 h-screen w-screen bg-dark-violet relative"}>
-            <h2 className={"text-center landingLogo text-5xl select-none"}>Chatrooms</h2>
+        <main className={styles.layout}>
+            <h2 className={styles.logo}>Chatrooms</h2>
             <Outlet />
         </main>
     )

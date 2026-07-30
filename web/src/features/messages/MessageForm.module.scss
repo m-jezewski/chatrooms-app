@@ -1,0 +1,19 @@
+@use '../../styles/tokens' as *;
+
+.form {
+  margin-top: auto;
+}
+
+.bar {
+  position: relative;
+  padding: 1rem;
+  border-top: 2px solid $slate-900;
+  background-color: rgba($indigo-900, 0.25);
+}
+
+.input {
+  padding: 0.75rem;
+  padding-right: 3rem;
+  border-radius: $radius-lg;
+  background-color: $slate-900;
+}

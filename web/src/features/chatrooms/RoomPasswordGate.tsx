@@ -8,6 +8,7 @@ import { FormContainer } from '../../shared/FormContainer.tsx';
 import { Chatroom } from '../../interfaces.ts';
 import { base64ToUint8, deriveRoomSecrets, RoomSecrets } from '../../utils/roomCrypto.ts';
 import { useJoinChatroomMutation } from '../../services/chatroomsApi.ts';
+import styles from './RoomPasswordGate.module.scss';
 
 interface RoomPasswordGateProps {
   channelData?: Chatroom;
@@ -44,17 +45,17 @@ export const RoomPasswordGate = ({ channelData, onJoin }: RoomPasswordGateProps)
   };
 
   return (
-    <div className={'grow flex items-center justify-center p-4'}>
+    <div className={styles.gate}>
       <Formik
         initialValues={{ password: '' }}
         validationSchema={object({ password: string().required('Password is required') })}
         onSubmit={handleSubmit}
       >
         {({ isSubmitting }) => (
-          <FormContainer className="min-w-80 max-w-96">
-            <div className={'text-center'}>
-              <h2 className={'text-xl mb-1'}>This room is encrypted</h2>
-              <p className={'text-sm text-gray-400'}>
+          <FormContainer className={styles.form}>
+            <div className={styles.intro}>
+              <h2 className={styles.title}>This room is encrypted</h2>
+              <p className={styles.hint}>
                 Enter the room password to decrypt messages. It never leaves your browser.
               </p>
             </div>

@@ -4,6 +4,7 @@ import {CreateChatroomFormModal} from "../features/chatrooms/CreateChatroomFormM
 import React, {useState} from "react";
 import {ChatroomList} from "../features/chatrooms/ChatroomList.tsx";
 import {useLogoutMutation} from "../services/authApi.ts";
+import styles from "./LoggedUserLayout.module.scss";
 
 const SidebarContent = ({onLogout, onAddChatroom}: {
     onLogout: () => void;
@@ -26,22 +27,22 @@ export const LoggedUserLayout = () => {
     const closeMobile = () => setMobileMenuOpen(false);
 
     return (
-        <div className={"flex flex-row items-stretch h-screen w-screen bg-dark relative"}>
+        <div className={styles.root}>
 
-            <div className="md:hidden fixed flex justify-between items-center p-4 pt-12 border-purple-950">
-                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white p-3 shadow-slate-700 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <div className={styles.mobileHeader}>
+                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className={styles.toggleButton}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.icon}>
                         <path strokeLinecap="round" strokeLinejoin="round" d={!mobileMenuOpen ? "M4 6h16M4 12h16M4 18h16" : "M6 18L18 6M6 6l12 12"} />
                     </svg>
                 </button>
             </div>
 
             {mobileMenuOpen && (
-                <div className="absolute z-10 top-0 left-0 w-full h-full bg-dark flex flex-col gap-4 p-6">
-                    <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-white text-2xl select-none">Chatrooms</h2>
-                        <button onClick={closeMobile} className="text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                <div className={styles.mobileMenu}>
+                    <div className={styles.mobileMenuHeader}>
+                        <h2 className={styles.mobileTitle}>Chatrooms</h2>
+                        <button onClick={closeMobile} className={styles.closeButton}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.closeIcon}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
@@ -53,18 +54,17 @@ export const LoggedUserLayout = () => {
                 </div>
             )}
 
-            <div className={"hidden md:flex basis-1/5 max-w-72 min-w-52 overflow-y-auto from-slate-900 to-neutral-900 flex-col p-3"}>
-                <Link to={'/chatrooms'}><h2
-                    className={"text-left text-white landingLogo text-2xl select-none p-4 border-b-2 border-purple-950 w-full"}>Chatrooms</h2>
+            <div className={styles.sidebar}>
+                <Link to={'/chatrooms'}><h2 className={styles.sidebarLogo}>Chatrooms</h2>
                 </Link>
-                <div className="flex flex-col gap-4 mt-4">
+                <div className={styles.sidebarNav}>
                     <SidebarContent
                         onLogout={() => logout()}
                         onAddChatroom={() => setIsOpen(true)}
                     />
                 </div>
             </div>
-            <main className={"basis-4/5 grow bg-dark-2 bg-gradient-to-tr"}>
+            <main className={styles.main}>
                 <Outlet/>
             </main>
             <CreateChatroomFormModal

@@ -15,6 +15,7 @@ import {User} from "../../interfaces.ts";
 import {useCreateChatroomMutation} from "../../services/chatroomsApi.ts";
 import {deriveRoomSecrets, generateSalt, uint8ToBase64} from "../../utils/roomCrypto.ts";
 import { useRoomKeyContext } from './RoomKeyContext.tsx';
+import styles from './CreateChatroomForm.module.scss';
 
 interface CreateChatroomFormProps {
     closeModal: () => void;
@@ -79,7 +80,7 @@ export const CreateChatroomForm = (
             onSubmit={handleSubmit}
         >
             {() => (
-                    <FormContainer className="min-w-80">
+                    <FormContainer className={styles.form}>
                         <div>
                             <InputLabel htmlFor={"name"}>Channel name</InputLabel>
                             <TextInput name={"name"} type={"name"} placeholder={"Channel name"}/>
@@ -87,7 +88,7 @@ export const CreateChatroomForm = (
                         <div>
                             <InputLabel htmlFor={"password"}>Room password</InputLabel>
                             <TextInput name={"password"} type={"password"} placeholder={"Room password"}/>
-                            <p className={"text-xs text-gray-400 pt-1"}>
+                            <p className={styles.hint}>
                                 Encrypts every message end-to-end. Share it out-of-band — it can't be recovered.
                             </p>
                         </div>

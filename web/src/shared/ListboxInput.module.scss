@@ -1,0 +1,71 @@
+@use '../styles/tokens' as *;
+
+.button {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: $radius;
+  background-color: $neutral-900;
+  color: rgba($gray-300, 0.9);
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-align: left;
+}
+
+.options {
+  --anchor-gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: $radius-xl;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.05);
+  transition: opacity 100ms ease-in;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-leave][data-closed] {
+    opacity: 0;
+  }
+}
+
+.option {
+  display: flex;
+  width: 18rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: $radius;
+  background-color: $neutral-900;
+  color: rgba($gray-300, 0.9);
+  font-size: 0.875rem;
+  font-weight: 400;
+
+  &:hover {
+    background-color: $slate-900;
+  }
+
+  &[data-focus] {
+    background-color: $slate-800;
+  }
+
+  &[data-selected] {
+    background-color: $slate-900;
+  }
+
+  &[data-disabled] {
+    background-color: $gray-950;
+  }
+
+  &[data-selected] .check {
+    visibility: visible;
+  }
+}
+
+.check {
+  visibility: hidden;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.error {
+  @include meta-error;
+}

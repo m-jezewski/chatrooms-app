@@ -1,0 +1,24 @@
+@use '../styles/tokens' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  border-radius: $radius;
+  background-color: $neutral-900;
+
+  &:focus-visible {
+    outline: 0;
+  }
+}
+
+.error {
+  @include meta-error;
+}

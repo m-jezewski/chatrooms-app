@@ -9,6 +9,7 @@ import { useLoginMutation } from '../../services/authApi.ts';
 import { FormHeading } from '../../shared/FormHeading.tsx';
 import { FormActions } from '../../shared/FormActions.tsx';
 import { FormContainer } from '../../shared/FormContainer.tsx';
+import styles from './Login.module.scss';
 
 interface formValues {
   email: string;
@@ -41,8 +42,7 @@ export const Login = () => {
   };
 
     return (
-        <div
-            className="rounded-lg min-w-80 flex flex-col justify-center align-middle gap-3 bg-fuchsia-900/15 shadow-sm py-11 px-12">
+        <div className={styles.card}>
             <FormHeading as="h1">Sign in</FormHeading>
             <Formik
                 initialValues={{
@@ -67,16 +67,16 @@ export const Login = () => {
                                 <InputLabel htmlFor={"password"}>Password</InputLabel>
                                 <TextInput name={"password"} type={"password"} placeholder={"********"}/>
                             </div>
-                            <AppButton variant={'purple'} loader={isLoading} className={"mt-3"}>
+                            <AppButton variant={'purple'} loader={isLoading} className={styles.signIn}>
                                 Sign in
                             </AppButton>
                         </FormContainer>
-                        <p className={"text-sm text-center mt-4 text-gray-300"}>New to Chatrooms?</p>
-                        <FormActions className={"mt-0"}>
-                            <AppButton type={"button"} variant={'slate'} className={"w-1/2"} onClick={handleRegisterButtonClick}>
+                        <p className={styles.subtext}>New to Chatrooms?</p>
+                        <FormActions className={styles.noMargin}>
+                            <AppButton type={"button"} variant={'slate'} className={styles.half} onClick={handleRegisterButtonClick}>
                                 Register
                             </AppButton>
-                            <AppButton type={"button"} className={"w-1/2 whitespace-nowrap"}
+                            <AppButton type={"button"} className={styles.halfNowrap}
                                        onClick={() => handleDemoButtonClick(formikConfig)}>
                                 Demo account
                             </AppButton>

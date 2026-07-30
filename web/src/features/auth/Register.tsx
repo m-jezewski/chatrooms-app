@@ -9,6 +9,7 @@ import {useRegisterMutation} from "../../services/authApi.ts";
 import {FormHeading} from "../../shared/FormHeading.tsx";
 import {FormActions} from "../../shared/FormActions.tsx";
 import {FormContainer} from "../../shared/FormContainer.tsx";
+import styles from "./Register.module.scss";
 
 interface formValues {
     email: string;
@@ -38,8 +39,7 @@ export const Register = () => {
     }
 
     return (
-      <div
-        className="rounded-lg min-w-80 flex flex-col justify-center align-middle gap-3 bg-slate-800/35 shadow-sm py-11 px-12">
+      <div className={styles.card}>
         <FormHeading as="h1">Register</FormHeading>
         <Formik
           initialValues={{
@@ -76,12 +76,12 @@ export const Register = () => {
                 <InputLabel htmlFor={"email"}>Password</InputLabel>
                 <TextInput name={"password"} type={"password"} />
               </div>
-              <AppButton className={"mt-2"} variant={'slate'} loader={isLoading} type={'submit'}>
+              <AppButton className={styles.register} variant={'slate'} loader={isLoading} type={'submit'}>
                 Register
               </AppButton>
-              <p className={"text-sm text-center mt-4 text-gray-300"}>Already have an account?</p>
-              <FormActions className={"mt-0"}>
-                <AppButton variant={'purple'} type={"button"} className={"w-full"} onClick={handleGoToLoginClick}>
+              <p className={styles.subtext}>Already have an account?</p>
+              <FormActions className={styles.noMargin}>
+                <AppButton variant={'purple'} type={"button"} className={styles.full} onClick={handleGoToLoginClick}>
                   Sign in
                 </AppButton>
               </FormActions>

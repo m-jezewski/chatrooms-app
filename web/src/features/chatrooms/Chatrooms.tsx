@@ -11,6 +11,7 @@ import { useRoomKey } from './RoomKeyContext.tsx';
 import { encrypt } from '../../utils/roomCrypto.ts';
 import { getNickname, getSenderId } from '../../utils/session.ts';
 import { Loader } from '../../shared/Loader.tsx';
+import styles from './Chatrooms.module.scss';
 
 export const Chatrooms = () => {
     const {id: channelId} = useParams();
@@ -50,9 +51,9 @@ export const Chatrooms = () => {
     };
 
     if (!channelId) {
-        return <div className={"flex justify-center items-center min-h-full text-center"}>
+        return <div className={styles.welcome}>
             <div>
-                <h1 className={"landingLogo text-4xl"}>Welcome to chatrooms</h1>
+                <h1 className={styles.welcomeTitle}>Welcome to chatrooms</h1>
                 <br/>
                 <p>Create your own chat with friends and blah blah blah</p>
             </div>
@@ -60,7 +61,7 @@ export const Chatrooms = () => {
     }
 
     return (
-        <div className={"max-h-full min-h-full flex flex-col"}>
+        <div className={styles.container}>
             <ChatroomTitlePanel channelData={channelData} />
             {!secrets ? (
                 <RoomPasswordGate
@@ -71,7 +72,7 @@ export const Chatrooms = () => {
                     }}
                 />
             ) : !joined ? (
-                <div className={"grow flex items-center justify-center"}>
+                <div className={styles.loading}>
                     <Loader/>
                 </div>
             ) : (

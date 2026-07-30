@@ -10,6 +10,7 @@ import { Loader } from '../../shared/Loader.tsx';
 import { useRoomKey } from './RoomKeyContext.tsx';
 import { decrypt } from '../../utils/roomCrypto.ts';
 import { getSenderId } from '../../utils/session.ts';
+import styles from './Chatroom.module.scss';
 
 
 export interface DecryptedMessage {
@@ -102,9 +103,9 @@ export const Chatroom = () => {
   };
 
   return (
-    <div ref={chatContainerRef} onScroll={handleScroll} className={'grow flex flex-col gap-2 p-4 overflow-y-auto'}>
+    <div ref={chatContainerRef} onScroll={handleScroll} className={styles.messages}>
       {hasMore && isFetching && (
-        <div className="flex justify-center py-2">
+        <div className={styles.loaderRow}>
           <Loader />
         </div>
       )}

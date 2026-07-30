@@ -6,6 +6,7 @@ import { Chatroom } from '../../interfaces.ts';
 import { selectLoggedUser } from '../auth/authSlice.ts';
 import { EditChatroomFormModal } from './EditChatroomFormModal.tsx';
 import { RemoveChatroomButton } from '../../shared/RemoveChatroomButton.tsx';
+import styles from './ChatroomTitlePanel.module.scss';
 
 interface ChatroomTitlePanelProps {
   channelData?: Chatroom
@@ -19,12 +20,12 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
   const isOwner = !!channelData?.ownerId && channelData.ownerId === loggedUser?.id;
 
   return (
-    <div className={"ml-20 mt-4 mb-4 mr-4 md:ml-4 bg-indigo-900/25 backdrop-blur-xl p-4 rounded-lg"}>
-      <div className={"flex items-center gap-2 mb-2 border-b-2 pb-1 border-gray-700"}>
-        <h1 className={"text-3xl break-all"}># {channelData?.name}</h1>
+    <div className={styles.panel}>
+      <div className={styles.titleRow}>
+        <h1 className={styles.title}># {channelData?.name}</h1>
       </div>
       {isOwner && (
-        <div className="flex gap-2 justify-end">
+        <div className={styles.actions}>
          <RemoveChatroomButton channelId={channelId} />
           <AppButton onClick={() => setIsEditFormOpen(true)}>
             Edit

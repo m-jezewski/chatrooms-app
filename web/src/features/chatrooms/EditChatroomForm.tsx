@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import { getErrorMessage } from '../../shared/getErrorMessage.ts';
 import { useUpdateChatroomMutation } from '../../services/chatroomsApi.ts';
 import { useGetUsersQuery } from '../../services/usersApi.ts';
+import styles from './EditChatroomForm.module.scss';
 
 interface EditChatroomFormProps {
   initialValues: Chatroom
@@ -63,7 +64,7 @@ export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditC
       onSubmit={handleSubmit}
     >
       {() => (
-        <FormContainer className="min-w-80">
+        <FormContainer className={styles.form}>
           <div>
             <InputLabel htmlFor={'name'}>Channel name</InputLabel>
             <TextInput name={'name'} type={'name'} placeholder={'Channel name'} />

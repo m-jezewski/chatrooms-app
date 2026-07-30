@@ -1,5 +1,6 @@
 import { Form } from 'formik';
 import React from 'react';
+import styles from './FormContainer.module.scss';
 
 export const FormContainer = (
   {
@@ -10,7 +11,7 @@ export const FormContainer = (
     className?: string;
   }) => {
   return (
-    <Form className={`w-full flex flex-col gap-3 min-w-64 ${className}`}>
+    <Form className={[styles.container, className].join(' ')}>
       {children}
     </Form>
   );

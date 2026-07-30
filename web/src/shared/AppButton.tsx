@@ -1,5 +1,6 @@
 import {ButtonHTMLAttributes, ReactNode} from "react";
 import {Loader} from "./Loader.tsx";
+import styles from "./AppButton.module.scss";
 
 interface AppButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     className?: string;
@@ -20,21 +21,13 @@ export const AppButton = (
     }: AppButtonProps
 ) => {
 
-    const colors = {
-        neutral: "bg-neutral-900",
-        slate: "bg-slate-900",
-        purple: "bg-fuchsia-950/80",
-        transparent: "bg-transparent",
-        red: 'bg-rose-900'
-    }
+    const roundedClass = rounded ? styles.round : styles.rounded
 
-    const roundedClass = rounded ? "rounded-full aspect-square" : "rounded"
-
-    const disabledClass = otherProps.disabled ? "opacity-50" : ""
+    const disabledClass = otherProps.disabled ? styles.disabled : ""
 
     return (
         <button {...otherProps}
-                className={[colors[variant], roundedClass, disabledClass, "p-2 text-gray-300/90 text-sm font-normal", className].join(" ")}>
+                className={[styles.button, styles[variant], roundedClass, disabledClass, className].join(" ")}>
             {loader ? <Loader /> : children}
         </button>
     )

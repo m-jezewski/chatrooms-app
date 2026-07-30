@@ -1,0 +1,12 @@
+@use './styles/tokens' as *;
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  min-height: 100vh;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: $blue-950;
+}

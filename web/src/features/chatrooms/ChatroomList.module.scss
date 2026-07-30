@@ -1,0 +1,36 @@
+@use '../../styles/tokens' as *;
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 2px solid $neutral-700;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.25rem;
+  font-weight: 400;
+  text-wrap: wrap;
+  word-break: break-all;
+  color: #fff;
+  border-radius: $radius;
+  border-bottom: 1px solid $neutral-700;
+  transition: all 150ms ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.active {
+  background-color: rgba(255, 255, 255, 0.05);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}

@@ -1,0 +1,7 @@
+@use '../styles/tokens' as *;
+
+.label {
+  font-size: 0.75rem;
+  color: $gray-300;
+  letter-spacing: 0.025em;
+}

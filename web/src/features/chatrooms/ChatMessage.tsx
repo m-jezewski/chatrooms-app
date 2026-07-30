@@ -1,5 +1,6 @@
 import React from 'react';
 import type { DecryptedMessage } from './Chatroom.tsx';
+import styles from './ChatMessage.module.scss';
 
 interface ChatMessageProps {
   previousMessageFromThisAuthor: boolean;
@@ -13,12 +14,12 @@ export const ChatMessage = ({ previousMessageFromThisAuthor, decrypted, mine }: 
 
   if (mine) {
     return (
-      <div className={'flex gap-2 flex-row'}>
-        <div className={'w-fit ml-auto'}>
+      <div className={styles.row}>
+        <div className={[styles.wrap, styles.mine].join(' ')}>
           {!previousMessageFromThisAuthor &&
-            <p className={'text-right text-gray-500 font-medium text-xs pr-2'}>You</p>}
-          <div className={'p-1.5 px-3 max-w-72 w-fit bg-purple-900 rounded-2xl'}>
-            <span style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }} className={'max-w-full text-md'}>{text}</span>
+            <p className={[styles.label, styles.labelMine].join(' ')}>You</p>}
+          <div className={[styles.bubble, styles.bubbleMine].join(' ')}>
+            <span className={styles.text}>{text}</span>
           </div>
         </div>
       </div>
@@ -26,12 +27,12 @@ export const ChatMessage = ({ previousMessageFromThisAuthor, decrypted, mine }: 
   }
 
   return (
-    <div className={'flex gap-2 flex-row'}>
-      <div className={'w-fit mr-auto'}>
+    <div className={styles.row}>
+      <div className={[styles.wrap, styles.theirs].join(' ')}>
         {!previousMessageFromThisAuthor &&
-          <p className={'text-left text-gray-500 font-medium text-xs pl-2'}>{nickname}</p>}
-        <div className={'p-1.5 px-3 max-w-72 w-fit bg-blue-900 rounded-2xl'}>
-          <span style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }} className={'max-w-full text-md'}>{text}</span>
+          <p className={[styles.label, styles.labelTheirs].join(' ')}>{nickname}</p>}
+        <div className={[styles.bubble, styles.bubbleTheirs].join(' ')}>
+          <span className={styles.text}>{text}</span>
         </div>
       </div>
     </div>

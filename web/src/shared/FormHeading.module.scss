@@ -1,0 +1,10 @@
+@use '../styles/tokens' as *;
+
+.heading {
+  font-weight: 500;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
+  color: $gray-300;
+}

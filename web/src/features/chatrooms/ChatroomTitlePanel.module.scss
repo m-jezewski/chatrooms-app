@@ -1,0 +1,36 @@
+@use '../../styles/tokens' as *;
+
+$md: 768px;
+
+.panel {
+  margin: 1rem 1rem 1rem 5rem;
+  padding: 1rem;
+  border-radius: $radius-lg;
+  background-color: rgba($indigo-900, 0.25);
+  backdrop-filter: blur(24px);
+
+  @media (min-width: $md) {
+    margin-left: 1rem;
+  }
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid $gray-700;
+}
+
+.title {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  word-break: break-all;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}

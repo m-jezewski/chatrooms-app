@@ -1,4 +1,4 @@
-import './App.css';
+import styles from './App.module.scss';
 import { Navigate, Route, Routes } from 'react-router';
 import { AuthLayout } from './features/auth/AuthLayout.tsx';
 import { Login } from './features/auth/Login.tsx';
@@ -17,7 +17,7 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className={'flex items-center justify-center w-screen min-h-screen mx-auto bg-blue-950'}>
+      <div className={styles.loading}>
         <Loader variant={'large'} />
       </div>
     );
