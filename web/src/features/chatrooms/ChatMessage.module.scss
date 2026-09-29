@@ -19,7 +19,7 @@
 }
 
 .label {
-  color: $gray-500;
+  color: $text-secondary;
   font-weight: 500;
   font-size: 0.75rem;
 }
@@ -42,11 +42,11 @@
 }
 
 .bubbleMine {
-  background-color: $purple-900;
+  background-color: #2563eb;
 }
 
 .bubbleTheirs {
-  background-color: $blue-900;
+  background-color: #121d41;
 }
 
 .text {

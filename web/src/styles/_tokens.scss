@@ -1,76 +1,37 @@
-// Design tokens — the old Tailwind default palette values we actually used,
-// pinned to hex so the look survives the Tailwind removal.
+$bg-color: #070c16;
+$input-bg: #0E172A;
+$border-color: #162341;
+$active-color: #1F315B;
 
-// Neutrals / slates
-$neutral-900: #171717;
-$neutral-800: #262626;
-$neutral-700: #404040;
-$slate-900: #0f172a;
-$slate-800: #1e293b;
+$bg-color-3: #171717;
+$bg-color-2: #10141E;
 
-// Accents
-$fuchsia-950: #4a044e;
-$fuchsia-900: #701a75;
-$rose-900: #881337;
-$purple-900: #581c87;
-$purple-950: #3b0764;
-$blue-900: #1e3a8a;
-$blue-950: #172554;
-$indigo-900: #312e81;
+$accent: #01A29D;
+$accent-darker: #017A76;
+$red: #881337;
 
-// Text / grays
-$gray-300: #d1d5db;
-$gray-400: #9ca3af;
-$gray-500: #6b7280;
-$gray-700: #374151;
-$gray-950: #030712;
-$red-300: #fca5a5;
+$surface-tint: rgba(17, 21, 32);
+$text-main: #e5e7eb;
+$text-secondary: #6b7280;
+$text-dark: #030712;
+$text-red: #fca5a5;
 
-$text-main: rgba(255, 255, 255, 0.87);
-
-// Radius
 $radius: 0.25rem;
 $radius-lg: 0.5rem;
-$radius-xl: 0.75rem;
 
-// Gradient surfaces (were the .bg-* utilities in index.css)
 @mixin bg-dark {
   background:
-    radial-gradient(1000px 600px at 50% -15%, rgba(139, 92, 246, 0.12), transparent 65%),
-    linear-gradient(to bottom, #08080f, #0e0e17);
+    radial-gradient(1000px 600px at 50% -15%, rgba(59, 130, 246, 0.12), transparent 65%),
+    linear-gradient(to bottom, $bg-color, #0b1220);
 }
 
-@mixin bg-dark-2 {
-  background:
-    radial-gradient(1200px 700px at 50% -20%, rgba(139, 92, 246, 0.16), transparent 60%),
-    linear-gradient(to bottom, #0b0b12, #111827);
-}
-
-@mixin bg-dark-violet {
-  background:
-    radial-gradient(1100px 700px at 50% -15%, rgba(139, 92, 246, 0.22), transparent 60%),
-    linear-gradient(to bottom, #151528, #1f1d3a);
-}
-
-@mixin bg-violet-surface {
-  background:
-    radial-gradient(900px 600px at 50% -10%, rgba(139, 92, 246, 0.18), transparent 65%),
-    linear-gradient(to bottom, #1b1a34, #26245a);
-}
-
-@mixin bg-modal {
-  background: rgba(35, 32, 70, 0.88);
-}
-
-// Brand wordmark font (was .landingLogo)
 @mixin logo-font {
   font-family: 'Playwrite VN', serif;
 }
 
-// Formik field error text (was .metaError)
 @mixin meta-error {
   font-size: 0.75rem;
-  color: $red-300;
+  color: $text-red;
   padding-left: 0.25rem;
   text-shadow: 0 0 10px rgba(0, 0, 0, 1);
 

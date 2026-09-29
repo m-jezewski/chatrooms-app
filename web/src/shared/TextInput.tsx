@@ -5,11 +5,13 @@ import styles from "./TextInput.module.scss";
 export const TextInput = (
     props: HTMLProps<HTMLInputElement>,
 ) => {
+    const {className, ...otherProps} = props;
+
     return (
         <Field name={props.name}>
             {({field, meta}: FieldProps) => (
                 <div className={styles.wrapper}>
-                    <input className={[styles.input, props.className].join(' ')} {...props} {...field} />
+                    <input className={[styles.input, className].join(' ')} {...otherProps} {...field} />
                     {meta.touched && meta.error && <div className={styles.error}>{meta.error}</div>}
                 </div>
             )}

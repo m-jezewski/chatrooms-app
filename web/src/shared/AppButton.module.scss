@@ -1,17 +1,56 @@
 @use '../styles/tokens' as *;
 
 .button {
-  padding: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 400;
-  color: rgba($gray-300, 0.9);
+  padding: 0.5rem 1rem;
+  font-size: 15px;
+  letter-spacing: 0.1px;
+  font-weight: 500;
+  transition: all 250ms ease-out;
+  color: rgba(255, 255, 255, 0.77);
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.97);;
+  }
+
+  &:focus-visible, &:focus {
+    outline: 0;
+    box-shadow: 0 0 2px 1px inset $accent;
+  }
+
+  &.compact {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
 }
 
-.neutral { background-color: $neutral-900; }
-.slate { background-color: $slate-900; }
-.purple { background-color: rgba($fuchsia-950, 0.8); }
+.neutral { background-color: $bg-color-3; }
+.slate { background-color: $bg-color-2; }
+.red { background-color: $red; }
+
+.purple {
+  background-color: $accent;
+  color: #02050EFF;
+
+  &:hover {
+    background-color: $accent-darker;
+    color: #02050EFF;
+  }
+
+  &:focus-visible, &:focus {
+    outline: 0;
+    box-shadow: 0 0 2px 1px inset white;
+  }
+}
+
 .transparent { background-color: transparent; }
-.red { background-color: $rose-900; }
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
 
 .rounded { border-radius: $radius; }
 

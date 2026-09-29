@@ -47,7 +47,7 @@ export const MessageForm = ({sendMessage}: MessageFormProps) => {
                                 </svg>
                             </AppButton>
 
-                            <TextInput name={'message'} className={styles.input} placeholder={"Write something..."}/>
+                            <TextInput name={'message'} className={styles.messageInput} placeholder={"Write something..."}/>
                         </div>
                     </Form>
                 )

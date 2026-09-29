@@ -6,14 +6,12 @@
 
 .bar {
   position: relative;
-  padding: 1rem;
-  border-top: 2px solid $slate-900;
-  background-color: rgba($indigo-900, 0.25);
+  padding: 0.5rem 0.75rem;
+  border-top: 2px solid $bg-color-2;
+  background-color: rgba($surface-tint, 0.3);
 }
 
-.input {
-  padding: 0.75rem;
-  padding-right: 3rem;
+.messageInput {
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
   border-radius: $radius-lg;
-  background-color: $slate-900;
 }
