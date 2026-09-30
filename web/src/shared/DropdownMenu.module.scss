@@ -1,0 +1,69 @@
+@use '../styles/tokens' as *;
+
+// Matches AppButton's compact/transparent look, so it sits naturally next to one.
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: $radius;
+  background-color: transparent;
+  color: $text-main;
+  transition: all 250ms ease-out;
+
+  &:hover {
+    color: $text-main;
+  }
+
+  &:focus-visible, &:focus, &[data-open] {
+    outline: 0;
+    box-shadow: 0 0 2px 1px inset $accent;
+  }
+}
+
+// Portaled and anchored to the trigger, styled like SelectInput's option list.
+.items {
+  min-width: 10rem;
+  --anchor-gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: $radius;
+  background-color: $input-bg;
+  border: 1px solid $border-color;
+  transition: opacity 100ms ease-in;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-leave][data-closed] {
+    opacity: 0;
+  }
+}
+
+.item {
+  display: block;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  font-size: 14px;
+  line-height: 1.5rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: $radius;
+  background-color: transparent;
+  color: $text-main;
+
+  &[data-focus] {
+    background-color: $border-color;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.danger {
+  color: #fca5a5;
+}

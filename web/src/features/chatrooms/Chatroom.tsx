@@ -20,7 +20,7 @@ export interface DecryptedMessage {
 }
 
 export const Chatroom = () => {
-  const { id: channelId } = useParams();
+  const { roomId: channelId } = useParams();
   const dispatch = useDispatch();
   const { secrets } = useRoomKey(channelId);
   const key = secrets?.key;

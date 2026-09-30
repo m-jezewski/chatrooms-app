@@ -7,7 +7,6 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  Patch,
   Post,
   Put,
   Req,
@@ -15,57 +14,56 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ThrottlerGuard } from '@nestjs/throttler';
-import { TextChannelsService } from './textChannels.service';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { TextChannelsService, ManageContext } from './textChannels.service';
 import { SessionGuard } from '../auth/guards/session-guard';
 import { User } from '@prisma/client';
-import {
-  CreateTextChannelDto,
-  JoinTextChannelDto,
-  TextChannelPublicDto,
-  UpdateChannelUsersDto,
-  UpdateTextChannelDto,
-} from './dto/textChannels-crud.dto';
+import { CreateTextChannelDto, JoinTextChannelDto, SaveRoomDto, UpdateTextChannelDto } from './dto/textChannels-crud.dto';
 import { Request } from 'express';
+
+function manageContext(req: Request): ManageContext {
+  const ownerToken = req.header('x-owner-token');
+  return { user: req.user as User | undefined, ownerToken };
+}
 
 @ApiTags('Text Channels')
 @Controller('textChannels')
 export class TextChannelsController {
   constructor(private readonly textChannelsService: TextChannelsService) {}
 
-  @UseGuards(SessionGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Get()
-  async getAllTextChannels(@Req() req: Request): Promise<TextChannelPublicDto[]> {
-    const user = req.user as User;
-
-    return this.textChannelsService.findChannelsByUser({
-      user,
-      findParams: {},
-    });
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  @Get('code/:inviteCode')
+  async getRoomByInviteCode(@Param('inviteCode') inviteCode: string) {
+    return this.textChannelsService.getRoomByInviteCode(inviteCode);
   }
 
   @UseGuards(SessionGuard)
+  @Get('saved')
+  async getSavedRooms(@Req() req: Request) {
+    const user = req.user as User;
+    return this.textChannelsService.getSavedRooms(user.id);
+  }
+
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  async getTextChannelById(@Param('id') id: string, @Req() req: Request) {
-    const user = req.user as User;
-
-    return this.textChannelsService.getChannel({ channelId: id, user: user });
+  async getTextChannelById(@Param('id') id: string) {
+    return this.textChannelsService.getChannel({ channelId: id });
   }
 
-  @UseGuards(SessionGuard)
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 3600_000 } })
   @UseInterceptors(ClassSerializerInterceptor)
-  @Post('create')
+  @Post()
   async create(@Body() textChannel: CreateTextChannelDto, @Req() req: Request) {
-    const user = req.user as User;
+    const user = req.user as User | undefined;
 
     const channel = await this.textChannelsService.createTextChannel({ textChannel, user });
     req.session.joinedChannels = [...(req.session.joinedChannels ?? []), channel.id];
     return channel;
   }
 
-  @UseGuards(SessionGuard, ThrottlerGuard)
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.OK)
   @Post(':id/join')
   async join(@Param('id') id: string, @Body() { authKey }: JoinTextChannelDto, @Req() req: Request) {
@@ -79,40 +77,43 @@ export class TextChannelsController {
   }
 
   @UseGuards(SessionGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Patch(':id')
-  async updateChannelUsers(@Param('id') id: string, @Body() { users }: UpdateChannelUsersDto, @Req() req: Request) {
+  @HttpCode(HttpStatus.OK)
+  @Post(':id/save')
+  async saveRoom(@Param('id') id: string, @Body() { name }: SaveRoomDto, @Req() req: Request) {
     const user = req.user as User;
-
-    return this.textChannelsService.updateUsersInChannel({
-      userIds: users,
-      user: user,
-      channelId: id,
-    });
+    return this.textChannelsService.saveRoom({ userId: user.id, roomId: id, name });
   }
 
   @UseGuards(SessionGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete(':id/save')
+  async unsaveRoom(@Param('id') id: string, @Req() req: Request) {
+    const user = req.user as User;
+    await this.textChannelsService.unsaveRoom({ userId: user.id, roomId: id });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post(':id/rotate-code')
+  async rotateInviteCode(@Param('id') id: string, @Req() req: Request) {
+    return this.textChannelsService.rotateInviteCode({ channelId: id, ctx: manageContext(req) });
+  }
+
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   async updateTextChannel(@Param('id') id: string, @Body() data: UpdateTextChannelDto, @Req() req: Request) {
-    const user = req.user as User;
-
     return this.textChannelsService.updateTextChannel({
       channelId: id,
       textChannel: data,
-      user,
+      ctx: manageContext(req),
     });
   }
 
-  @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
   async deleteTextChannel(@Param('id') id: string, @Req() req: Request) {
-    const user = req.user as User;
-
     return this.textChannelsService.deleteTextChannel({
       channelId: id,
-      user: user,
+      ctx: manageContext(req),
     });
   }
 }

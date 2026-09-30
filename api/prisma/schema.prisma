@@ -14,33 +14,48 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid()) @db.Uuid
-  createdAt     DateTime @default(now())
-  email         String   @unique
+  id            String        @id @default(uuid()) @db.Uuid
+  createdAt     DateTime      @default(now())
+  email         String        @unique
   password      String
   name          String?
-  textChannels  TextChannel[] @relation("ChannelMembers")
   ownedChannels TextChannel[] @relation("ChannelOwner")
+  savedRooms    SavedRoom[]
 }
 
 model TextChannel {
-  id                String   @id @default(uuid()) @db.Uuid
-  createdAt         DateTime @default(now())
-  name              String
-  salt              String
-  authKeyHash       String
-  owner             User?    @relation("ChannelOwner", fields: [ownerId], references: [id], onDelete: SetNull)
-  ownerId           String?  @db.Uuid
-  messages          Message[]
-  users             User[]   @relation("ChannelMembers")
+  id             String      @id @default(uuid()) @db.Uuid
+  createdAt      DateTime    @default(now())
+  name           String
+  salt           String
+  authKeyHash    String
+  inviteCode     String      @unique
+  ownerTokenHash String?
+  expiresAt      DateTime?
+  owner          User?       @relation("ChannelOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId        String?     @db.Uuid
+  messages       Message[]
+  savedBy        SavedRoom[]
+}
+
+model SavedRoom {
+  id        String      @id @default(uuid()) @db.Uuid
+  createdAt DateTime    @default(now())
+  name      String?
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String      @db.Uuid
+  room      TextChannel @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId    String      @db.Uuid
+
+  @@unique([userId, roomId])
 }
 
 model Message {
-  id               String   @id @default(uuid()) @db.Uuid
-  payload          String
-  senderId         String
-  createdAt        DateTime @default(now())
+  id        String   @id @default(uuid()) @db.Uuid
+  payload   String
+  senderId  String
+  createdAt DateTime @default(now())
 
   textChannel   TextChannel? @relation(fields: [textChannelId], references: [id], onDelete: Cascade)
-  textChannelId String?  @db.Uuid
+  textChannelId String?      @db.Uuid
 }

@@ -1,73 +1,119 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, User } from '@prisma/client';
+import { TextChannel, User } from '@prisma/client';
+import { createHash, randomBytes } from 'crypto';
 import {
+  CreatedTextChannelDto,
   CreateTextChannelDto,
+  RoomLocatorDto,
+  SavedRoomDto,
   TextChannelPublicDto,
-  TextChannelWithUsersDto,
   UpdateTextChannelDto,
 } from './dto/textChannels-crud.dto';
 import * as bcrypt from 'bcrypt';
 
 const AUTH_KEY_SALT_ROUNDS = 10;
+const OWNER_TOKEN_BYTES = 32;
+const INVITE_CODE_LENGTH = 8;
+
+const INVITE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const INVITE_CODE_MAX_ATTEMPTS = 5;
+const ANONYMOUS_TTL_MAX_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const SECRET_FIELDS = { authKeyHash: true, ownerTokenHash: true } as const;
+
+export interface ManageContext {
+  user?: User;
+  ownerToken?: string;
+}
 
 @Injectable()
 export class TextChannelsService {
   constructor(private prisma: PrismaService) {}
 
-  private canAccessChannel(channel: TextChannelWithUsersDto, user: User): boolean {
-    return channel.users.some((channelUser) => channelUser.id === user.id);
+  private sha256(value: string): string {
+    return createHash('sha256').update(value).digest('hex');
   }
 
-  private assertChannelOwner(channel: TextChannelWithUsersDto, user: User): void {
-    if (channel.ownerId !== user.id) {
-      throw new ForbiddenException('Only the channel owner can perform this action');
+  private assertCanManage(channel: Pick<TextChannel, 'ownerId' | 'ownerTokenHash'>, ctx: ManageContext): void {
+    const { user, ownerToken } = ctx;
+
+    if (channel.ownerId && user && channel.ownerId === user.id) {
+      return;
     }
+    if (channel.ownerTokenHash && ownerToken && this.sha256(ownerToken) === channel.ownerTokenHash) {
+      return;
+    }
+    throw new ForbiddenException('Only the room owner can manage this room');
   }
 
-  async findChannelsByUser(params: {
-    findParams: Prisma.TextChannelFindManyArgs;
-    user: User;
-  }): Promise<TextChannelPublicDto[]> {
-    const { findParams, user } = params;
-
-    return this.prisma.textChannel.findMany({
-      ...findParams,
-      where: {
-        ...findParams.where,
-        users: {
-          some: {
-            id: user.id,
-          },
-        },
-      },
-      omit: { authKeyHash: true },
-    });
+  private generateInviteCode(): string {
+    const bytes = randomBytes(INVITE_CODE_LENGTH);
+    let code = '';
+    for (let i = 0; i < INVITE_CODE_LENGTH; i++) {
+      code += INVITE_ALPHABET[bytes[i] % INVITE_ALPHABET.length];
+    }
+    return code;
   }
 
-  async getChannel(params: { channelId: string; user: User }): Promise<TextChannelWithUsersDto> {
-    const { channelId, user } = params;
+  private async generateUniqueInviteCode(): Promise<string> {
+    for (let attempt = 0; attempt < INVITE_CODE_MAX_ATTEMPTS; attempt++) {
+      const code = this.generateInviteCode();
+      const existing = await this.prisma.textChannel.findUnique({ where: { inviteCode: code }, select: { id: true } });
+      if (!existing) {
+        return code;
+      }
+    }
+    throw new Error('Could not generate a unique invite code');
+  }
+
+  private resolveExpiry(expiresAt: string | null | undefined, isAccountOwned: boolean): Date | null {
+    const parsed = expiresAt ? new Date(expiresAt) : null;
+
+    if (isAccountOwned) {
+      return parsed;
+    }
+    if (!parsed) {
+      throw new BadRequestException('Anonymous rooms must have an expiry date');
+    }
+    if (parsed.getTime() > Date.now() + ANONYMOUS_TTL_MAX_MS) {
+      throw new BadRequestException('Anonymous rooms can live at most 30 days');
+    }
+
+    return parsed;
+  }
+
+  private async getManageableChannel(channelId: string): Promise<TextChannel> {
+    const channel = await this.prisma.textChannel.findUnique({ where: { id: channelId } });
+    if (!channel) {
+      throw new NotFoundException('Channel not found');
+    }
+    return channel;
+  }
+
+  async getChannel(params: { channelId: string }): Promise<TextChannelPublicDto> {
     const channel = await this.prisma.textChannel.findUnique({
-      where: { id: channelId },
-      include: {
-        users: {
-          select: {
-            id: true,
-          },
-        },
-      },
-      omit: { authKeyHash: true },
+      where: { id: params.channelId },
+      omit: SECRET_FIELDS,
     });
 
     if (!channel) {
       throw new NotFoundException('Channel not found');
     }
 
-    if (!this.canAccessChannel(channel, user)) {
-      throw new ForbiddenException('You are not a member of this channel');
+    return channel;
+  }
+
+  async getRoomByInviteCode(inviteCode: string): Promise<RoomLocatorDto> {
+    const channel = await this.prisma.textChannel.findUnique({
+      where: { inviteCode },
+      select: { id: true, name: true, salt: true },
+    });
+
+    if (!channel) {
+      throw new NotFoundException('Room not found');
     }
 
-    return channel;
+    return { roomId: channel.id, name: channel.name, salt: channel.salt };
   }
 
   async verifyChannelAuthKey(params: { channelId: string; authKey: string }): Promise<void> {
@@ -84,62 +130,105 @@ export class TextChannelsService {
     }
   }
 
-  async createTextChannel(params: { textChannel: CreateTextChannelDto; user: User }): Promise<TextChannelPublicDto> {
+  async createTextChannel(params: { textChannel: CreateTextChannelDto; user?: User }): Promise<CreatedTextChannelDto> {
     const { textChannel, user } = params;
-    const { authKey, users, ...channelData } = textChannel;
-    const memberIds = Array.from(new Set([...users, user.id]));
+    const { authKey, expiresAt, ...channelData } = textChannel;
 
-    return this.prisma.textChannel.create({
+    const inviteCode = await this.generateUniqueInviteCode();
+    const authKeyHash = await bcrypt.hash(authKey, AUTH_KEY_SALT_ROUNDS);
+    const parsedExpiresAt = this.resolveExpiry(expiresAt, !!user);
+
+    if (user) {
+      return this.prisma.textChannel.create({
+        data: {
+          ...channelData,
+          authKeyHash,
+          inviteCode,
+          expiresAt: parsedExpiresAt,
+          owner: { connect: { id: user.id } },
+        },
+        omit: SECRET_FIELDS,
+      });
+    }
+
+    const ownerToken = randomBytes(OWNER_TOKEN_BYTES).toString('base64url');
+    const channel = await this.prisma.textChannel.create({
       data: {
         ...channelData,
-        authKeyHash: await bcrypt.hash(authKey, AUTH_KEY_SALT_ROUNDS),
-        owner: { connect: { id: user.id } },
-        users: {
-          connect: memberIds.map((userId) => ({ id: userId })),
-        },
+        authKeyHash,
+        inviteCode,
+        expiresAt: parsedExpiresAt,
+        ownerTokenHash: this.sha256(ownerToken),
       },
-      omit: { authKeyHash: true },
+      omit: SECRET_FIELDS,
     });
+
+    return { ...channel, ownerToken };
+  }
+
+  async rotateInviteCode(params: { channelId: string; ctx: ManageContext }): Promise<{ inviteCode: string }> {
+    const { channelId, ctx } = params;
+    const channel = await this.getManageableChannel(channelId);
+    this.assertCanManage(channel, ctx);
+
+    const inviteCode = await this.generateUniqueInviteCode();
+    await this.prisma.textChannel.update({ where: { id: channelId }, data: { inviteCode } });
+    return { inviteCode };
   }
 
   async updateTextChannel(params: {
     channelId: string;
-    user: User;
+    ctx: ManageContext;
     textChannel: UpdateTextChannelDto;
   }): Promise<TextChannelPublicDto> {
-    const { textChannel, channelId, user } = params;
-    const channel = await this.getChannel({ channelId, user });
-    this.assertChannelOwner(channel, user);
+    const { textChannel, channelId, ctx } = params;
+    const channel = await this.getManageableChannel(channelId);
+    this.assertCanManage(channel, ctx);
+
+    const { expiresAt, ...rest } = textChannel;
+    const expiry = 'expiresAt' in textChannel ? { expiresAt: this.resolveExpiry(expiresAt, !!channel.ownerId) } : {};
 
     return this.prisma.textChannel.update({
       where: { id: channelId },
-      data: {
-        ...textChannel,
-        users: textChannel.users ? { set: textChannel.users.map((userId) => ({ id: userId })) } : undefined,
-      },
-      omit: { authKeyHash: true },
+      data: { ...rest, ...expiry },
+      omit: SECRET_FIELDS,
     });
   }
 
-  async deleteTextChannel(params: { channelId: string; user: User }): Promise<TextChannelPublicDto> {
-    const { channelId, user } = params;
-    const channel = await this.getChannel({ channelId, user });
-    this.assertChannelOwner(channel, user);
-    return this.prisma.textChannel.delete({ where: { id: channelId }, omit: { authKeyHash: true } });
+  async deleteTextChannel(params: { channelId: string; ctx: ManageContext }): Promise<TextChannelPublicDto> {
+    const { channelId, ctx } = params;
+    const channel = await this.getManageableChannel(channelId);
+    this.assertCanManage(channel, ctx);
+    return this.prisma.textChannel.delete({ where: { id: channelId }, omit: SECRET_FIELDS });
   }
 
-  async updateUsersInChannel(params: { userIds: string[]; channelId: string; user: User }) {
-    const { userIds, channelId, user } = params;
-    const channel = await this.getChannel({ channelId, user });
-    this.assertChannelOwner(channel, user);
+  async saveRoom(params: { userId: string; roomId: string; name?: string }): Promise<SavedRoomDto> {
+    const { userId, roomId, name } = params;
+    const room = await this.prisma.textChannel.findUnique({ where: { id: roomId }, select: { name: true } });
+    if (!room) {
+      throw new NotFoundException('Room not found');
+    }
 
-    await this.prisma.textChannel.update({
-      where: { id: channelId },
-      data: {
-        users: {
-          connect: userIds.map((userId) => ({ id: userId })),
-        },
-      },
+    const saved = await this.prisma.savedRoom.upsert({
+      where: { userId_roomId: { userId, roomId } },
+      create: { userId, roomId, name: name ?? null },
+      update: { name: name ?? null },
     });
+
+    return { roomId, name: saved.name ?? room.name };
+  }
+
+  async unsaveRoom(params: { userId: string; roomId: string }): Promise<void> {
+    await this.prisma.savedRoom.deleteMany({ where: params });
+  }
+
+  async getSavedRooms(userId: string): Promise<SavedRoomDto[]> {
+    const saved = await this.prisma.savedRoom.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: { room: { select: { name: true } } },
+    });
+
+    return saved.map((entry) => ({ roomId: entry.roomId, name: entry.name ?? entry.room.name }));
   }
 }

@@ -11,21 +11,18 @@ import { useRoomKey } from './RoomKeyContext.tsx';
 import { encrypt } from '../../utils/roomCrypto.ts';
 import { getNickname, getSenderId } from '../../utils/session.ts';
 import { Loader } from '../../shared/Loader.tsx';
+import { recordRecentRoom } from '../../utils/recentRooms.ts';
 import styles from './Chatrooms.module.scss';
 
 export const Chatrooms = () => {
-    const {id: channelId} = useParams();
+    const {roomId: channelId} = useParams();
     const {data: channelData} = useGetChatroomByIdQuery(channelId!, {skip: !channelId});
     const { secrets, setSecrets } = useRoomKey(channelId);
     const [joinChatroom] = useJoinChatroomMutation();
-    // The channel this browser tab has proven the room password for on the server.
     const [joinedChannelId, setJoinedChannelId] = useState<string | null>(null);
     const joined = !!channelId && joinedChannelId === channelId;
-    // Join the socket room only once the server session knows the join, or joinChannel gets rejected.
     const {sendMessage} = useWebSocket(joined ? channelId : undefined);
 
-    // Held secrets don't guarantee a joined server session (expiry, server restart) —
-    // silently re-prove the password with the stored authKey instead of prompting again.
     useEffect(() => {
         if (!channelId || !secrets || joinedChannelId === channelId) return;
         let cancelled = false;
@@ -44,6 +41,12 @@ export const Chatrooms = () => {
         };
     }, [channelId, secrets, joinedChannelId, joinChatroom]);
 
+    useEffect(() => {
+        if (channelData) {
+            recordRecentRoom({ roomId: channelData.id, name: channelData.name });
+        }
+    }, [channelData]);
+
     const handleSendMessage = async (text: string) => {
         if (!channelId || !secrets) return;
         const payload = await encrypt(secrets.key, JSON.stringify({ nickname: getNickname(), text }));
@@ -53,9 +56,10 @@ export const Chatrooms = () => {
     if (!channelId) {
         return <div className={styles.welcome}>
             <div>
-                <h1 className={styles.welcomeTitle}>Welcome to chatrooms</h1>
-                <br/>
-                <p>Create your own chat with friends and blah blah blah</p>
+                <h1 className={styles.welcomeTitle}>No room open</h1>
+                <p className={styles.welcomeText}>
+                    Pick one from the sidebar, or create and join rooms from there.
+                </p>
             </div>
         </div>
     }
@@ -68,7 +72,7 @@ export const Chatrooms = () => {
                     channelData={channelData}
                     onJoin={(roomSecrets) => {
                         setSecrets(roomSecrets);
-                        setJoinedChannelId(channelId); // the gate already joined the session
+                        setJoinedChannelId(channelId);
                     }}
                 />
             ) : !joined ? (

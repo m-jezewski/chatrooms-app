@@ -1,0 +1,106 @@
+@use '../styles/tokens' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 14px;
+  line-height: 1.5rem;
+  text-align: left;
+  color: $text-main;
+  border-radius: $radius;
+  background-color: $input-bg;
+  border: 1px solid $border-color;
+  transition: box-shadow 75ms ease-out;
+
+  &:focus {
+    outline: 0;
+  }
+
+  &[data-focus], &[data-open] {
+    outline: 0;
+    box-shadow: 0 0 2px 1px inset $accent;
+  }
+}
+
+.placeholder {
+  color: $text-secondary;
+}
+
+.chevron {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: $text-secondary;
+  transition: transform 150ms ease-out;
+
+  .button[data-open] & {
+    transform: rotate(180deg);
+  }
+}
+
+.options {
+  width: var(--button-width);
+  --anchor-gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: $radius;
+  background-color: $input-bg;
+  border: 1px solid $border-color;
+  transition: opacity 100ms ease-in;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-leave][data-closed] {
+    opacity: 0;
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  font-size: 14px;
+  line-height: 1.5rem;
+  cursor: pointer;
+  border-radius: $radius;
+  color: $text-main;
+
+  &[data-focus] {
+    background-color: $border-color;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .check {
+    visibility: hidden;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    color: $accent;
+  }
+
+  &[data-selected] .check {
+    visibility: visible;
+  }
+}
+
+.error {
+  @include meta-error;
+}

@@ -1,0 +1,20 @@
+@use '../../styles/tokens' as *;
+
+.register {
+  margin-top: 1rem;
+}
+
+.subtext {
+  font-size: 0.875rem;
+  text-align: center;
+  margin-top: 1rem;
+  color: $text-main;
+}
+
+.noMargin {
+  margin-top: 0;
+}
+
+.full {
+  width: 100%;
+}

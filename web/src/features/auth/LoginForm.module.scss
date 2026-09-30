@@ -1,0 +1,25 @@
+@use '../../styles/tokens' as *;
+
+.signIn {
+  margin-top: 1rem;
+}
+
+.subtext {
+  font-size: 0.875rem;
+  text-align: center;
+  margin-top: 1rem;
+  color: $text-main;
+}
+
+.noMargin {
+  margin-top: 0;
+}
+
+.half {
+  width: 50%;
+}
+
+.halfNowrap {
+  width: 50%;
+  white-space: nowrap;
+}

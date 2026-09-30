@@ -1,89 +1,20 @@
-import { Formik, FormikHelpers, FormikProps } from 'formik';
-import { TextInput } from '../../shared/TextInput.tsx';
-import { InputLabel } from '../../shared/InputLabel.tsx';
-import { AppButton } from '../../shared/AppButton.tsx';
-import { object, string } from 'yup';
+import React from 'react';
 import { useNavigate } from 'react-router';
-import toast from 'react-hot-toast';
-import { useLoginMutation } from '../../services/authApi.ts';
 import { FormHeading } from '../../shared/FormHeading.tsx';
-import { FormActions } from '../../shared/FormActions.tsx';
-import { FormContainer } from '../../shared/FormContainer.tsx';
+import { LoginForm } from './LoginForm.tsx';
 import styles from './Login.module.scss';
 
-interface formValues {
-  email: string;
-  password: string;
-}
-
+// Entry-layout host for signing in. Inside the app shell the same form opens in AuthModal.
 export const Login = () => {
-  const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
 
-  const handleSubmit = async (values: formValues, formikHelpers: FormikHelpers<formValues>) => {
-    try {
-      await login(values).unwrap();
-      navigate('/chatrooms');
-    } catch (error) {
-      toast.error('Failed to log in.');
-    }
-    formikHelpers.resetForm();
-  };
-
-  const handleRegisterButtonClick = () => {
-    navigate('/register');
-  };
-
-  const handleDemoButtonClick = async (formikConfig: FormikProps<formValues>) => {
-    await formikConfig.setValues({
-      email: 'public_user@chatrooms.com',
-      password: 'public_user_password',
-    }, true);
-  };
-
-    return (
-        <div className={styles.card}>
-            <FormHeading as="h1">Sign in</FormHeading>
-            <Formik
-                initialValues={{
-                    email: '',
-                    password: '',
-                }}
-                validationSchema={object({
-                    email: string()
-                        .email()
-                        .required(),
-                    password: string().required().min(5).max(50)
-                })}
-                onSubmit={handleSubmit}
-            >
-                {(formikConfig) => (<>
-                        <FormContainer>
-                            <div>
-                                <InputLabel htmlFor={"email"}>Email</InputLabel>
-                                <TextInput name={"email"} type={"email"} placeholder={"youremail@domain.com"}/>
-                            </div>
-                            <div>
-                                <InputLabel htmlFor={"password"}>Password</InputLabel>
-                                <TextInput name={"password"} type={"password"} placeholder={"********"}/>
-                            </div>
-                            <AppButton variant={'purple'} loader={isLoading} className={styles.signIn}>
-                                Sign in
-                            </AppButton>
-                        </FormContainer>
-                        <p className={styles.subtext}>New to Chatrooms?</p>
-                        <FormActions className={styles.noMargin}>
-                            <AppButton type={"button"} variant={'slate'} className={styles.half} onClick={handleRegisterButtonClick}>
-                                Register
-                            </AppButton>
-                            <AppButton type={"button"} className={styles.halfNowrap}
-                                       onClick={() => handleDemoButtonClick(formikConfig)}>
-                                Demo account
-                            </AppButton>
-                        </FormActions>
-                    </>
-                )}
-            </Formik>
-        </div>
-    )
-}
+  return (
+    <div className={styles.card}>
+      <FormHeading as="h1">Sign in</FormHeading>
+      <LoginForm
+        onSuccess={() => navigate('/chatrooms')}
+        onSwitchToRegister={() => navigate('/register')}
+      />
+    </div>
+  );
+};

@@ -1,39 +1,18 @@
-import {
-  ClassSerializerInterceptor,
-  Controller,
-  Get,
-  Param,
-  Query,
-  Req,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { ClassSerializerInterceptor, Controller, Get, Param, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { MessagesService } from './messages.service';
-import { SessionGuard } from '../auth/guards/session-guard';
-import { User } from '@prisma/client';
-import { Request } from 'express';
 import { GetMessagesQueryDto } from './dto/messages.dto';
-import { TextChannelsService } from '../textChannels/textChannels.service';
 import { ChannelJoinedGuard } from '../textChannels/guards/channel-joined.guard';
-import { MessagesGateway } from './MessagesGateway';
 
 @ApiTags('Messages')
 @Controller('textChannels/:channelId/messages')
 export class MessagesController {
-  constructor(
-    private readonly messagesService: MessagesService,
-    private readonly textChannelsService: TextChannelsService,
-    private readonly messagesGateway: MessagesGateway,
-  ) {}
+  constructor(private readonly messagesService: MessagesService) {}
 
-  @UseGuards(SessionGuard, ChannelJoinedGuard)
+  @UseGuards(ChannelJoinedGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async getMessages(@Param('channelId') channelId: string, @Query() query: GetMessagesQueryDto, @Req() req: Request) {
-    const user = req.user as User;
-    await this.textChannelsService.getChannel({ channelId, user });
-
+  async getMessages(@Param('channelId') channelId: string, @Query() query: GetMessagesQueryDto) {
     const messages = await this.messagesService.getChannelMessages({
       channelId,
       before: query.before,

@@ -10,8 +10,24 @@ export interface Chatroom {
     name: string;
     createdAt: Date;
     ownerId: string | null;
-    users: { id: string; }[];
     salt: string;
+    inviteCode: string;
+    expiresAt: string | null;
+}
+
+export interface CreatedChatroom extends Chatroom {
+    ownerToken?: string;
+}
+
+export interface RoomLocator {
+    roomId: string;
+    name: string;
+    salt: string;
+}
+
+export interface SavedRoom {
+    roomId: string;
+    name: string;
 }
 
 export interface Message {

@@ -1,0 +1,51 @@
+@use '../styles/tokens' as *;
+
+.layout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  min-height: 100vh;
+  width: 100vw;
+  padding: 3rem 1rem;
+  background-color: $bg-color;
+}
+
+.authBar {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+// In the flow, directly under the card — the layout's 2.5rem gap would push it too far off,
+// so it pulls itself back up towards the form it belongs to.
+.backRow {
+  display: flex;
+  justify-content: center;
+  margin-top: -1.5rem;
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.backArrow {
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
+}
+
+.logo {
+  text-align: center;
+  font-size: 3rem;
+  line-height: 1;
+  user-select: none;
+  color: $text-main;
+  @include logo-font;
+}

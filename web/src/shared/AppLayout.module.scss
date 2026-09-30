@@ -62,6 +62,7 @@ $md: 768px;
   font-size: 1.5rem;
   line-height: 2rem;
   user-select: none;
+  @include logo-font;
 }
 
 .closeButton {
@@ -81,22 +82,11 @@ $md: 768px;
   min-width: 13rem;
   padding: 0.75rem;
   overflow-y: auto;
+  background-color: $bg-color-2;
 
   @media (min-width: $md) {
     display: flex;
   }
-}
-
-.sidebarLogo {
-  width: 100%;
-  text-align: left;
-  color: #fff;
-  font-size: 1.5rem;
-  line-height: 2rem;
-  user-select: none;
-  padding: 1rem;
-  border-bottom: 2px solid $purple-950;
-  @include logo-font;
 }
 
 .sidebarNav {
@@ -104,10 +94,24 @@ $md: 768px;
   flex-direction: column;
   gap: 1rem;
   margin-top: 1rem;
+  flex: 1;
+}
+
+.sectionLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $text-secondary;
+  padding: 0 0.25rem;
+}
+
+.spacer {
+  flex: 1;
 }
 
 .main {
   flex-basis: 80%;
   flex-grow: 1;
-  @include bg-dark-2;
+  overflow-y: auto;
+  background-color: $bg-color;
 }

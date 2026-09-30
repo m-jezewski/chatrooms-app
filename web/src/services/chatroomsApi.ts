@@ -1,28 +1,28 @@
 import {api} from './api.ts';
-import {Chatroom, Message} from '../interfaces.ts';
+import {Chatroom, CreatedChatroom, Message, RoomLocator, SavedRoom} from '../interfaces.ts';
+
+const ownerHeaders = (ownerToken?: string | null) => (ownerToken ? { 'X-Owner-Token': ownerToken } : undefined);
 
 export const chatroomsApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getChatrooms: builder.query<Chatroom[], void>({
-            query: () => '/textChannels/',
-            providesTags: ['ChatroomList'],
-        }),
         getChatroomById: builder.query<Chatroom, string>({
             query: (id) => `/textChannels/${id}`,
             providesTags: (_result, _error, id) => [{type: 'Chatroom', id}],
         }),
-        createChatroom: builder.mutation<Chatroom, {
+        getRoomByInviteCode: builder.query<RoomLocator, string>({
+            query: (inviteCode) => `/textChannels/code/${inviteCode}`,
+        }),
+        createChatroom: builder.mutation<CreatedChatroom, {
             name: string;
-            users: string[];
             salt: string;
             authKey: string;
+            expiresAt?: string | null;
         }>({
             query: (channelData) => ({
-                url: '/textChannels/create',
+                url: '/textChannels',
                 method: 'POST',
                 body: channelData,
             }),
-            invalidatesTags: ['ChatroomList'],
         }),
         joinChatroom: builder.mutation<{ joined: boolean }, { channelId: string; authKey: string }>({
             query: ({channelId, authKey}) => ({
@@ -31,20 +31,34 @@ export const chatroomsApi = api.injectEndpoints({
                 body: {authKey},
             }),
         }),
-        updateChatroom: builder.mutation<Chatroom, { id: string; name: string; users: string[] }>({
-            query: ({id, ...body}) => ({
+        updateChatroom: builder.mutation<Chatroom, {
+            id: string;
+            name?: string;
+            expiresAt?: string | null;
+            ownerToken?: string | null;
+        }>({
+            query: ({id, ownerToken, ...body}) => ({
                 url: `/textChannels/${id}`,
                 method: 'PUT',
-                body: {id, ...body},
+                body,
+                headers: ownerHeaders(ownerToken),
             }),
-            invalidatesTags: (_result, _error, {id}) => ['ChatroomList', {type: 'Chatroom', id}],
+            invalidatesTags: (_result, _error, {id}) => [{type: 'Chatroom', id}],
         }),
-        deleteChatroom: builder.mutation<void, string>({
-            query: (id) => ({
+        rotateInviteCode: builder.mutation<{ inviteCode: string }, { id: string; ownerToken?: string | null }>({
+            query: ({id, ownerToken}) => ({
+                url: `/textChannels/${id}/rotate-code`,
+                method: 'POST',
+                headers: ownerHeaders(ownerToken),
+            }),
+            invalidatesTags: (_result, _error, {id}) => [{type: 'Chatroom', id}],
+        }),
+        deleteChatroom: builder.mutation<void, { id: string; ownerToken?: string | null }>({
+            query: ({id, ownerToken}) => ({
                 url: `/textChannels/${id}`,
                 method: 'DELETE',
+                headers: ownerHeaders(ownerToken),
             }),
-            invalidatesTags: ['ChatroomList'],
         }),
         getOlderMessages: builder.query<
             { messages: Message[], hasMore: boolean },
@@ -53,15 +67,38 @@ export const chatroomsApi = api.injectEndpoints({
             query: ({ channelId, before, limit = 20 }) =>
                 `/textChannels/${channelId}/messages?before=${before}&limit=${limit}`,
         }),
+        getSavedRooms: builder.query<SavedRoom[], void>({
+            query: () => '/textChannels/saved',
+            providesTags: ['SavedRooms'],
+        }),
+        saveRoom: builder.mutation<SavedRoom, { id: string; name?: string }>({
+            query: ({ id, name }) => ({
+                url: `/textChannels/${id}/save`,
+                method: 'POST',
+                body: name ? { name } : {},
+            }),
+            invalidatesTags: ['SavedRooms'],
+        }),
+        unsaveRoom: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `/textChannels/${id}/save`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['SavedRooms'],
+        }),
     }),
 });
 
 export const {
-    useGetChatroomsQuery,
     useGetChatroomByIdQuery,
     useCreateChatroomMutation,
+    useLazyGetRoomByInviteCodeQuery,
     useJoinChatroomMutation,
     useUpdateChatroomMutation,
+    useRotateInviteCodeMutation,
     useDeleteChatroomMutation,
     useLazyGetOlderMessagesQuery,
+    useGetSavedRoomsQuery,
+    useSaveRoomMutation,
+    useUnsaveRoomMutation,
 } = chatroomsApi;

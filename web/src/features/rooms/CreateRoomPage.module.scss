@@ -1,0 +1,17 @@
+@use '../../styles/tokens' as *;
+
+// Passive wrapper — the EntryLayout already centers content on the gradient.
+.page {
+  display: contents;
+}
+
+.card {
+  width: 100%;
+  max-width: 30rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 2rem;
+  border-radius: $radius-lg;
+  background-color: rgba($surface-tint, 0.12);
+}

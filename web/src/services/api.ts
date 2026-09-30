@@ -23,6 +23,6 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 
 export const api = createApi({
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['User', 'Chatroom', 'UserList', 'ChatroomList'],
+    tagTypes: ['User', 'Chatroom', 'UserList', 'ChatroomList', 'SavedRooms'],
     endpoints: () => ({}),
 });

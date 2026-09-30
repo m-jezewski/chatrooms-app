@@ -1,0 +1,6 @@
+@use '../../styles/tokens' as *;
+
+.muted {
+  font-size: 0.85rem;
+  color: $text-secondary;
+}
