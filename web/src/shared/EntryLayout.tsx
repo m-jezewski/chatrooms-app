@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useMatch } from 'react-router';
 import { useSelector } from 'react-redux';
 import { AppButton } from './AppButton.tsx';
+import { EntryAction, getPathWithParams } from './entryHandoff.ts';
 import { selectLoggedUser } from '../features/auth/authSlice.ts';
 import styles from './EntryLayout.module.scss';
 
@@ -12,18 +13,9 @@ export const EntryLayout = () => {
   const titleMatch = useMatch('/');
 
   if (loggedUser) {
-    const params = new URLSearchParams();
-    if (createMatch) {
-      params.set('modal', 'create');
-    } else if (joinMatch || joinCodeMatch) {
-      params.set('modal', 'join');
-      const inviteCode = joinCodeMatch?.params.inviteCode;
-      if (inviteCode) {
-        params.set('code', inviteCode);
-      }
-    }
-    const query = params.toString();
-    return <Navigate to={query ? `/chatrooms?${query}` : '/chatrooms'} replace />;
+    const action: EntryAction | null = createMatch ? 'create' : joinMatch || joinCodeMatch ? 'join' : null;
+
+    return <Navigate to={getPathWithParams({ action, inviteCode: joinCodeMatch?.params.inviteCode })} replace />;
   }
 
   return (

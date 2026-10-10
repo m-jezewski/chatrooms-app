@@ -1,18 +1,17 @@
 import { AppButton } from '../../shared/AppButton.tsx';
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { Chatroom } from '../../interfaces.ts';
 import { selectLoggedUser } from '../auth/authSlice.ts';
-import { EditChatroomFormModal } from './EditChatroomFormModal.tsx';
-import { EditRoomTtlFormModal } from './EditRoomTtlFormModal.tsx';
+import { EditChatroomForm } from './EditChatroomForm.tsx';
+import { EditRoomTtlForm } from './EditRoomTtlForm.tsx';
+import { DeleteRoomDialog } from './DeleteRoomDialog.tsx';
 import { DropdownMenu } from '../../shared/DropdownMenu.tsx';
-import { ConfirmModal } from '../../shared/ConfirmModal.tsx';
+import { AppModal } from '../../shared/AppModal.tsx';
 import { getOwnerToken } from '../../utils/session.ts';
-import { removeRecentRoom } from '../../utils/recentRooms.ts';
 import {
-  useDeleteChatroomMutation,
   useGetSavedRoomsQuery,
   useRotateInviteCodeMutation,
   useSaveRoomMutation,
@@ -26,17 +25,18 @@ interface ChatroomTitlePanelProps {
 
 export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => {
   const { roomId } = useParams();
-  const navigate = useNavigate();
   const loggedUser = useSelector(selectLoggedUser);
-  const [isEditFormOpen, setIsEditFormOpen] = useState<boolean>(false);
-  const [isTtlFormOpen, setIsTtlFormOpen] = useState<boolean>(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
+
   const [rotateInviteCode] = useRotateInviteCodeMutation();
-  const [deleteChatroom] = useDeleteChatroomMutation();
   const [saveRoom] = useSaveRoomMutation();
   const [unsaveRoom] = useUnsaveRoomMutation();
+
   const { data: savedRooms = [] } = useGetSavedRoomsQuery(undefined, { skip: !loggedUser });
   const isSaved = !!roomId && savedRooms.some((room) => room.roomId === roomId);
+
+  const [expiryOpen, setExpiryOpen] = useState(false);
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const ownerToken = roomId ? getOwnerToken(roomId) : null;
   const isOwner =
@@ -63,19 +63,6 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
     } catch {
       toast.error('Could not update saved rooms.');
     }
-  };
-
-  const handleDelete = async () => {
-    if (!roomId) return;
-    try {
-      await deleteChatroom({ id: roomId, ownerToken }).unwrap();
-    } catch (error) {
-      toast.error('Cannot remove room');
-      throw error;
-    }
-    removeRecentRoom(roomId);
-    navigate('/chatrooms');
-    toast.success('Successfully removed the room!');
   };
 
   const copyInvite = () => {
@@ -110,9 +97,9 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
               </>
             }
             options={[
-              { label: 'Change expiry', onSelect: () => setIsTtlFormOpen(true) },
-              { label: 'Change name', onSelect: () => setIsEditFormOpen(true) },
-              { label: 'Delete room', onSelect: () => setIsDeleteOpen(true), danger: true },
+              { label: 'Change expiry', onSelect: () => setExpiryOpen(true) },
+              { label: 'Change name', onSelect: () => setRenameOpen(true) },
+              { label: 'Delete room', onSelect: () => setDeleteOpen(true), danger: true },
             ]}
           />
         )}
@@ -124,31 +111,19 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
         </div>
       </div>
 
-      {channelData && <EditChatroomFormModal
-        initialValues={channelData}
-        closeModal={() => setIsEditFormOpen(false)}
-        isOpen={isEditFormOpen}
-      />}
+      {channelData && (
+        <>
+          <AppModal title={'Change expiry'} isOpen={expiryOpen} onClose={() => setExpiryOpen(false)}>
+            {(close) => <EditRoomTtlForm room={channelData} closeModal={close} />}
+          </AppModal>
 
-      {channelData && <EditRoomTtlFormModal
-        room={channelData}
-        closeModal={() => setIsTtlFormOpen(false)}
-        isOpen={isTtlFormOpen}
-      />}
+          <AppModal title={'Change name'} isOpen={renameOpen} onClose={() => setRenameOpen(false)}>
+            {(close) => <EditChatroomForm initialValues={channelData} closeModal={close} />}
+          </AppModal>
 
-      <ConfirmModal
-        title={'Delete room'}
-        isOpen={isDeleteOpen}
-        closeModal={() => setIsDeleteOpen(false)}
-        confirmLabel={'Delete'}
-        danger
-        onConfirm={handleDelete}
-      >
-        <p className={styles.confirmText}>
-          Deleting <strong>#{channelData?.name}</strong> removes every message in it for everyone.
-          This cannot be undone.
-        </p>
-      </ConfirmModal>
+          <DeleteRoomDialog room={channelData} isOpen={deleteOpen} closeModal={() => setDeleteOpen(false)} />
+        </>
+      )}
     </div>
   );
 };

@@ -3,8 +3,6 @@ import { FormHeading } from '../../shared/FormHeading.tsx';
 import { CreateRoomForm } from './CreateRoomForm.tsx';
 import styles from './CreateRoomPage.module.scss';
 
-// Entry-layout host for the create flow — reachable from the welcome screen only.
-// Inside the app shell the same form opens in CreateRoomModal instead.
 export const CreateRoomPage = () => {
   const [created, setCreated] = useState(false);
 

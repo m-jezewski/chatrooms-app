@@ -4,7 +4,6 @@ import { FormHeading } from '../../shared/FormHeading.tsx';
 import { LoginForm } from './LoginForm.tsx';
 import styles from './Login.module.scss';
 
-// Entry-layout host for signing in. Inside the app shell the same form opens in AuthModal.
 export const Login = () => {
   const navigate = useNavigate();
 

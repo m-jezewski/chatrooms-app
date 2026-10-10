@@ -1,0 +1,6 @@
+@use '../../styles/tokens' as *;
+
+.text {
+  font-size: 0.85rem;
+  color: $text-secondary;
+}

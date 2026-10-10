@@ -1,0 +1,13 @@
+@use '../styles/tokens' as *;
+
+.sectionLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $text-secondary;
+  padding: 0 0.25rem;
+}
+
+.spacer {
+  flex: 1;
+}
