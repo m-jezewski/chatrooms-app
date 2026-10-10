@@ -1,5 +1,8 @@
 import { Field, FieldProps } from 'formik';
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import { AppIcon } from './AppIcon.tsx';
+import CheckIcon from '../assets/icons/check.svg?react';
+import ChevronDownIcon from '../assets/icons/chevron-down.svg?react';
 import styles from './SelectInput.module.scss';
 
 export interface SelectOption<TValue> {
@@ -41,9 +44,7 @@ export const SelectInput = <TValue,>(
                 <span className={selected ? undefined : styles.placeholder}>
                   {selected ? selected.label : placeholder}
                 </span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.chevron} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                </svg>
+                <AppIcon icon={ChevronDownIcon} className={styles.chevron} />
               </ListboxButton>
 
               <ListboxOptions anchor="bottom start" className={styles.options}>
@@ -55,9 +56,7 @@ export const SelectInput = <TValue,>(
                     className={styles.option}
                   >
                     <span>{option.label}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={styles.check} aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                    </svg>
+                    <AppIcon icon={CheckIcon} className={styles.check} />
                   </ListboxOption>
                 ))}
               </ListboxOptions>

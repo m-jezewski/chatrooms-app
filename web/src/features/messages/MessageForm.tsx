@@ -2,6 +2,8 @@ import {TextInput} from "../../shared/TextInput.tsx";
 import {Form, Formik, FormikHelpers} from "formik";
 import React from "react";
 import {AppButton} from "../../shared/AppButton.tsx";
+import {AppIcon} from "../../shared/AppIcon.tsx";
+import SendIcon from "../../assets/icons/send.svg?react";
 import styles from "./MessageForm.module.scss";
 
 interface MessageFormValues {
@@ -33,18 +35,13 @@ export const MessageForm = ({sendMessage}: MessageFormProps) => {
                 return (
                     <Form className={styles.form}>
                         <div className={styles.bar}>
-                            <AppButton variant={'transparent'} rounded={true} style={{
+                            <AppButton variant={'transparent'} rounded={true} aria-label={"Send message"} style={{
                                 position: 'absolute',
                                 right: '1.25rem',
                                 top: '50%',
                                 transform: 'translate(0, -50%)'
                             }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960"
-                                     width="20px"
-                                     fill="#e8eaed">
-                                    <path
-                                        d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/>
-                                </svg>
+                                <AppIcon icon={SendIcon} className={styles.sendIcon}/>
                             </AppButton>
 
                             <TextInput name={'message'} className={styles.messageInput} placeholder={"Write something..."}/>

@@ -1,6 +1,8 @@
 import { Navigate, Outlet, useMatch } from 'react-router';
 import { useSelector } from 'react-redux';
 import { AppButton } from './AppButton.tsx';
+import { AppIcon } from './AppIcon.tsx';
+import ArrowLeftIcon from '../assets/icons/arrow-left.svg?react';
 import { EntryAction, getPathWithParams } from './entryHandoff.ts';
 import { selectLoggedUser } from '../features/auth/authSlice.ts';
 import styles from './EntryLayout.module.scss';
@@ -28,9 +30,7 @@ export const EntryLayout = () => {
       {!titleMatch && (
         <div className={styles.backRow}>
           <AppButton as="link" to="/" variant="transparent" className={styles.backButton}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.backArrow} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-            </svg>
+            <AppIcon icon={ArrowLeftIcon} className={styles.backArrow} />
             Back to home
           </AppButton>
         </div>
