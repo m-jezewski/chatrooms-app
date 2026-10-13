@@ -40,12 +40,3 @@
   height: 1.15em;
   flex-shrink: 0;
 }
-
-.logo {
-  text-align: center;
-  font-size: 3rem;
-  line-height: 1;
-  user-select: none;
-  color: $text-main;
-  @include logo-font;
-}
