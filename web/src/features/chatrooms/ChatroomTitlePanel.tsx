@@ -41,8 +41,7 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const ownerToken = roomId ? getOwnerToken(roomId) : null;
-  const isOwner =
-    (!!channelData?.ownerId && channelData.ownerId === loggedUser?.id) || !!ownerToken;
+  const isOwner = (!!channelData?.ownerId && channelData.ownerId === loggedUser?.id) || !!ownerToken;
 
   const handleRotate = async () => {
     if (!roomId) return;
@@ -81,9 +80,7 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
           <span className={styles.hash}>#</span>
           <h1>{channelData?.name}</h1>
         </div>
-        <div className={styles.loggedUsersInfo}>
-          1 user online {/* TODO */}
-        </div>
+        <div className={styles.loggedUsersInfo}>1 user online {/* TODO */}</div>
       </div>
       <div className={styles.ownerBar}>
         {isOwner && (
@@ -105,8 +102,14 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
 
         <div className={styles.code}>
           <code>{channelData?.inviteCode}</code>
-          <AppButton compact={true} variant={'transparent'} onClick={copyInvite}>Copy link</AppButton>
-          {isOwner && <AppButton compact={true} variant={'transparent'} onClick={handleRotate}>Rotate</AppButton>}
+          <AppButton compact={true} variant={'transparent'} onClick={copyInvite}>
+            Copy link
+          </AppButton>
+          {isOwner && (
+            <AppButton compact={true} variant={'transparent'} onClick={handleRotate}>
+              Rotate
+            </AppButton>
+          )}
         </div>
       </div>
 

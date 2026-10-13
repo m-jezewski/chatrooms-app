@@ -13,13 +13,13 @@ import { useUpdateChatroomMutation } from '../../services/chatroomsApi.ts';
 import { getOwnerToken } from '../../utils/session.ts';
 
 interface EditChatroomFormProps {
-  initialValues: Chatroom
+  initialValues: Chatroom;
   closeModal: () => void;
   onSuccess?: () => void;
 }
 
 interface EditChatroomFormState {
-  name: string,
+  name: string;
 }
 
 export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditChatroomFormProps) => {
@@ -33,7 +33,7 @@ export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditC
         ownerToken: getOwnerToken(initialValues.id),
       }).unwrap();
       toast.success('Successfully edited the room!');
-      onSuccess && onSuccess();
+      onSuccess?.();
       closeModal();
     } catch (error) {
       toast.error('Failed to edit the room. ' + (getErrorMessage(error) || ''));
@@ -58,7 +58,9 @@ export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditC
           </div>
           <FormActions equalWidth>
             <AppButton onClick={() => closeModal()}>Cancel</AppButton>
-            <AppButton variant={'purple'} type={'submit'}>Save</AppButton>
+            <AppButton variant={'purple'} type={'submit'}>
+              Save
+            </AppButton>
           </FormActions>
         </FormContainer>
       )}

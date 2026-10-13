@@ -38,9 +38,7 @@ export function removeRecentRoom(roomId: string): void {
 function capToLimit(rooms: RecentRoom[]): RecentRoom[] {
   if (rooms.length <= 12) return rooms;
 
-  const keep = [...rooms]
-    .sort((roomA, roomB) => (roomA.lastSeenAt ?? 0) - (roomB.lastSeenAt ?? 0))
-    .slice(0, 12);
+  const keep = [...rooms].sort((roomA, roomB) => (roomA.lastSeenAt ?? 0) - (roomB.lastSeenAt ?? 0)).slice(0, 12);
 
   return rooms.filter((room) => keep.includes(room));
 }

@@ -17,7 +17,9 @@
     color: $text-main;
   }
 
-  &:focus-visible, &:focus, &[data-open] {
+  &:focus-visible,
+  &:focus,
+  &[data-open] {
     outline: 0;
     box-shadow: 0 0 2px 1px inset $accent;
   }

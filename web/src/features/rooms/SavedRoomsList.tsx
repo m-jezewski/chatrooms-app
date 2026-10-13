@@ -15,9 +15,7 @@ export const SavedRoomsList = () => {
     <div className={styles.list}>
       {rooms.map((room) => (
         <Link to={`/chatrooms/${room.roomId}`} key={room.roomId}>
-          <div className={[styles.item, room.roomId === roomId ? styles.active : ''].join(' ')}>
-            # {room.name}
-          </div>
+          <div className={[styles.item, room.roomId === roomId ? styles.active : ''].join(' ')}># {room.name}</div>
         </Link>
       ))}
     </div>

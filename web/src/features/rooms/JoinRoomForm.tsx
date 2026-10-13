@@ -29,10 +29,7 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
   const [joinChatroom] = useJoinChatroomMutation();
   const [locator, setLocator] = useState<RoomLocator | null>(null);
 
-  const resolveCode = async (
-    code: string,
-    helpers?: FormikHelpers<{ inviteCode: string }>,
-  ) => {
+  const resolveCode = async (code: string, helpers?: FormikHelpers<{ inviteCode: string }>) => {
     try {
       const room = await lookupRoom(code.trim().toUpperCase()).unwrap();
       setLocator(room);
@@ -90,7 +87,9 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
             </div>
             {onCancel ? (
               <FormActions equalWidth>
-                <AppButton type="button" onClick={onCancel}>Cancel</AppButton>
+                <AppButton type="button" onClick={onCancel}>
+                  Cancel
+                </AppButton>
                 <AppButton variant="purple" type="submit" disabled={isSubmitting}>
                   {isSubmitting ? 'Looking up…' : 'Find room'}
                 </AppButton>
@@ -126,7 +125,9 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
             </div>
             {onCancel ? (
               <FormActions equalWidth>
-                <AppButton type="button" onClick={onCancel}>Cancel</AppButton>
+                <AppButton type="button" onClick={onCancel}>
+                  Cancel
+                </AppButton>
                 <AppButton variant="purple" type="submit" disabled={isSubmitting}>
                   {isSubmitting ? 'Joining…' : 'Join room'}
                 </AppButton>

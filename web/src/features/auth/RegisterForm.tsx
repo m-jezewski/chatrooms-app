@@ -43,17 +43,9 @@ export const RegisterForm = ({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
         password: '',
       }}
       validationSchema={object({
-        email: string()
-          .email()
-          .required(),
-        password: string()
-          .required()
-          .min(5)
-          .max(50),
-        name: string()
-          .required()
-          .min(3)
-          .max(75),
+        email: string().email().required(),
+        password: string().required().min(5).max(50),
+        name: string().required().min(3).max(75),
       })}
       onSubmit={handleSubmit}
     >

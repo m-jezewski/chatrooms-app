@@ -89,13 +89,17 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
         <InputLabel>Invite link</InputLabel>
         <div className={styles.copyRow}>
           <code className={styles.code}>{inviteLink}</code>
-          <AppButton type="button" onClick={() => navigator.clipboard?.writeText(inviteLink)}>Copy</AppButton>
+          <AppButton type="button" onClick={() => navigator.clipboard?.writeText(inviteLink)}>
+            Copy
+          </AppButton>
         </div>
 
         <InputLabel>Invite code</InputLabel>
         <div className={styles.copyRow}>
           <code className={styles.code}>{created.inviteCode}</code>
-          <AppButton type="button" onClick={() => navigator.clipboard?.writeText(created.inviteCode)}>Copy</AppButton>
+          <AppButton type="button" onClick={() => navigator.clipboard?.writeText(created.inviteCode)}>
+            Copy
+          </AppButton>
         </div>
 
         {created.ownerToken && (
@@ -103,13 +107,15 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
             <strong>Owner token (shown once):</strong>
             <code className={styles.code}>{created.ownerToken}</code>
             <p className={styles.muted}>
-              Kept in this tab for managing the room. Closing the tab drops management — the room still
-              expires on its own.
+              Kept in this tab for managing the room. Closing the tab drops management — the room still expires on its
+              own.
             </p>
           </div>
         )}
 
-        <AppButton variant="purple" type="button" onClick={enterRoom}>Enter room</AppButton>
+        <AppButton variant="purple" type="button" onClick={enterRoom}>
+          Enter room
+        </AppButton>
       </>
     );
   }
@@ -142,9 +148,7 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
                   <span className={styles.meterLabel}>{strength.label}</span>
                 </div>
               )}
-              <p className={styles.hint}>
-                Use a long passphrase for stronger encryption.
-              </p>
+              <p className={styles.hint}>Use a long passphrase for stronger encryption.</p>
             </div>
             <div>
               <InputLabel htmlFor="ttl">Expires</InputLabel>
@@ -152,7 +156,9 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
             </div>
             {onCancel ? (
               <FormActions equalWidth>
-                <AppButton type="button" onClick={onCancel}>Cancel</AppButton>
+                <AppButton type="button" onClick={onCancel}>
+                  Cancel
+                </AppButton>
                 <AppButton variant="purple" type="submit" disabled={isSubmitting}>
                   {isSubmitting ? 'Creating…' : 'Create room'}
                 </AppButton>

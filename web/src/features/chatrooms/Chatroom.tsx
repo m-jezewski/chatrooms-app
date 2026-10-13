@@ -12,7 +12,6 @@ import { decrypt } from '../../utils/roomCrypto.ts';
 import { getSenderId } from '../../utils/session.ts';
 import styles from './Chatroom.module.scss';
 
-
 export interface DecryptedMessage {
   nickname: string;
   text: string;
@@ -38,7 +37,7 @@ export const Chatroom = () => {
   useEffect(() => {
     const pending = messages.filter((message) => decrypted.get(message.id)?.cipher !== message.payload);
     if (pending.length === 0 || !key) {
-      return
+      return;
     }
 
     (async () => {

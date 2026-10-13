@@ -39,11 +39,21 @@
   transition: width 150ms ease;
 }
 
-.meterFill0 { @include fill(10%, $red); }
-.meterFill1 { @include fill(30%, $red); }
-.meterFill2 { @include fill(55%, #b45309); }
-.meterFill3 { @include fill(80%, #4d7c0f); }
-.meterFill4 { @include fill(100%, #15803d); }
+.meterFill0 {
+  @include fill(10%, $red);
+}
+.meterFill1 {
+  @include fill(30%, $red);
+}
+.meterFill2 {
+  @include fill(55%, #b45309);
+}
+.meterFill3 {
+  @include fill(80%, #4d7c0f);
+}
+.meterFill4 {
+  @include fill(100%, #15803d);
+}
 
 .copyRow {
   display: flex;

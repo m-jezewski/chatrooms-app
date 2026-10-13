@@ -29,7 +29,7 @@ export const useRoomKeyContext = () => {
     throw new Error('RoomKey hooks must be used within a RoomKeyProvider');
   }
   return context;
-}
+};
 
 export const useRoomKey = (roomId: string | undefined) => {
   const context = useRoomKeyContext();

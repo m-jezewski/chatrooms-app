@@ -40,8 +40,7 @@ export const DeleteRoomDialog = ({ room, isOpen, closeModal }: DeleteRoomDialogP
       onConfirm={handleConfirm}
     >
       <p className={styles.text}>
-        Deleting <strong>#{room.name}</strong> removes every message in it for everyone.
-        This cannot be undone.
+        Deleting <strong>#{room.name}</strong> removes every message in it for everyone. This cannot be undone.
       </p>
     </ConfirmModal>
   );

@@ -17,13 +17,7 @@ export const CreateRoomDialog = ({ trigger, defaultOpen }: CreateRoomDialogProps
       defaultOpen={defaultOpen}
       onClose={() => setCreated(false)}
     >
-      {(close) => (
-        <CreateRoomForm
-          onCreated={() => setCreated(true)}
-          onEntered={close}
-          onCancel={close}
-        />
-      )}
+      {(close) => <CreateRoomForm onCreated={() => setCreated(true)} onEntered={close} onCancel={close} />}
     </AppModal>
   );
 };

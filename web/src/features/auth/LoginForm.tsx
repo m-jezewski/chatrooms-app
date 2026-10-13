@@ -34,10 +34,13 @@ export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => 
   };
 
   const handleDemoButtonClick = async (formikConfig: FormikProps<formValues>) => {
-    await formikConfig.setValues({
-      email: 'public_user@chatrooms.com',
-      password: 'public_user_password',
-    }, true);
+    await formikConfig.setValues(
+      {
+        email: 'public_user@chatrooms.com',
+        password: 'public_user_password',
+      },
+      true,
+    );
   };
 
   return (
@@ -47,9 +50,7 @@ export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => 
         password: '',
       }}
       validationSchema={object({
-        email: string()
-          .email()
-          .required(),
+        email: string().email().required(),
         password: string().required().min(5).max(50),
       })}
       onSubmit={handleSubmit}
@@ -74,8 +75,11 @@ export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => 
             <AppButton type={'button'} variant={'slate'} className={styles.half} onClick={onSwitchToRegister}>
               Register
             </AppButton>
-            <AppButton type={'button'} className={styles.halfNowrap}
-                       onClick={() => handleDemoButtonClick(formikConfig)}>
+            <AppButton
+              type={'button'}
+              className={styles.halfNowrap}
+              onClick={() => handleDemoButtonClick(formikConfig)}
+            >
               Demo account
             </AppButton>
           </FormActions>

@@ -1,14 +1,5 @@
 import { TextChannel } from '@prisma/client';
-import {
-  IsDate,
-  IsDateString,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsDate, IsDateString, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 import { OmitType, PartialType, PickType, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class TextChannelDto implements TextChannel {
@@ -39,7 +30,10 @@ export class TextChannelDto implements TextChannel {
   @IsNotEmpty()
   inviteCode: string;
 
-  @ApiPropertyOptional({ nullable: true, description: 'SHA-256 of the anonymous owner token; null for account-owned rooms.' })
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'SHA-256 of the anonymous owner token; null for account-owned rooms.',
+  })
   @IsOptional()
   @IsString()
   ownerTokenHash: string | null;
@@ -68,18 +62,25 @@ export class CreateTextChannelDto extends OmitType(TextChannelDto, [
   'ownerTokenHash',
   'expiresAt',
 ] as const) {
-  @ApiProperty({ example: 'base64(32B)', description: 'Client-derived proof of the room password. Hashed server-side, never stored raw.' })
+  @ApiProperty({
+    example: 'base64(32B)',
+    description: 'Client-derived proof of the room password. Hashed server-side, never stored raw.',
+  })
   @IsString()
   @IsNotEmpty()
   authKey: string;
 
-  @ApiPropertyOptional({ description: 'ISO date when the room should expire. Required (and capped at +30 days) for anonymous creators.' })
+  @ApiPropertyOptional({
+    description: 'ISO date when the room should expire. Required (and capped at +30 days) for anonymous creators.',
+  })
   @IsOptional()
   @IsDateString()
   expiresAt?: string;
 }
 
-export class UpdateTextChannelDto extends PartialType(OmitType(CreateTextChannelDto, ['salt', 'authKey', 'expiresAt'] as const)) {
+export class UpdateTextChannelDto extends PartialType(
+  OmitType(CreateTextChannelDto, ['salt', 'authKey', 'expiresAt'] as const),
+) {
   @ApiPropertyOptional({
     type: String,
     nullable: true,
@@ -91,14 +92,14 @@ export class UpdateTextChannelDto extends PartialType(OmitType(CreateTextChannel
   expiresAt?: string | null;
 }
 
-export class JoinTextChannelDto extends PickType(CreateTextChannelDto, ['authKey'] as const) {
-}
+export class JoinTextChannelDto extends PickType(CreateTextChannelDto, ['authKey'] as const) {}
 
-export class TextChannelPublicDto extends OmitType(TextChannelDto, ['authKeyHash', 'ownerTokenHash'] as const) {
-}
+export class TextChannelPublicDto extends OmitType(TextChannelDto, ['authKeyHash', 'ownerTokenHash'] as const) {}
 
 export class CreatedTextChannelDto extends TextChannelPublicDto {
-  @ApiPropertyOptional({ description: 'Raw owner token, returned exactly once for anonymous creators. Store it client-side.' })
+  @ApiPropertyOptional({
+    description: 'Raw owner token, returned exactly once for anonymous creators. Store it client-side.',
+  })
   ownerToken?: string;
 }
 export class RoomLocatorDto {

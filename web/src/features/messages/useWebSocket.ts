@@ -1,12 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import {
-  connectionOpened,
-  connectionClosed,
-  receivedMessage,
-  setMessages,
-} from './messagesSlice.ts';
-import {Message} from "../../interfaces.ts";
+import { connectionOpened, connectionClosed, receivedMessage, setMessages } from './messagesSlice.ts';
+import { Message } from '../../interfaces.ts';
 import io, { Socket } from 'socket.io-client';
 
 const useWebSocket = (channelId: string | undefined) => {

@@ -16,8 +16,7 @@ export const ChatMessage = ({ previousMessageFromThisAuthor, decrypted, mine }: 
     return (
       <div className={styles.row}>
         <div className={[styles.wrap, styles.mine].join(' ')}>
-          {!previousMessageFromThisAuthor &&
-            <p className={[styles.label, styles.labelMine].join(' ')}>You</p>}
+          {!previousMessageFromThisAuthor && <p className={[styles.label, styles.labelMine].join(' ')}>You</p>}
           <div className={[styles.bubble, styles.bubbleMine].join(' ')}>
             <span className={styles.text}>{text}</span>
           </div>
@@ -29,8 +28,7 @@ export const ChatMessage = ({ previousMessageFromThisAuthor, decrypted, mine }: 
   return (
     <div className={styles.row}>
       <div className={[styles.wrap, styles.theirs].join(' ')}>
-        {!previousMessageFromThisAuthor &&
-          <p className={[styles.label, styles.labelTheirs].join(' ')}>{nickname}</p>}
+        {!previousMessageFromThisAuthor && <p className={[styles.label, styles.labelTheirs].join(' ')}>{nickname}</p>}
         <div className={[styles.bubble, styles.bubbleTheirs].join(' ')}>
           <span className={styles.text}>{text}</span>
         </div>

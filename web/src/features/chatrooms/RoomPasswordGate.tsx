@@ -55,9 +55,7 @@ export const RoomPasswordGate = ({ channelData, onJoin }: RoomPasswordGateProps)
           <FormContainer className={styles.form}>
             <div className={styles.intro}>
               <h2 className={styles.title}>This room is encrypted</h2>
-              <p className={styles.hint}>
-                Enter the room password to decrypt messages. It never leaves your browser.
-              </p>
+              <p className={styles.hint}>Enter the room password to decrypt messages. It never leaves your browser.</p>
             </div>
             <div>
               <InputLabel htmlFor={'password'}>Room password</InputLabel>

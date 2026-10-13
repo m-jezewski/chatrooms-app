@@ -16,7 +16,8 @@ export const HomePage = () => {
     <div className={styles.wrapper}>
       <p className={styles.tagline}>
         Anonymous, end-to-end encrypted chatrooms.
-        <br/>No account needed.
+        <br />
+        No account needed.
       </p>
       <div className={styles.card}>
         <div className={styles.block}>
@@ -40,7 +41,9 @@ export const HomePage = () => {
               placeholder="e.g. K7QF9M2X"
               aria-label="Invitation code"
             />
-            <AppButton variant="purple" type="submit">Join</AppButton>
+            <AppButton variant="purple" type="submit">
+              Join
+            </AppButton>
           </form>
         </div>
       </div>

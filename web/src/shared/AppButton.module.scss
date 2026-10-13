@@ -9,10 +9,11 @@
   color: rgba(255, 255, 255, 0.77);
 
   &:hover {
-    color: rgba(255, 255, 255, 0.97);;
+    color: rgba(255, 255, 255, 0.97);
   }
 
-  &:focus-visible, &:focus {
+  &:focus-visible,
+  &:focus {
     outline: 0;
     box-shadow: 0 0 2px 1px inset $accent;
   }
@@ -23,26 +24,35 @@
   }
 }
 
-.neutral { background-color: $bg-color-3; }
-.slate { background-color: $bg-color-2; }
-.red { background-color: $red; }
+.neutral {
+  background-color: $bg-color-3;
+}
+.slate {
+  background-color: $bg-color-2;
+}
+.red {
+  background-color: $red;
+}
 
 .purple {
   background-color: $accent;
-  color: #02050EFF;
+  color: #02050eff;
 
   &:hover {
     background-color: $accent-darker;
-    color: #02050EFF;
+    color: #02050eff;
   }
 
-  &:focus-visible, &:focus {
+  &:focus-visible,
+  &:focus {
     outline: 0;
     box-shadow: 0 0 2px 1px inset white;
   }
 }
 
-.transparent { background-color: transparent; }
+.transparent {
+  background-color: transparent;
+}
 
 .link {
   display: inline-flex;
@@ -52,11 +62,15 @@
   cursor: pointer;
 }
 
-.rounded { border-radius: $radius; }
+.rounded {
+  border-radius: $radius;
+}
 
 .round {
   border-radius: 9999px;
   aspect-ratio: 1;
 }
 
-.disabled { opacity: 0.5; }
+.disabled {
+  opacity: 0.5;
+}

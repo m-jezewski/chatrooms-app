@@ -5,7 +5,8 @@ import {
   deriveRoomSecrets,
   encrypt,
   generateSalt,
-  generateSenderId, IV_BYTES,
+  generateSenderId,
+  IV_BYTES,
 } from './roomCrypto';
 
 const TAG_BYTES = 16;

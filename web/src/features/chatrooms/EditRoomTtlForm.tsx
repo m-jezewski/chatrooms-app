@@ -24,15 +24,10 @@ interface EditRoomTtlFormValues {
 
 export const EditRoomTtlForm = ({ room, closeModal }: EditRoomTtlFormProps) => {
   const [updateChatroom] = useUpdateChatroomMutation();
-
-  // Anonymous rooms must keep an expiry, so "Never" is theirs to lose — same rule server-side.
   const isAccountOwned = !!room.ownerId;
   const options = ttlOptionsFor(isAccountOwned);
 
-  const handleSubmit = async (
-    values: EditRoomTtlFormValues,
-    formikHelpers: FormikHelpers<EditRoomTtlFormValues>,
-  ) => {
+  const handleSubmit = async (values: EditRoomTtlFormValues, formikHelpers: FormikHelpers<EditRoomTtlFormValues>) => {
     try {
       await updateChatroom({
         id: room.id,
@@ -66,8 +61,12 @@ export const EditRoomTtlForm = ({ room, closeModal }: EditRoomTtlFormProps) => {
             </p>
           </div>
           <FormActions equalWidth>
-            <AppButton type="button" onClick={closeModal}>Cancel</AppButton>
-            <AppButton variant="purple" type="submit" disabled={isSubmitting}>Save</AppButton>
+            <AppButton type="button" onClick={closeModal}>
+              Cancel
+            </AppButton>
+            <AppButton variant="purple" type="submit" disabled={isSubmitting}>
+              Save
+            </AppButton>
           </FormActions>
         </FormContainer>
       )}

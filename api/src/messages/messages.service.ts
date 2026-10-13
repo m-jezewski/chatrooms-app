@@ -4,14 +4,9 @@ import { Message } from '@prisma/client';
 
 @Injectable()
 export class MessagesService {
-  constructor(private prisma: PrismaService) {
-  }
+  constructor(private prisma: PrismaService) {}
 
-  async getChannelMessages(params: {
-    channelId: string;
-    before?: string;
-    limit?: number;
-  }): Promise<Message[]> {
+  async getChannelMessages(params: { channelId: string; before?: string; limit?: number }): Promise<Message[]> {
     const { channelId, before, limit = 20 } = params;
 
     const messages = await this.prisma.message.findMany({

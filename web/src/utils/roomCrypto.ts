@@ -31,13 +31,7 @@ export interface RoomSecrets {
 
 // Derive both room secrets from the password and per-room salt.
 export async function deriveRoomSecrets(password: string, salt: Uint8Array<ArrayBuffer>): Promise<RoomSecrets> {
-  const baseKey = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(password),
-    'PBKDF2',
-    false,
-    ['deriveBits'],
-  );
+  const baseKey = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']);
   const baseBits = await crypto.subtle.deriveBits(
     { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
     baseKey,
@@ -62,7 +56,6 @@ function hkdfParams(info: string): HkdfParams {
   return { name: 'HKDF', hash: 'SHA-256', salt: new Uint8Array(0), info: encoder.encode(info) };
 }
 
-
 // MESSAGES
 
 // Random opaque per-session token (not an identity, just a temp ownership handle).
@@ -78,11 +71,7 @@ export async function encrypt(key: CryptoKey, plaintext: string): Promise<string
   crypto.getRandomValues(initializationVector);
   const utf8Plaintext = encoder.encode(plaintext);
 
-  const ciphertext = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv: initializationVector },
-    key,
-    utf8Plaintext,
-  );
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: initializationVector }, key, utf8Plaintext);
   const ctBytes = new Uint8Array(ciphertext);
 
   const blob = new Uint8Array(initializationVector.length + ctBytes.length);
@@ -121,8 +110,5 @@ export function base64ToUint8(base64: string): Uint8Array<ArrayBuffer> {
 }
 
 function uint8ToBase64Url(bytes: Uint8Array): string {
-  return uint8ToBase64(bytes)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
+  return uint8ToBase64(bytes).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }

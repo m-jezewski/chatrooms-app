@@ -10,10 +10,7 @@ export const Login = () => {
   return (
     <div className={styles.card}>
       <FormHeading as="h1">Sign in</FormHeading>
-      <LoginForm
-        onSuccess={() => navigate('/chatrooms')}
-        onSwitchToRegister={() => navigate('/register')}
-      />
+      <LoginForm onSuccess={() => navigate('/chatrooms')} onSwitchToRegister={() => navigate('/register')} />
     </div>
   );
 };

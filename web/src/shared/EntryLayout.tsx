@@ -23,8 +23,12 @@ export const EntryLayout = () => {
   return (
     <main className={styles.layout}>
       <div className={styles.authBar}>
-        <AppButton as="link" to="/login" variant="transparent">Sign in</AppButton>
-        <AppButton as="link" to="/register" variant="purple">Register</AppButton>
+        <AppButton as="link" to="/login" variant="transparent">
+          Sign in
+        </AppButton>
+        <AppButton as="link" to="/register" variant="purple">
+          Register
+        </AppButton>
       </div>
       <Outlet />
       {!titleMatch && (

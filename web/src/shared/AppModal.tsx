@@ -9,7 +9,7 @@ type AppModalProps = {
   children: ReactNode | ((close: () => void) => ReactNode);
 } & (
   | { trigger: TriggerElement; defaultOpen?: boolean; onClose?: () => void; isOpen?: never } // Uncontrolled
-  | { trigger?: never; defaultOpen?: never; onClose: () => void; isOpen: boolean; } // Controlled
+  | { trigger?: never; defaultOpen?: never; onClose: () => void; isOpen: boolean } // Controlled
 );
 
 export const AppModal = (props: AppModalProps) => {
@@ -25,12 +25,13 @@ export const AppModal = (props: AppModalProps) => {
 
   return (
     <>
-      {trigger && cloneElement(trigger, {
-        onClick: (event: MouseEvent<HTMLElement>) => {
-          trigger.props.onClick?.(event);
-          setSelfOpen(true);
-        },
-      })}
+      {trigger &&
+        cloneElement(trigger, {
+          onClick: (event: MouseEvent<HTMLElement>) => {
+            trigger.props.onClick?.(event);
+            setSelfOpen(true);
+          },
+        })}
 
       <Dialog open={isOpen} onClose={close} className={styles.dialog}>
         <div className={styles.overlay}>

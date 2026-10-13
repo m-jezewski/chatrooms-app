@@ -14,18 +14,16 @@ interface ConfirmModalProps {
   onConfirm: () => void | Promise<void>;
 }
 
-export const ConfirmModal = (
-  {
-    isOpen,
-    closeModal,
-    title,
-    children,
-    confirmLabel = 'Confirm',
-    cancelLabel = 'Cancel',
-    danger = false,
-    onConfirm,
-  }: ConfirmModalProps,
-) => {
+export const ConfirmModal = ({
+  isOpen,
+  closeModal,
+  title,
+  children,
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  danger = false,
+  onConfirm,
+}: ConfirmModalProps) => {
   const [isConfirming, setIsConfirming] = useState(false);
 
   const handleConfirm = async () => {
@@ -34,6 +32,7 @@ export const ConfirmModal = (
       await onConfirm();
       closeModal();
     } catch {
+      // onConfirm reports its own failure (toast); we only need to stop the spinner and keep the modal open.
     }
     setIsConfirming(false);
   };
@@ -42,13 +41,10 @@ export const ConfirmModal = (
     <AppModal title={title} isOpen={isOpen} onClose={closeModal}>
       {children}
       <FormActions equalWidth>
-        <AppButton type="button" onClick={closeModal} disabled={isConfirming}>{cancelLabel}</AppButton>
-        <AppButton
-          type="button"
-          variant={danger ? 'red' : 'purple'}
-          onClick={handleConfirm}
-          disabled={isConfirming}
-        >
+        <AppButton type="button" onClick={closeModal} disabled={isConfirming}>
+          {cancelLabel}
+        </AppButton>
+        <AppButton type="button" variant={danger ? 'red' : 'purple'} onClick={handleConfirm} disabled={isConfirming}>
           {confirmLabel}
         </AppButton>
       </FormActions>

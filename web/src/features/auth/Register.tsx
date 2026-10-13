@@ -10,10 +10,7 @@ export const Register = () => {
   return (
     <div className={styles.card}>
       <FormHeading as="h1">Register</FormHeading>
-      <RegisterForm
-        onSuccess={() => navigate('/chatrooms')}
-        onSwitchToLogin={() => navigate('/login')}
-      />
+      <RegisterForm onSuccess={() => navigate('/chatrooms')} onSwitchToLogin={() => navigate('/login')} />
     </div>
   );
 };

@@ -18,14 +18,12 @@ interface SelectInputProps<TValue> {
   className?: string;
 }
 
-export const SelectInput = <TValue,>(
-  {
-    name,
-    options,
-    placeholder = 'Select…',
-    className,
-  }: SelectInputProps<TValue>,
-) => {
+export const SelectInput = <TValue,>({
+  name,
+  options,
+  placeholder = 'Select…',
+  className,
+}: SelectInputProps<TValue>) => {
   return (
     <Field name={name}>
       {({ field, form, meta }: FieldProps) => {

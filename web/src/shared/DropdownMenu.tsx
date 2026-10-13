@@ -18,16 +18,7 @@ interface DropdownMenuProps {
   'aria-label'?: string;
 }
 
-// Generic action menu on Headless UI's Menu: keyboard navigation, outside-click and focus
-// handling come from the library, the styling matches the app's inputs and buttons.
-export const DropdownMenu = (
-  {
-    label,
-    options,
-    className,
-    'aria-label': ariaLabel,
-  }: DropdownMenuProps,
-) => {
+export const DropdownMenu = ({ label, options, className, 'aria-label': ariaLabel }: DropdownMenuProps) => {
   return (
     <Menu>
       <MenuButton className={[styles.trigger, className].filter(Boolean).join(' ')} aria-label={ariaLabel}>
