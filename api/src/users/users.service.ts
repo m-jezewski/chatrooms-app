@@ -20,15 +20,8 @@ export class UsersService {
     return user;
   }
 
-  async getUserByEmail(params: { email: string }): Promise<User> {
-    const { email } = params;
-    const user = await this.prisma.user.findUnique({ where: { email } });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    return user;
+  async findUserByEmail(params: { email: string }): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { email: params.email } });
   }
 
   async createUser(params: CreateUserDto): Promise<User> {
