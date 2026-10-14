@@ -19,7 +19,7 @@ export interface CreatedChatroom extends Chatroom {
   ownerToken?: string;
 }
 
-export interface RoomLocator {
+export interface RoomEntry {
   roomId: string;
   name: string;
   salt: string;

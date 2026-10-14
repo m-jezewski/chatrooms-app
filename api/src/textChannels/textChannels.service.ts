@@ -1,13 +1,13 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { TextChannel, User } from '@prisma/client';
+import { Prisma, TextChannel, User } from '@prisma/client';
 import { createHash, randomBytes } from 'crypto';
 import {
   CreatedTextChannelDto,
   CreateTextChannelDto,
-  RoomLocatorDto,
+  RoomEntryDto,
   SavedRoomDto,
-  TextChannelPublicDto,
+  TextChannelDetailsDto,
   UpdateTextChannelDto,
 } from './dto/textChannels-crud.dto';
 import * as bcrypt from 'bcrypt';
@@ -20,6 +20,7 @@ const INVITE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const INVITE_CODE_MAX_ATTEMPTS = 5;
 const ANONYMOUS_TTL_MAX_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const SECRET_FIELDS = { authKeyHash: true, ownerTokenHash: true } as const;
+const ENTRY_SELECT = { id: true, name: true, salt: true } as const;
 
 export interface ManageContext {
   user?: User;
@@ -34,16 +35,19 @@ export class TextChannelsService {
     return createHash('sha256').update(value).digest('hex');
   }
 
-  private assertCanManage(channel: Pick<TextChannel, 'ownerId' | 'ownerTokenHash'>, ctx: ManageContext): void {
+  private canManage(channel: Pick<TextChannel, 'ownerId' | 'ownerTokenHash'>, ctx: ManageContext): boolean {
     const { user, ownerToken } = ctx;
 
     if (channel.ownerId && user && channel.ownerId === user.id) {
-      return;
+      return true;
     }
-    if (channel.ownerTokenHash && ownerToken && this.sha256(ownerToken) === channel.ownerTokenHash) {
-      return;
+    return !!channel.ownerTokenHash && !!ownerToken && this.sha256(ownerToken) === channel.ownerTokenHash;
+  }
+
+  private assertCanManage(channel: Pick<TextChannel, 'ownerId' | 'ownerTokenHash'>, ctx: ManageContext): void {
+    if (!this.canManage(channel, ctx)) {
+      throw new ForbiddenException('Only the room owner can manage this room');
     }
-    throw new ForbiddenException('Only the room owner can manage this room');
   }
 
   private generateInviteCode(): string {
@@ -90,24 +94,36 @@ export class TextChannelsService {
     return channel;
   }
 
-  async getChannel(params: { channelId: string }): Promise<TextChannelPublicDto> {
-    const channel = await this.prisma.textChannel.findUnique({
-      where: { id: params.channelId },
-      omit: SECRET_FIELDS,
-    });
+
+  async getChannel(params: {
+    channelId: string;
+    joinedChannels: string[];
+    ctx: ManageContext;
+  }): Promise<TextChannelDetailsDto> {
+    const { channelId, joinedChannels, ctx } = params;
+    const channel = await this.prisma.textChannel.findUnique({ where: { id: channelId } });
 
     if (!channel) {
       throw new NotFoundException('Channel not found');
     }
+    if (!joinedChannels.includes(channelId) && !this.canManage(channel, ctx)) {
+      throw new ForbiddenException('Room is locked');
+    }
 
-    return channel;
+    const { authKeyHash: _authKeyHash, ownerTokenHash: _ownerTokenHash, ...details } = channel;
+    return details;
   }
 
-  async getRoomByInviteCode(inviteCode: string): Promise<RoomLocatorDto> {
-    const channel = await this.prisma.textChannel.findUnique({
-      where: { inviteCode },
-      select: { id: true, name: true, salt: true },
-    });
+  async getRoomEntryById(channelId: string): Promise<RoomEntryDto> {
+    return this.getRoomEntry({ id: channelId });
+  }
+
+  async getRoomEntryByCode(inviteCode: string): Promise<RoomEntryDto> {
+    return this.getRoomEntry({ inviteCode });
+  }
+
+  private async getRoomEntry(where: Prisma.TextChannelWhereUniqueInput): Promise<RoomEntryDto> {
+    const channel = await this.prisma.textChannel.findUnique({ where, select: ENTRY_SELECT });
 
     if (!channel) {
       throw new NotFoundException('Room not found');
@@ -180,7 +196,7 @@ export class TextChannelsService {
     channelId: string;
     ctx: ManageContext;
     textChannel: UpdateTextChannelDto;
-  }): Promise<TextChannelPublicDto> {
+  }): Promise<TextChannelDetailsDto> {
     const { textChannel, channelId, ctx } = params;
     const channel = await this.getManageableChannel(channelId);
     this.assertCanManage(channel, ctx);
@@ -195,7 +211,7 @@ export class TextChannelsService {
     });
   }
 
-  async deleteTextChannel(params: { channelId: string; ctx: ManageContext }): Promise<TextChannelPublicDto> {
+  async deleteTextChannel(params: { channelId: string; ctx: ManageContext }): Promise<TextChannelDetailsDto> {
     const { channelId, ctx } = params;
     const channel = await this.getManageableChannel(channelId);
     this.assertCanManage(channel, ctx);

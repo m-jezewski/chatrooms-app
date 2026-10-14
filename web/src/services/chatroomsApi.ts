@@ -1,15 +1,20 @@
 import { api } from './api.ts';
-import { Chatroom, CreatedChatroom, Message, RoomLocator, SavedRoom } from '../interfaces.ts';
+import { Chatroom, CreatedChatroom, Message, RoomEntry, SavedRoom } from '../interfaces.ts';
+import { getOwnerToken } from '../utils/session.ts';
 
 const ownerHeaders = (ownerToken?: string | null) => (ownerToken ? { 'X-Owner-Token': ownerToken } : undefined);
 
 export const chatroomsApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getChatroomById: builder.query<Chatroom, string>({
-      query: (id) => `/textChannels/${id}`,
+      query: (id) => ({ url: `/textChannels/${id}`, headers: ownerHeaders(getOwnerToken(id)) }),
       providesTags: (_result, _error, id) => [{ type: 'Chatroom', id }],
     }),
-    getRoomByInviteCode: builder.query<RoomLocator, string>({
+    getRoomEntry: builder.query<RoomEntry, string>({
+      query: (id) => `/textChannels/${id}/entry`,
+      providesTags: (_result, _error, id) => [{ type: 'Chatroom', id }],
+    }),
+    getRoomEntryByCode: builder.query<RoomEntry, string>({
       query: (inviteCode) => `/textChannels/code/${inviteCode}`,
     }),
     createChatroom: builder.mutation<
@@ -33,6 +38,7 @@ export const chatroomsApi = api.injectEndpoints({
         method: 'POST',
         body: { authKey },
       }),
+      invalidatesTags: (_result, _error, { channelId }) => [{ type: 'Chatroom', id: channelId }],
     }),
     updateChatroom: builder.mutation<
       Chatroom,
@@ -97,8 +103,9 @@ export const chatroomsApi = api.injectEndpoints({
 
 export const {
   useGetChatroomByIdQuery,
+  useGetRoomEntryQuery,
   useCreateChatroomMutation,
-  useLazyGetRoomByInviteCodeQuery,
+  useLazyGetRoomEntryByCodeQuery,
   useJoinChatroomMutation,
   useUpdateChatroomMutation,
   useRotateInviteCodeMutation,

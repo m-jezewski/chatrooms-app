@@ -5,13 +5,13 @@ import { InputLabel } from '../../shared/InputLabel.tsx';
 import { TextInput } from '../../shared/TextInput.tsx';
 import { AppButton } from '../../shared/AppButton.tsx';
 import { FormContainer } from '../../shared/FormContainer.tsx';
-import { Chatroom } from '../../interfaces.ts';
+import { RoomEntry } from '../../interfaces.ts';
 import { base64ToUint8, deriveRoomSecrets, RoomSecrets } from '../../utils/roomCrypto.ts';
 import { useJoinChatroomMutation } from '../../services/chatroomsApi.ts';
 import styles from './RoomPasswordGate.module.scss';
 
 interface RoomPasswordGateProps {
-  channelData?: Chatroom;
+  entry?: RoomEntry;
   onJoin: (secrets: RoomSecrets) => void;
 }
 
@@ -19,19 +19,19 @@ interface RoomPasswordFormValues {
   password: string;
 }
 
-export const RoomPasswordGate = ({ channelData, onJoin }: RoomPasswordGateProps) => {
+export const RoomPasswordGate = ({ entry, onJoin }: RoomPasswordGateProps) => {
   const [joinChatroom] = useJoinChatroomMutation();
 
   const handleSubmit = async (
     { password }: RoomPasswordFormValues,
     formikHelpers: FormikHelpers<RoomPasswordFormValues>,
   ) => {
-    if (!channelData) return;
+    if (!entry) return;
 
-    const secrets = await deriveRoomSecrets(password, base64ToUint8(channelData.salt));
+    const secrets = await deriveRoomSecrets(password, base64ToUint8(entry.salt));
 
     try {
-      await joinChatroom({ channelId: channelData.id, authKey: secrets.authKey }).unwrap();
+      await joinChatroom({ channelId: entry.roomId, authKey: secrets.authKey }).unwrap();
     } catch (error) {
       const status = (error as { status?: number | string })?.status;
       formikHelpers.setFieldError(

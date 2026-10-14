@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { MessageForm } from '../messages/MessageForm.tsx';
 import useWebSocket from '../messages/useWebSocket.ts';
-import { useGetChatroomByIdQuery, useJoinChatroomMutation } from '../../services/chatroomsApi.ts';
+import { useGetChatroomByIdQuery, useGetRoomEntryQuery, useJoinChatroomMutation } from '../../services/chatroomsApi.ts';
 import { ChatroomTitlePanel } from './ChatroomTitlePanel.tsx';
 import { Chatroom } from './Chatroom.tsx';
 import { RoomPasswordGate } from './RoomPasswordGate.tsx';
@@ -16,6 +16,7 @@ import styles from './Chatrooms.module.scss';
 
 export const Chatrooms = () => {
   const { roomId: channelId } = useParams();
+  const { data: entry } = useGetRoomEntryQuery(channelId!, { skip: !channelId });
   const { data: channelData } = useGetChatroomByIdQuery(channelId!, { skip: !channelId });
   const { secrets, setSecrets } = useRoomKey(channelId);
   const [joinChatroom] = useJoinChatroomMutation();
@@ -42,10 +43,10 @@ export const Chatrooms = () => {
   }, [channelId, secrets, joinedChannelId, joinChatroom]);
 
   useEffect(() => {
-    if (channelData) {
-      recordRecentRoom({ roomId: channelData.id, name: channelData.name });
+    if (joined && entry) {
+      recordRecentRoom({ roomId: entry.roomId, name: entry.name });
     }
-  }, [channelData]);
+  }, [joined, entry]);
 
   const handleSendMessage = async (text: string) => {
     if (!channelId || !secrets) return;
@@ -66,10 +67,10 @@ export const Chatrooms = () => {
 
   return (
     <div className={styles.container}>
-      <ChatroomTitlePanel channelData={channelData} />
+      <ChatroomTitlePanel entry={entry} channelData={channelData} />
       {!secrets ? (
         <RoomPasswordGate
-          channelData={channelData}
+          entry={entry}
           onJoin={(roomSecrets) => {
             setSecrets(roomSecrets);
             setJoinedChannelId(channelId);

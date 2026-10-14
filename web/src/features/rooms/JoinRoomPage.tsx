@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router';
 import { FormHeading } from '../../shared/FormHeading.tsx';
 import { JoinRoomForm } from './JoinRoomForm.tsx';
-import { RoomLocator } from '../../interfaces.ts';
+import { RoomEntry } from '../../interfaces.ts';
 import styles from './JoinRoomPage.module.scss';
 
 export const JoinRoomPage = () => {
   const { inviteCode } = useParams();
-  const [locator, setLocator] = useState<RoomLocator | null>(null);
+  const [locator, setLocator] = useState<RoomEntry | null>(null);
 
   return (
     <div className={styles.page}>

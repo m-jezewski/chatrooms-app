@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { Chatroom } from '../../interfaces.ts';
+import { Chatroom, RoomEntry } from '../../interfaces.ts';
 import { selectLoggedUser } from '../auth/authSlice.ts';
 import { EditChatroomForm } from './EditChatroomForm.tsx';
 import { EditRoomTtlForm } from './EditRoomTtlForm.tsx';
@@ -22,10 +22,11 @@ import {
 import styles from './ChatroomTitlePanel.module.scss';
 
 interface ChatroomTitlePanelProps {
+  entry?: RoomEntry;
   channelData?: Chatroom;
 }
 
-export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => {
+export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelProps) => {
   const { roomId } = useParams();
   const loggedUser = useSelector(selectLoggedUser);
 
@@ -78,7 +79,7 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
       <div>
         <div className={styles.title}>
           <span className={styles.hash}>#</span>
-          <h1>{channelData?.name}</h1>
+          <h1>{entry?.name}</h1>
         </div>
         <div className={styles.loggedUsersInfo}>1 user online {/* TODO */}</div>
       </div>
@@ -100,17 +101,19 @@ export const ChatroomTitlePanel = ({ channelData }: ChatroomTitlePanelProps) => 
           />
         )}
 
-        <div className={styles.code}>
-          <code>{channelData?.inviteCode}</code>
-          <AppButton compact={true} variant={'transparent'} onClick={copyInvite}>
-            Copy link
-          </AppButton>
-          {isOwner && (
-            <AppButton compact={true} variant={'transparent'} onClick={handleRotate}>
-              Rotate
+        {channelData && (
+          <div className={styles.code}>
+            <code>{channelData.inviteCode}</code>
+            <AppButton compact={true} variant={'transparent'} onClick={copyInvite}>
+              Copy link
             </AppButton>
-          )}
-        </div>
+            {isOwner && (
+              <AppButton compact={true} variant={'transparent'} onClick={handleRotate}>
+                Rotate
+              </AppButton>
+            )}
+          </div>
+        )}
       </div>
 
       {channelData && (

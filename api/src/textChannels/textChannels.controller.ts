@@ -39,8 +39,8 @@ export class TextChannelsController {
   @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @Get('code/:inviteCode')
-  async getRoomByInviteCode(@Param('inviteCode') inviteCode: string) {
-    return this.textChannelsService.getRoomByInviteCode(inviteCode);
+  async getRoomEntryByCode(@Param('inviteCode') inviteCode: string) {
+    return this.textChannelsService.getRoomEntryByCode(inviteCode);
   }
 
   @UseGuards(SessionGuard)
@@ -50,10 +50,21 @@ export class TextChannelsController {
     return this.textChannelsService.getSavedRooms(user.id);
   }
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  @Get(':id/entry')
+  async getRoomEntry(@Param('id') id: string) {
+    return this.textChannelsService.getRoomEntryById(id);
+  }
+
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  async getTextChannelById(@Param('id') id: string) {
-    return this.textChannelsService.getChannel({ channelId: id });
+  async getTextChannelById(@Param('id') id: string, @Req() req: Request) {
+    return this.textChannelsService.getChannel({
+      channelId: id,
+      joinedChannels: req.session.joinedChannels ?? [],
+      ctx: manageContext(req),
+    });
   }
 
   @UseGuards(ThrottlerGuard)

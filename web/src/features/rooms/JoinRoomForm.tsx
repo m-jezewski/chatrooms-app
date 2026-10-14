@@ -7,17 +7,17 @@ import { TextInput } from '../../shared/TextInput.tsx';
 import { AppButton } from '../../shared/AppButton.tsx';
 import { FormActions } from '../../shared/FormActions.tsx';
 import { FormContainer } from '../../shared/FormContainer.tsx';
-import { useJoinChatroomMutation, useLazyGetRoomByInviteCodeQuery } from '../../services/chatroomsApi.ts';
+import { useJoinChatroomMutation, useLazyGetRoomEntryByCodeQuery } from '../../services/chatroomsApi.ts';
 import { base64ToUint8, deriveRoomSecrets } from '../../utils/roomCrypto.ts';
 import { saveNickname } from '../../utils/session.ts';
 import { recordRecentRoom } from '../../utils/recentRooms.ts';
 import { useRoomKeyContext } from '../chatrooms/RoomKeyContext.tsx';
-import { RoomLocator } from '../../interfaces.ts';
+import { RoomEntry } from '../../interfaces.ts';
 import styles from './JoinRoomForm.module.scss';
 
 interface JoinRoomFormProps {
   inviteCode?: string;
-  onRoomResolved?: (room: RoomLocator) => void;
+  onRoomResolved?: (room: RoomEntry) => void;
   onJoined?: () => void;
   onCancel?: () => void;
 }
@@ -25,9 +25,9 @@ interface JoinRoomFormProps {
 export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }: JoinRoomFormProps) => {
   const navigate = useNavigate();
   const { setKey } = useRoomKeyContext();
-  const [lookupRoom] = useLazyGetRoomByInviteCodeQuery();
+  const [lookupRoom] = useLazyGetRoomEntryByCodeQuery();
   const [joinChatroom] = useJoinChatroomMutation();
-  const [locator, setLocator] = useState<RoomLocator | null>(null);
+  const [locator, setLocator] = useState<RoomEntry | null>(null);
 
   const resolveCode = async (code: string, helpers?: FormikHelpers<{ inviteCode: string }>) => {
     try {

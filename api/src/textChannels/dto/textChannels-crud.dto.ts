@@ -94,22 +94,23 @@ export class UpdateTextChannelDto extends PartialType(
 
 export class JoinTextChannelDto extends PickType(CreateTextChannelDto, ['authKey'] as const) {}
 
-export class TextChannelPublicDto extends OmitType(TextChannelDto, ['authKeyHash', 'ownerTokenHash'] as const) {}
+export class TextChannelDetailsDto extends OmitType(TextChannelDto, ['authKeyHash', 'ownerTokenHash'] as const) {}
 
-export class CreatedTextChannelDto extends TextChannelPublicDto {
+export class CreatedTextChannelDto extends TextChannelDetailsDto {
   @ApiPropertyOptional({
     description: 'Raw owner token, returned exactly once for anonymous creators. Store it client-side.',
   })
   ownerToken?: string;
 }
-export class RoomLocatorDto {
+
+export class RoomEntryDto {
   @ApiProperty({ example: 'a1b2c3d4-...' })
   roomId: string;
 
   @ApiProperty({ example: 'name' })
   name: string;
 
-  @ApiProperty({ example: 'base64 salt' })
+  @ApiProperty({ example: 'base64 salt', description: 'Per-room KDF salt.' })
   salt: string;
 }
 
