@@ -1,21 +1,13 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { getHashedPassword } from '../utils/bcrypt';
-import { CreateUserDto, UpdateUserDto } from './dto/user-crud.dto';
+import { CreateUserDto } from './dto/user-crud.dto';
 import { EmailInUseError } from '../utils/customExceptions';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
-
-  private canModifyUser(targetUserId: string, loggedUser: User): boolean {
-    return loggedUser.id === targetUserId;
-  }
-
-  async findUsers(params: { findParams: Prisma.UserFindManyArgs }): Promise<User[]> {
-    return this.prisma.user.findMany(params.findParams);
-  }
 
   async getUser(params: { userId: string }): Promise<User> {
     const { userId } = params;
@@ -58,35 +50,10 @@ export class UsersService {
     }
   }
 
-  async updateUser(params: { userId: string; loggedUser: User; data: UpdateUserDto }): Promise<User> {
-    const { userId, loggedUser, data } = params;
-    await this.getUser({ userId });
-
-    if (!this.canModifyUser(userId, loggedUser)) {
-      throw new ForbiddenException('You can only update your own account');
-    }
-
-    try {
-      return await this.prisma.user.update({
-        where: { id: userId },
-        data,
-      });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        throw new EmailInUseError();
-      }
-      throw error;
-    }
-  }
-
-  async deleteUser(params: { userId: string; loggedUser: User }): Promise<User> {
-    const { userId, loggedUser } = params;
-    await this.getUser({ userId });
-
-    if (!this.canModifyUser(userId, loggedUser)) {
-      throw new ForbiddenException('You can only delete your own account');
-    }
-
-    return this.prisma.user.delete({ where: { id: userId } });
+  async deleteOwnAccount(userId: string): Promise<void> {
+    await this.prisma.$transaction([
+      this.prisma.textChannel.deleteMany({ where: { ownerId: userId } }),
+      this.prisma.user.delete({ where: { id: userId } }),
+    ]);
   }
 }

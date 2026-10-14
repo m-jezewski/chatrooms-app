@@ -1,19 +1,6 @@
-import {
-  Body,
-  ClassSerializerInterceptor,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Delete, HttpCode, HttpStatus, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto, UserEntity } from './dto/user-crud.dto';
 import { SessionGuard } from '../auth/guards/session-guard';
 import { Request } from 'express';
 import { User } from '@prisma/client';
@@ -24,44 +11,14 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(SessionGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Get()
-  async getAllUsers(): Promise<UserEntity[]> {
-    const users = await this.usersService.findUsers({ findParams: {} });
-    return users.map((u) => new UserEntity(u));
-  }
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete('me')
+  async deleteOwnAccount(@Req() req: Request): Promise<void> {
+    const { id } = req.user as User;
+    await this.usersService.deleteOwnAccount(id);
 
-  @UseGuards(SessionGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Get(':id')
-  async getUserById(@Param('id') id: string): Promise<UserEntity> {
-    const user = await this.usersService.getUser({ userId: id });
-    return new UserEntity(user);
-  }
-
-  @UseGuards(SessionGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Post('create')
-  async create(@Body() user: CreateUserDto): Promise<UserEntity> {
-    const created = await this.usersService.createUser(user);
-    return new UserEntity(created);
-  }
-
-  @UseGuards(SessionGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Patch(':id')
-  async updateUser(@Param('id') id: string, @Body() data: UpdateUserDto, @Req() request: Request): Promise<UserEntity> {
-    const loggedUser = request.user as User;
-    const updated = await this.usersService.updateUser({ userId: id, loggedUser, data });
-    return new UserEntity(updated);
-  }
-
-  @UseGuards(SessionGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Delete(':id')
-  async deleteUser(@Param('id') id: string, @Req() request: Request): Promise<UserEntity> {
-    const loggedUser = request.user as User;
-    const deleted = await this.usersService.deleteUser({ userId: id, loggedUser });
-    return new UserEntity(deleted);
+    await new Promise<void>((resolve, reject) => {
+      req.session.destroy((error) => (error ? reject(error) : resolve()));
+    });
   }
 }
