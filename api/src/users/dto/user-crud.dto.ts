@@ -3,6 +3,8 @@ import { OmitType, ApiProperty } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
+export type UserProfile = Omit<User, 'password'>;
+
 export class UserDto implements User {
   @ApiProperty({ example: 'a1b2c3d4-...' })
   @IsUUID()
@@ -48,7 +50,7 @@ export class UserEntity implements Omit<User, 'password'> {
   @Exclude()
   password: string;
 
-  constructor(partial: Partial<User>) {
+  constructor(partial: Partial<UserProfile>) {
     Object.assign(this, partial);
   }
 }

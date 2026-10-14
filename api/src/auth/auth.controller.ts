@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { RegisterUserDto, UserEntity } from '../users/dto/user-crud.dto';
+import { RegisterUserDto, UserEntity, UserProfile } from '../users/dto/user-crud.dto';
 import { SessionGuard } from './guards/session-guard';
 import { EmailInUseError } from '../utils/customExceptions';
 import { AuthService } from './auth.service';
@@ -35,8 +35,9 @@ export class AuthController {
 
   @Get('status')
   @UseGuards(SessionGuard)
-  async getAuthSession(@Req() req) {
-    return new UserEntity(req.user);
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getAuthSession(@Req() req: Request): Promise<UserEntity> {
+    return new UserEntity(req.user as UserProfile);
   }
 
   @UseGuards(SessionGuard)

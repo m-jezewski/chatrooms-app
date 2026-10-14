@@ -2,8 +2,8 @@ import { Controller, Delete, HttpCode, HttpStatus, Req, UseGuards } from '@nestj
 import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { SessionGuard } from '../auth/guards/session-guard';
+import { UserProfile } from './dto/user-crud.dto';
 import { Request } from 'express';
-import { User } from '@prisma/client';
 
 @ApiTags('Users')
 @Controller('users')
@@ -14,7 +14,7 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('me')
   async deleteOwnAccount(@Req() req: Request): Promise<void> {
-    const { id } = req.user as User;
+    const { id } = req.user as UserProfile;
     await this.usersService.deleteOwnAccount(id);
 
     await new Promise<void>((resolve, reject) => {

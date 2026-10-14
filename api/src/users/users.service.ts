@@ -2,16 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { getHashedPassword } from '../utils/bcrypt';
-import { CreateUserDto } from './dto/user-crud.dto';
+import { CreateUserDto, UserProfile } from './dto/user-crud.dto';
 import { EmailInUseError } from '../utils/customExceptions';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async getUser(params: { userId: string }): Promise<User> {
+  async getUser(params: { userId: string }): Promise<UserProfile> {
     const { userId } = params;
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, omit: { password: true } });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -24,7 +24,7 @@ export class UsersService {
     return this.prisma.user.findUnique({ where: { email: params.email } });
   }
 
-  async createUser(params: CreateUserDto): Promise<User> {
+  async createUser(params: CreateUserDto): Promise<UserProfile> {
     const { password, name, email } = params;
 
     try {
@@ -34,6 +34,7 @@ export class UsersService {
           email: email,
           password: getHashedPassword(password),
         },
+        omit: { password: true },
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
