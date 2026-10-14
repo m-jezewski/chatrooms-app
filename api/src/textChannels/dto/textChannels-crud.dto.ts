@@ -1,5 +1,16 @@
 import { TextChannel } from '@prisma/client';
-import { IsDate, IsDateString, IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import {
+  IsBase64,
+  IsDate,
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { OmitType, PartialType, PickType, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class TextChannelDto implements TextChannel {
@@ -15,9 +26,11 @@ export class TextChannelDto implements TextChannel {
   @MaxLength(50)
   name: string;
 
-  @ApiProperty({ example: 'base64 salt', description: 'Per-room salt' })
+  @ApiProperty({ example: 'base64 salt', description: 'Per-room salt, 16 bytes.', minLength: 24, maxLength: 24 })
   @IsString()
   @IsNotEmpty()
+  @Length(24, 24)
+  @IsBase64()
   salt: string;
 
   @ApiProperty({ description: 'bcrypt hash of the room auth key.' })
@@ -65,9 +78,13 @@ export class CreateTextChannelDto extends OmitType(TextChannelDto, [
   @ApiProperty({
     example: 'base64(32B)',
     description: 'Client-derived proof of the room password. Hashed server-side, never stored raw.',
+    minLength: 44,
+    maxLength: 44,
   })
   @IsString()
   @IsNotEmpty()
+  @Length(44, 44)
+  @IsBase64()
   authKey: string;
 
   @ApiPropertyOptional({

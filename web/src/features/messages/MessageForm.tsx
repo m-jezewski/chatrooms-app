@@ -49,7 +49,12 @@ export const MessageForm = ({ sendMessage }: MessageFormProps) => {
                 <AppIcon icon={SendIcon} className={styles.sendIcon} />
               </AppButton>
 
-              <TextInput name={'message'} className={styles.messageInput} placeholder={'Write something...'} />
+              <TextInput
+                name={'message'}
+                className={styles.messageInput}
+                placeholder={'Write something...'}
+                maxLength={2000}
+              />
             </div>
           </Form>
         );

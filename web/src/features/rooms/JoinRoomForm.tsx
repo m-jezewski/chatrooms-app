@@ -121,7 +121,12 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
             </div>
             <div>
               <InputLabel htmlFor="nickname">Nickname (optional)</InputLabel>
-              <TextInput name="nickname" type="text" placeholder="Shown to others in the room" />
+              <TextInput
+                name="nickname"
+                type="text"
+                placeholder="Shown to others in the room"
+                maxLength={32}
+              />
             </div>
             {onCancel ? (
               <FormActions equalWidth>

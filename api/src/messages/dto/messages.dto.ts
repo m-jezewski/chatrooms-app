@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
+import { IsBase64, IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { Message } from '@prisma/client';
@@ -55,13 +55,17 @@ export class JoinChannelDto {
 export class LeaveChannelDto extends JoinChannelDto {}
 
 export class SendMessageDto extends JoinChannelDto {
-  @ApiProperty({ example: 'base64(IV ‖ ciphertext ‖ authTag)' })
+  @ApiProperty({ example: 'base64(IV ‖ ciphertext ‖ authTag)', maxLength: 12000 })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(12000)
+  @IsBase64()
   payload: string;
 
-  @ApiProperty({ example: 'kQ8f...' })
+  @ApiProperty({ example: 'kQ8f...', maxLength: 64 })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(64)
+  @IsBase64({ urlSafe: true })
   senderId: string;
 }
