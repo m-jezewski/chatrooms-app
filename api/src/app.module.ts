@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { ExecutionContext, Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MessagesModule } from './messages/messages.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -18,7 +19,10 @@ import { validationSchema } from './config/validation.schema';
       load: [configuration],
       validationSchema,
     }),
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 10 }]), // applied per endpoint
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: 60000, limit: 100 }],
+      skipIf: (context: ExecutionContext) => context.getType() !== 'http',
+    }),
     PrismaModule,
     AuthModule,
     MessagesModule,
@@ -26,6 +30,6 @@ import { validationSchema } from './config/validation.schema';
     TextChannelsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

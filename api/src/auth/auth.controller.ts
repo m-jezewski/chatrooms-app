@@ -11,6 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RegisterUserDto, UserEntity, UserProfile } from '../users/dto/user-crud.dto';
 import { SessionGuard } from './guards/session-guard';
@@ -24,6 +25,7 @@ import { Request } from 'express';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @UseGuards(LocalAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('login')
@@ -33,6 +35,7 @@ export class AuthController {
     return new UserEntity(loggedUser);
   }
 
+  @SkipThrottle()
   @Get('status')
   @UseGuards(SessionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
@@ -46,6 +49,7 @@ export class AuthController {
     return this.authService.logout(req);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 3600000 } })
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('register')
   async register(@Body() registerDto: RegisterUserDto, @Req() req: Request): Promise<UserEntity> {

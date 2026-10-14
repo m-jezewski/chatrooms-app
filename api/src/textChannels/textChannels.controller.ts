@@ -14,7 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle } from '@nestjs/throttler';
 import { TextChannelsService, ManageContext } from './textChannels.service';
 import { SessionGuard } from '../auth/guards/session-guard';
 import { User } from '@prisma/client';
@@ -36,7 +36,6 @@ function manageContext(req: Request): ManageContext {
 export class TextChannelsController {
   constructor(private readonly textChannelsService: TextChannelsService) {}
 
-  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @Get('code/:inviteCode')
   async getRoomEntryByCode(@Param('inviteCode') inviteCode: string) {
@@ -50,7 +49,6 @@ export class TextChannelsController {
     return this.textChannelsService.getSavedRooms(user.id);
   }
 
-  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @Get(':id/entry')
   async getRoomEntry(@Param('id') id: string) {
@@ -67,7 +65,6 @@ export class TextChannelsController {
     });
   }
 
-  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 5, ttl: 3600_000 } })
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
@@ -79,7 +76,7 @@ export class TextChannelsController {
     return channel;
   }
 
-  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @Post(':id/join')
   async join(@Param('id') id: string, @Body() { authKey }: JoinTextChannelDto, @Req() req: Request) {
