@@ -36,6 +36,8 @@ model TextChannel {
   ownerId        String?     @db.Uuid
   messages       Message[]
   savedBy        SavedRoom[]
+
+  @@index([expiresAt])
 }
 
 model SavedRoom {
@@ -58,4 +60,6 @@ model Message {
 
   textChannel   TextChannel? @relation(fields: [textChannelId], references: [id], onDelete: Cascade)
   textChannelId String?      @db.Uuid
+
+  @@index([textChannelId, createdAt])
 }

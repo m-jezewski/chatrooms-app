@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { TextChannelsModule } from './textChannels/textChannels.module';
+import { RoomExpiryModule } from './roomExpiry/roomExpiry.module';
 import configuration from './config/configuration';
 import { validationSchema } from './config/validation.schema';
 
@@ -28,6 +29,7 @@ import { validationSchema } from './config/validation.schema';
     MessagesModule,
     UsersModule,
     TextChannelsModule,
+    RoomExpiryModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
