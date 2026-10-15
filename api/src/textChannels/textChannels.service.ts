@@ -11,6 +11,7 @@ import {
   UpdateTextChannelDto,
 } from './dto/textChannels-crud.dto';
 import * as bcrypt from 'bcrypt';
+import { activeRoomWhere } from './room-expiry';
 
 const AUTH_KEY_SALT_ROUNDS = 10;
 const OWNER_TOKEN_BYTES = 32;
@@ -87,13 +88,12 @@ export class TextChannelsService {
   }
 
   private async getManageableChannel(channelId: string): Promise<TextChannel> {
-    const channel = await this.prisma.textChannel.findUnique({ where: { id: channelId } });
+    const channel = await this.prisma.textChannel.findUnique({ where: activeRoomWhere({ id: channelId }) });
     if (!channel) {
       throw new NotFoundException('Channel not found');
     }
     return channel;
   }
-
 
   async getChannel(params: {
     channelId: string;
@@ -101,7 +101,7 @@ export class TextChannelsService {
     ctx: ManageContext;
   }): Promise<TextChannelDetailsDto> {
     const { channelId, joinedChannels, ctx } = params;
-    const channel = await this.prisma.textChannel.findUnique({ where: { id: channelId } });
+    const channel = await this.prisma.textChannel.findUnique({ where: activeRoomWhere({ id: channelId }) });
 
     if (!channel) {
       throw new NotFoundException('Channel not found');
@@ -123,7 +123,7 @@ export class TextChannelsService {
   }
 
   private async getRoomEntry(where: Prisma.TextChannelWhereUniqueInput): Promise<RoomEntryDto> {
-    const channel = await this.prisma.textChannel.findUnique({ where, select: ENTRY_SELECT });
+    const channel = await this.prisma.textChannel.findUnique({ where: activeRoomWhere(where), select: ENTRY_SELECT });
 
     if (!channel) {
       throw new NotFoundException('Room not found');
@@ -134,7 +134,7 @@ export class TextChannelsService {
 
   async verifyChannelAuthKey(params: { channelId: string; authKey: string }): Promise<void> {
     const { channelId, authKey } = params;
-    const channel = await this.prisma.textChannel.findUnique({ where: { id: channelId } });
+    const channel = await this.prisma.textChannel.findUnique({ where: activeRoomWhere({ id: channelId }) });
 
     if (!channel) {
       throw new NotFoundException('Channel not found');
@@ -220,7 +220,10 @@ export class TextChannelsService {
 
   async saveRoom(params: { userId: string; roomId: string; name?: string }): Promise<SavedRoomDto> {
     const { userId, roomId, name } = params;
-    const room = await this.prisma.textChannel.findUnique({ where: { id: roomId }, select: { name: true } });
+    const room = await this.prisma.textChannel.findUnique({
+      where: activeRoomWhere({ id: roomId }),
+      select: { name: true },
+    });
     if (!room) {
       throw new NotFoundException('Room not found');
     }
