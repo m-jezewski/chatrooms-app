@@ -11,7 +11,7 @@ import {
   UpdateTextChannelDto,
 } from './dto/textChannels-crud.dto';
 import * as bcrypt from 'bcrypt';
-import { activeRoomWhere } from './room-expiry';
+import { activeRoomWhere, ANONYMOUS_TTL_MAX_MS } from './room-expiry';
 
 const AUTH_KEY_SALT_ROUNDS = 10;
 const OWNER_TOKEN_BYTES = 32;
@@ -19,7 +19,6 @@ const INVITE_CODE_LENGTH = 8;
 
 const INVITE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const INVITE_CODE_MAX_ATTEMPTS = 5;
-const ANONYMOUS_TTL_MAX_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const SECRET_FIELDS = { authKeyHash: true, ownerTokenHash: true } as const;
 const ENTRY_SELECT = { id: true, name: true, salt: true } as const;
 
@@ -71,20 +70,18 @@ export class TextChannelsService {
     throw new Error('Could not generate a unique invite code');
   }
 
-  private resolveExpiry(expiresAt: string | null | undefined, isAccountOwned: boolean): Date | null {
-    const parsed = expiresAt ? new Date(expiresAt) : null;
-
-    if (isAccountOwned) {
-      return parsed;
+  private resolveExpiry(ttlMs: number | null | undefined, isAccountOwned: boolean): Date | null {
+    if (ttlMs === null || ttlMs === undefined) {
+      if (!isAccountOwned) {
+        throw new BadRequestException('Anonymous rooms must have an expiry');
+      }
+      return null;
     }
-    if (!parsed) {
-      throw new BadRequestException('Anonymous rooms must have an expiry date');
-    }
-    if (parsed.getTime() > Date.now() + ANONYMOUS_TTL_MAX_MS) {
+    if (!isAccountOwned && ttlMs > ANONYMOUS_TTL_MAX_MS) {
       throw new BadRequestException('Anonymous rooms can live at most 30 days');
     }
 
-    return parsed;
+    return new Date(Date.now() + ttlMs);
   }
 
   private async getManageableChannel(channelId: string): Promise<TextChannel> {
@@ -148,11 +145,11 @@ export class TextChannelsService {
 
   async createTextChannel(params: { textChannel: CreateTextChannelDto; user?: User }): Promise<CreatedTextChannelDto> {
     const { textChannel, user } = params;
-    const { authKey, expiresAt, ...channelData } = textChannel;
+    const { authKey, ttlMs, ...channelData } = textChannel;
 
+    const parsedExpiresAt = this.resolveExpiry(ttlMs, !!user);
     const inviteCode = await this.generateUniqueInviteCode();
     const authKeyHash = await bcrypt.hash(authKey, AUTH_KEY_SALT_ROUNDS);
-    const parsedExpiresAt = this.resolveExpiry(expiresAt, !!user);
 
     if (user) {
       return this.prisma.textChannel.create({
@@ -201,8 +198,8 @@ export class TextChannelsService {
     const channel = await this.getManageableChannel(channelId);
     this.assertCanManage(channel, ctx);
 
-    const { expiresAt, ...rest } = textChannel;
-    const expiry = 'expiresAt' in textChannel ? { expiresAt: this.resolveExpiry(expiresAt, !!channel.ownerId) } : {};
+    const { ttlMs, ...rest } = textChannel;
+    const expiry = 'ttlMs' in textChannel ? { expiresAt: this.resolveExpiry(ttlMs, !!channel.ownerId) } : {};
 
     return this.prisma.textChannel.update({
       where: { id: channelId },

@@ -10,7 +10,7 @@ import { Chatroom } from '../../interfaces.ts';
 import { getErrorMessage } from '../../shared/getErrorMessage.ts';
 import { useUpdateChatroomMutation } from '../../services/chatroomsApi.ts';
 import { getOwnerToken } from '../../utils/session.ts';
-import { DEFAULT_TTL_MS, expiresAtFrom, formatExpiry, ttlOptionsFor } from '../../utils/ttl.ts';
+import { DEFAULT_TTL_MS, formatExpiry, ttlOptionsFor } from '../../utils/ttl.ts';
 import styles from './EditRoomTtlForm.module.scss';
 
 interface EditRoomTtlFormProps {
@@ -31,7 +31,7 @@ export const EditRoomTtlForm = ({ room, closeModal }: EditRoomTtlFormProps) => {
     try {
       await updateChatroom({
         id: room.id,
-        expiresAt: expiresAtFrom(values.ttl),
+        ttlMs: values.ttl,
         ownerToken: getOwnerToken(room.id),
       }).unwrap();
       toast.success('Room expiry updated!');

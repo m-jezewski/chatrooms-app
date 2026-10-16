@@ -2,16 +2,19 @@ import { TextChannel } from '@prisma/client';
 import {
   IsBase64,
   IsDate,
-  IsDateString,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
   Length,
+  Max,
   MaxLength,
+  Min,
   MinLength,
 } from 'class-validator';
 import { OmitType, PartialType, PickType, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ANONYMOUS_TTL_MAX_MS, TTL_MAX_MS, TTL_MIN_MS } from '../room-expiry';
 
 export class TextChannelDto implements TextChannel {
   @ApiProperty({ example: 'a1b2c3d4-...' })
@@ -88,25 +91,36 @@ export class CreateTextChannelDto extends OmitType(TextChannelDto, [
   authKey: string;
 
   @ApiPropertyOptional({
-    description: 'ISO date when the room should expire. Required (and capped at +30 days) for anonymous creators.',
+    type: Number,
+    nullable: true,
+    minimum: TTL_MIN_MS,
+    maximum: TTL_MAX_MS,
+    example: 86_400_000,
+    description: `Lifetime in milliseconds or null`,
   })
   @IsOptional()
-  @IsDateString()
-  expiresAt?: string;
+  @IsInt()
+  @Min(TTL_MIN_MS)
+  @Max(TTL_MAX_MS)
+  ttlMs?: number | null;
 }
 
 export class UpdateTextChannelDto extends PartialType(
-  OmitType(CreateTextChannelDto, ['salt', 'authKey', 'expiresAt'] as const),
+  OmitType(CreateTextChannelDto, ['salt', 'authKey', 'ttlMs'] as const),
 ) {
   @ApiPropertyOptional({
-    type: String,
+    type: Number,
     nullable: true,
-    description:
-      'New expiry as an ISO date, or null for never. Anonymous-owned rooms must keep an expiry, capped at +30 days.',
+    minimum: TTL_MIN_MS,
+    maximum: TTL_MAX_MS,
+    example: 86_400_000,
+    description: `Lifetime in milliseconds or null`,
   })
   @IsOptional()
-  @IsDateString()
-  expiresAt?: string | null;
+  @IsInt()
+  @Min(TTL_MIN_MS)
+  @Max(TTL_MAX_MS)
+  ttlMs?: number | null;
 }
 
 export class JoinTextChannelDto extends PickType(CreateTextChannelDto, ['authKey'] as const) {}

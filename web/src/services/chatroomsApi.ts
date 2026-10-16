@@ -23,7 +23,7 @@ export const chatroomsApi = api.injectEndpoints({
         name: string;
         salt: string;
         authKey: string;
-        expiresAt?: string | null;
+        ttlMs?: number | null;
       }
     >({
       query: (channelData) => ({
@@ -45,7 +45,7 @@ export const chatroomsApi = api.injectEndpoints({
       {
         id: string;
         name?: string;
-        expiresAt?: string | null;
+        ttlMs?: number | null;
         ownerToken?: string | null;
       }
     >({

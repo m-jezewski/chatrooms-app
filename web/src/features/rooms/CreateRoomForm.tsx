@@ -18,7 +18,7 @@ import { recordRecentRoom } from '../../utils/recentRooms.ts';
 import { useRoomKeyContext } from '../chatrooms/RoomKeyContext.tsx';
 import { getErrorMessage } from '../../shared/getErrorMessage.ts';
 import { passwordStrength } from '../../utils/passwordStrength.ts';
-import { DEFAULT_TTL_MS, expiresAtFrom, ttlOptionsFor } from '../../utils/ttl.ts';
+import { DEFAULT_TTL_MS, ttlOptionsFor } from '../../utils/ttl.ts';
 import styles from './CreateRoomForm.module.scss';
 
 interface CreateRoomFormValues {
@@ -49,8 +49,6 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
   const ttlOptions = ttlOptionsFor(!!loggedUser);
 
   const handleSubmit = async (values: CreateRoomFormValues, helpers: FormikHelpers<CreateRoomFormValues>) => {
-    const expiresAt = expiresAtFrom(values.ttl);
-
     try {
       const salt = generateSalt();
       const secrets = await deriveRoomSecrets(values.password, salt);
@@ -59,7 +57,7 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
         name: values.name,
         salt: uint8ToBase64(salt),
         authKey: secrets.authKey,
-        expiresAt,
+        ttlMs: values.ttl,
       }).unwrap();
 
       if (room.ownerToken) {
