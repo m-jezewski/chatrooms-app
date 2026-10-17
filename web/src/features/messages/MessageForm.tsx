@@ -36,6 +36,7 @@ export const MessageForm = ({ sendMessage }: MessageFormProps) => {
           <Form className={styles.form}>
             <div className={styles.bar}>
               <AppButton
+                type={'submit'}
                 variant={'transparent'}
                 rounded={true}
                 aria-label={'Send message'}

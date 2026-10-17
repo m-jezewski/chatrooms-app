@@ -38,7 +38,7 @@ export const SelectInput = <TValue,>({
             }}
           >
             <div className={styles.wrapper}>
-              <ListboxButton className={[styles.button, className].filter(Boolean).join(' ')}>
+              <ListboxButton id={name} className={[styles.button, className].filter(Boolean).join(' ')}>
                 <span className={selected ? undefined : styles.placeholder}>
                   {selected ? selected.label : placeholder}
                 </span>

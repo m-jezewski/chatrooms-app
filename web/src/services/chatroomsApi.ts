@@ -71,6 +71,7 @@ export const chatroomsApi = api.injectEndpoints({
         method: 'DELETE',
         headers: ownerHeaders(ownerToken),
       }),
+      invalidatesTags: (_result, _error, { id }) => [{ type: 'Chatroom', id }, 'SavedRooms'],
     }),
     getOlderMessages: builder.query<
       { messages: Message[]; hasMore: boolean },

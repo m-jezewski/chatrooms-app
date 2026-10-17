@@ -45,14 +45,15 @@ export const AppButton = ({
     );
   }
 
-  const { as: _as, ...buttonProps } = otherProps;
+  const { as: _as, type = 'button', ...buttonProps } = otherProps;
 
   const disabledClass = buttonProps.disabled ? styles.disabled : '';
 
   return (
     <button
+      type={type}
       {...buttonProps}
-      className={[styles.button, styles[variant], compact, compactClass, roundedClass, disabledClass, className]
+      className={[styles.button, styles[variant], compactClass, roundedClass, disabledClass, className]
         .filter(Boolean)
         .join(' ')}
     >

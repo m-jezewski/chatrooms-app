@@ -26,11 +26,11 @@ export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => 
   const handleSubmit = async (values: formValues, formikHelpers: FormikHelpers<formValues>) => {
     try {
       await login(values).unwrap();
+      formikHelpers.resetForm();
       onSuccess?.();
-    } catch (error) {
+    } catch {
       toast.error('Failed to log in.');
     }
-    formikHelpers.resetForm();
   };
 
   const handleDemoButtonClick = async (formikConfig: FormikProps<formValues>) => {
@@ -60,13 +60,18 @@ export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => 
           <FormContainer>
             <div>
               <InputLabel htmlFor={'email'}>Email</InputLabel>
-              <TextInput name={'email'} type={'email'} placeholder={'youremail@domain.com'} />
+              <TextInput name={'email'} type={'email'} autoComplete={'email'} placeholder={'youremail@domain.com'} />
             </div>
             <div>
               <InputLabel htmlFor={'password'}>Password</InputLabel>
-              <TextInput name={'password'} type={'password'} placeholder={'********'} />
+              <TextInput
+                name={'password'}
+                type={'password'}
+                autoComplete={'current-password'}
+                placeholder={'********'}
+              />
             </div>
-            <AppButton variant={'purple'} loader={isLoading} className={styles.signIn}>
+            <AppButton variant={'purple'} type={'submit'} loader={isLoading} className={styles.signIn}>
               Sign in
             </AppButton>
           </FormContainer>

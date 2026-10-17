@@ -27,12 +27,12 @@ export const RegisterForm = ({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
   const handleSubmit = async (values: formValues, formikHelpers: FormikHelpers<formValues>) => {
     try {
       await register(values).unwrap();
+      formikHelpers.resetForm();
       toast.success('Successfully registered!');
       onSuccess?.();
-    } catch (error) {
+    } catch {
       toast.error('Failed to register.');
     }
-    formikHelpers.resetForm();
   };
 
   return (
@@ -54,15 +54,15 @@ export const RegisterForm = ({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
           <FormContainer>
             <div>
               <InputLabel htmlFor={'email'}>Email</InputLabel>
-              <TextInput name={'email'} type={'email'} placeholder={'youremail@domain.com'} />
+              <TextInput name={'email'} type={'email'} autoComplete={'email'} placeholder={'youremail@domain.com'} />
             </div>
             <div>
               <InputLabel htmlFor={'name'}>Name</InputLabel>
-              <TextInput name={'name'} type={'text'} />
+              <TextInput name={'name'} type={'text'} autoComplete={'nickname'} />
             </div>
             <div>
               <InputLabel htmlFor={'password'}>Password</InputLabel>
-              <TextInput name={'password'} type={'password'} placeholder={'********'} />
+              <TextInput name={'password'} type={'password'} autoComplete={'new-password'} placeholder={'********'} />
             </div>
             <AppButton variant={'purple'} loader={isLoading} type={'submit'} className={styles.register}>
               Register

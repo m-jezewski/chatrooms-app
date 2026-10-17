@@ -5,9 +5,9 @@ interface InputLabelProps extends HTMLProps<HTMLLabelElement> {
   children: React.ReactNode;
 }
 
-export const InputLabel = ({ children, ...otherProps }: InputLabelProps) => {
+export const InputLabel = ({ children, className, ...otherProps }: InputLabelProps) => {
   return (
-    <label {...otherProps} className={styles.label}>
+    <label {...otherProps} className={[styles.label, className].filter(Boolean).join(' ')}>
       {children}
     </label>
   );
