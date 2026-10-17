@@ -8,7 +8,7 @@ import { AppButton } from '../../shared/AppButton.tsx';
 import { FormActions } from '../../shared/FormActions.tsx';
 import { FormContainer } from '../../shared/FormContainer.tsx';
 import { useJoinChatroomMutation, useLazyGetRoomEntryByCodeQuery } from '../../services/chatroomsApi.ts';
-import { base64ToUint8, deriveRoomSecrets } from '../../utils/roomCrypto.ts';
+import { base64ToUint8, deriveRoomSecrets, RoomSecrets } from '../../utils/roomCrypto.ts';
 import { saveNickname } from '../../utils/session.ts';
 import { recordRecentRoom } from '../../utils/recentRooms.ts';
 import { useRoomKeyContext } from '../chatrooms/RoomKeyContext.tsx';
@@ -28,16 +28,19 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
   const [lookupRoom] = useLazyGetRoomEntryByCodeQuery();
   const [joinChatroom] = useJoinChatroomMutation();
   const [locator, setLocator] = useState<RoomEntry | null>(null);
+  const [lookupError, setLookupError] = useState<string | null>(null);
 
-  const resolveCode = async (code: string, helpers?: FormikHelpers<{ inviteCode: string }>) => {
+  const resolveCode = async (code: string) => {
+    setLookupError(null);
+
     try {
       const room = await lookupRoom(code.trim().toUpperCase()).unwrap();
       setLocator(room);
       onRoomResolved?.(room);
-    } catch {
-      helpers?.setFieldError('inviteCode', 'No room found for this code');
+    } catch (error) {
+      const status = (error as { status?: number | string })?.status;
+      setLookupError(status === 429 ? 'Too many attempts — try again in a minute' : 'No room found for this code');
     }
-    helpers?.setSubmitting(false);
   };
 
   useEffect(() => {
@@ -51,7 +54,14 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
     helpers: FormikHelpers<{ password: string; nickname: string }>,
   ) => {
     if (!locator) return;
-    const secrets = await deriveRoomSecrets(values.password, base64ToUint8(locator.salt));
+
+    let secrets: RoomSecrets;
+    try {
+      secrets = await deriveRoomSecrets(values.password, base64ToUint8(locator.salt));
+    } catch {
+      helpers.setFieldError('password', 'Could not unlock this room — its encryption data looks damaged');
+      return;
+    }
 
     try {
       await joinChatroom({ channelId: locator.roomId, authKey: secrets.authKey }).unwrap();
@@ -77,13 +87,14 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
       <Formik
         initialValues={{ inviteCode: inviteCode ?? '' }}
         validationSchema={object({ inviteCode: string().required('Enter an invite code') })}
-        onSubmit={({ inviteCode: code }, helpers) => resolveCode(code, helpers)}
+        onSubmit={({ inviteCode: code }) => resolveCode(code)}
       >
         {({ isSubmitting }) => (
           <FormContainer>
             <div>
               <InputLabel htmlFor="inviteCode">Invite code</InputLabel>
               <TextInput name="inviteCode" type="text" placeholder="e.g. K7QF9M2X" autoFocus />
+              {lookupError && <p className={styles.error}>{lookupError}</p>}
             </div>
             {onCancel ? (
               <FormActions equalWidth>
@@ -121,12 +132,7 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
             </div>
             <div>
               <InputLabel htmlFor="nickname">Nickname (optional)</InputLabel>
-              <TextInput
-                name="nickname"
-                type="text"
-                placeholder="Shown to others in the room"
-                maxLength={32}
-              />
+              <TextInput name="nickname" type="text" placeholder="Shown to others in the room" maxLength={32} />
             </div>
             {onCancel ? (
               <FormActions equalWidth>

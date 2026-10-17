@@ -28,7 +28,13 @@ export const RoomPasswordGate = ({ entry, onJoin }: RoomPasswordGateProps) => {
   ) => {
     if (!entry) return;
 
-    const secrets = await deriveRoomSecrets(password, base64ToUint8(entry.salt));
+    let secrets: RoomSecrets;
+    try {
+      secrets = await deriveRoomSecrets(password, base64ToUint8(entry.salt));
+    } catch {
+      formikHelpers.setFieldError('password', 'Could not unlock this room — its encryption data looks damaged');
+      return;
+    }
 
     try {
       await joinChatroom({ channelId: entry.roomId, authKey: secrets.authKey }).unwrap();

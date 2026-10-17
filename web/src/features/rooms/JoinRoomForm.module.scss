@@ -4,3 +4,7 @@
   font-size: 0.85rem;
   color: $text-secondary;
 }
+
+.error {
+  @include meta-error;
+}
