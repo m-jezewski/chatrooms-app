@@ -1,4 +1,5 @@
 const RECENT_ROOMS_KEY = 'recentRooms';
+export const RECENT_ROOMS_LIMIT = 50;
 
 export interface RecentRoom {
   roomId: string;
@@ -36,9 +37,14 @@ export function removeRecentRoom(roomId: string): void {
 }
 
 function capToLimit(rooms: RecentRoom[]): RecentRoom[] {
-  if (rooms.length <= 12) return rooms;
+  if (rooms.length <= RECENT_ROOMS_LIMIT) return rooms;
 
-  const keep = [...rooms].sort((roomA, roomB) => (roomA.lastSeenAt ?? 0) - (roomB.lastSeenAt ?? 0)).slice(0, 12);
+  const keep = new Set(
+    [...rooms]
+      .sort((roomA, roomB) => (roomB.lastSeenAt ?? 0) - (roomA.lastSeenAt ?? 0))
+      .slice(0, RECENT_ROOMS_LIMIT)
+      .map((room) => room.roomId),
+  );
 
-  return rooms.filter((room) => keep.includes(room));
+  return rooms.filter((room) => keep.has(room.roomId));
 }
