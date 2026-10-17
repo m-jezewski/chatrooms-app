@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Message } from '../../interfaces.ts';
 
 interface MessagesState {
+  channelId: string | null;
   messages: Message[];
   hasMore: boolean;
   isConnected: boolean;
@@ -9,6 +10,7 @@ interface MessagesState {
 }
 
 const initialState: MessagesState = {
+  channelId: null,
   messages: [],
   hasMore: true,
   isConnected: false,
@@ -26,15 +28,26 @@ const messagesSlice = createSlice({
     connectionClosed(state) {
       state.isConnected = false;
     },
-    setMessages(state, action: PayloadAction<Message[]>) {
-      state.messages = action.payload;
+    openedChannel(state, action: PayloadAction<string | null>) {
+      state.channelId = action.payload;
+      state.messages = [];
       state.hasMore = true;
     },
-    prependMessages(state, action: PayloadAction<{ messages: Message[]; hasMore: boolean }>) {
+    setMessages(state, action: PayloadAction<{ channelId: string; messages: Message[] }>) {
+      if (action.payload.channelId !== state.channelId) return;
+
+      state.messages = action.payload.messages;
+      state.hasMore = true;
+    },
+    prependMessages(state, action: PayloadAction<{ channelId: string; messages: Message[]; hasMore: boolean }>) {
+      if (action.payload.channelId !== state.channelId) return;
+
       state.messages = [...action.payload.messages, ...state.messages];
       state.hasMore = action.payload.hasMore;
     },
     receivedMessage(state, action: PayloadAction<Message>) {
+      if (action.payload.textChannelId !== state.channelId) return;
+
       state.messages.push(action.payload);
     },
     connectionError(state, action: PayloadAction<string>) {
@@ -44,7 +57,14 @@ const messagesSlice = createSlice({
   },
 });
 
-export const { connectionOpened, connectionClosed, receivedMessage, connectionError, setMessages, prependMessages } =
-  messagesSlice.actions;
+export const {
+  connectionOpened,
+  connectionClosed,
+  openedChannel,
+  receivedMessage,
+  connectionError,
+  setMessages,
+  prependMessages,
+} = messagesSlice.actions;
 
 export default messagesSlice.reducer;

@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { connectionOpened, connectionClosed, connectionError, receivedMessage, setMessages } from './messagesSlice.ts';
+import {
+  connectionOpened,
+  connectionClosed,
+  connectionError,
+  openedChannel,
+  receivedMessage,
+  setMessages,
+} from './messagesSlice.ts';
 import { Message } from '../../interfaces.ts';
 import { RootState } from '../../store.ts';
 import io, { Socket } from 'socket.io-client';
@@ -39,8 +46,8 @@ const useWebSocket = (channelId: string | undefined) => {
       dispatch(receivedMessage(message));
     };
 
-    const onJoinedChannel = (data: { messages: Message[] }) => {
-      dispatch(setMessages(data.messages));
+    const onJoinedChannel = (data: { messages: Message[]; channelId: string }) => {
+      dispatch(setMessages({ channelId: data.channelId, messages: data.messages }));
     };
 
     socket.on('connect', onConnect);
@@ -62,6 +69,10 @@ const useWebSocket = (channelId: string | undefined) => {
       dispatch(connectionClosed());
     };
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(openedChannel(channelId ?? null));
+  }, [channelId, dispatch]);
 
   useEffect(() => {
     if (!channelId || !isConnected) return;

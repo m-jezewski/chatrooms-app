@@ -95,7 +95,7 @@ export const Chatroom = () => {
         channelId: channelId,
         before: oldestMessageId,
       }).unwrap();
-      dispatch(prependMessages({ messages: result.messages, hasMore: result.hasMore }));
+      dispatch(prependMessages({ channelId, messages: result.messages, hasMore: result.hasMore }));
     } catch {
       isLoadingOlderRef.current = false;
     }
