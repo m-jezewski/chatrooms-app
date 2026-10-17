@@ -12,9 +12,10 @@ interface MessageFormValues {
 
 interface MessageFormProps {
   sendMessage: (message: string) => void;
+  disabled?: boolean;
 }
 
-export const MessageForm = ({ sendMessage }: MessageFormProps) => {
+export const MessageForm = ({ sendMessage, disabled = false }: MessageFormProps) => {
   const handleSubmit = (values: MessageFormValues, formikHelpers: FormikHelpers<MessageFormValues>) => {
     if (values.message.trim().length < 1) {
       return;
@@ -39,6 +40,7 @@ export const MessageForm = ({ sendMessage }: MessageFormProps) => {
                 type={'submit'}
                 variant={'transparent'}
                 rounded={true}
+                disabled={disabled}
                 aria-label={'Send message'}
                 style={{
                   position: 'absolute',
@@ -53,8 +55,9 @@ export const MessageForm = ({ sendMessage }: MessageFormProps) => {
               <TextInput
                 name={'message'}
                 className={styles.messageInput}
-                placeholder={'Write something...'}
+                placeholder={disabled ? 'Connecting…' : 'Write something...'}
                 maxLength={2000}
+                disabled={disabled}
               />
             </div>
           </Form>

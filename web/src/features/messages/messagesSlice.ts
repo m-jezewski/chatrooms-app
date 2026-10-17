@@ -38,6 +38,7 @@ const messagesSlice = createSlice({
       state.messages.push(action.payload);
     },
     connectionError(state, action: PayloadAction<string>) {
+      state.isConnected = false;
       state.error = action.payload;
     },
   },

@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
-import { connectionOpened, connectionClosed, receivedMessage, setMessages } from './messagesSlice.ts';
+import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
+import { connectionOpened, connectionClosed, connectionError, receivedMessage, setMessages } from './messagesSlice.ts';
 import { Message } from '../../interfaces.ts';
+import { RootState } from '../../store.ts';
 import io, { Socket } from 'socket.io-client';
 
 const useWebSocket = (channelId: string | undefined) => {
   const dispatch = useDispatch();
   const socketRef = useRef<Socket | null>(null);
+  const isConnected = useSelector((state: RootState) => state.messages.isConnected);
 
   useEffect(() => {
     socketRef.current = io(import.meta.env.VITE_WS_URL, {
@@ -16,6 +19,22 @@ const useWebSocket = (channelId: string | undefined) => {
     });
     const socket = socketRef.current;
 
+    const onConnect = () => {
+      dispatch(connectionOpened());
+    };
+
+    const onDisconnect = () => {
+      dispatch(connectionClosed());
+    };
+
+    const onConnectError = (error: Error) => {
+      dispatch(connectionError(error.message || 'Cannot reach the chat server'));
+    };
+
+    const onServerError = ({ message }: { message?: string }) => {
+      toast.error(message ?? 'The chat server rejected that action.');
+    };
+
     const onNewMessage = (message: Message) => {
       dispatch(receivedMessage(message));
     };
@@ -24,34 +43,37 @@ const useWebSocket = (channelId: string | undefined) => {
       dispatch(setMessages(data.messages));
     };
 
-    const onDisconnect = () => {
-      dispatch(connectionClosed());
-    };
-
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('connect_error', onConnectError);
+    socket.on('error', onServerError);
     socket.on('newMessage', onNewMessage);
     socket.on('joinedChannel', onJoinedChannel);
-    socket.on('disconnect', onDisconnect);
 
     return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('connect_error', onConnectError);
+      socket.off('error', onServerError);
       socket.off('newMessage', onNewMessage);
       socket.off('joinedChannel', onJoinedChannel);
-      socket.off('disconnect', onDisconnect);
       socket.disconnect();
       socketRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!channelId) return;
-
-    socketRef.current?.emit('joinChannel', { channelId });
-    dispatch(connectionOpened());
-
-    return () => {
-      socketRef.current?.emit('leaveChannel', { channelId });
       dispatch(connectionClosed());
     };
-  }, [channelId]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!channelId || !isConnected) return;
+
+    socketRef.current?.emit('joinChannel', { channelId });
+
+    return () => {
+      if (socketRef.current?.connected) {
+        socketRef.current.emit('leaveChannel', { channelId });
+      }
+    };
+  }, [channelId, isConnected]);
 
   const sendMessage = useCallback(
     ({ channelId, payload, senderId }: { channelId: string; payload: string; senderId: string }) => {

@@ -1,5 +1,6 @@
 import { useParams } from 'react-router';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { MessageForm } from '../messages/MessageForm.tsx';
 import useWebSocket from '../messages/useWebSocket.ts';
@@ -12,6 +13,7 @@ import { encrypt } from '../../utils/roomCrypto.ts';
 import { getNickname, getSenderId } from '../../utils/session.ts';
 import { Loader } from '../../shared/Loader.tsx';
 import { recordRecentRoom } from '../../utils/recentRooms.ts';
+import { RootState } from '../../store.ts';
 import styles from './Chatrooms.module.scss';
 
 export const Chatrooms = () => {
@@ -23,6 +25,8 @@ export const Chatrooms = () => {
   const [joinedChannelId, setJoinedChannelId] = useState<string | null>(null);
   const joined = !!channelId && joinedChannelId === channelId;
   const { sendMessage } = useWebSocket(joined ? channelId : undefined);
+  const isConnected = useSelector((state: RootState) => state.messages.isConnected);
+  const connectionProblem = useSelector((state: RootState) => state.messages.error);
 
   useEffect(() => {
     if (!channelId || !secrets || joinedChannelId === channelId) return;
@@ -83,7 +87,8 @@ export const Chatrooms = () => {
       ) : (
         <>
           <Chatroom />
-          <MessageForm sendMessage={handleSendMessage} />
+          {!isConnected && <p className={styles.connection}>{connectionProblem ?? 'Connecting to the chat server…'}</p>}
+          <MessageForm sendMessage={handleSendMessage} disabled={!isConnected} />
         </>
       )}
     </div>
