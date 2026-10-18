@@ -39,12 +39,14 @@ export class MessagesGateway implements OnGatewayInit {
   }
 
   private reloadSession(client: Socket): Promise<SessionData | undefined> {
-    const session = (client.handshake as any)?.session;
+    const handshake = client.handshake as any;
+    const session = handshake?.session;
     if (!session) {
       return Promise.resolve(undefined);
     }
+
     return new Promise((resolve) => {
-      session.reload((error: unknown) => resolve(error ? undefined : session));
+      session.reload((error: unknown) => resolve(error ? undefined : handshake.session));
     });
   }
 
