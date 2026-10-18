@@ -13,17 +13,10 @@ export class MessagesController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   async getMessages(@Param('channelId') channelId: string, @Query() query: GetMessagesQueryDto) {
-    const messages = await this.messagesService.getChannelMessages({
+    return this.messagesService.getChannelMessagePage({
       channelId,
       before: query.before,
-      limit: query.limit + 1,
+      limit: query.limit,
     });
-
-    const hasMore = messages.length > query.limit;
-
-    return {
-      messages: hasMore ? messages.slice(0, -1) : messages,
-      hasMore,
-    };
   }
 }

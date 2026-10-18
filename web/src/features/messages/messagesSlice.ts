@@ -33,11 +33,11 @@ const messagesSlice = createSlice({
       state.messages = [];
       state.hasMore = true;
     },
-    setMessages(state, action: PayloadAction<{ channelId: string; messages: Message[] }>) {
+    setMessages(state, action: PayloadAction<{ channelId: string; messages: Message[]; hasMore: boolean }>) {
       if (action.payload.channelId !== state.channelId) return;
 
       state.messages = action.payload.messages;
-      state.hasMore = true;
+      state.hasMore = action.payload.hasMore;
     },
     prependMessages(state, action: PayloadAction<{ channelId: string; messages: Message[]; hasMore: boolean }>) {
       if (action.payload.channelId !== state.channelId) return;

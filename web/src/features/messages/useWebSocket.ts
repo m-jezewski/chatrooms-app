@@ -46,8 +46,8 @@ const useWebSocket = (channelId: string | undefined) => {
       dispatch(receivedMessage(message));
     };
 
-    const onJoinedChannel = (data: { messages: Message[]; channelId: string }) => {
-      dispatch(setMessages({ channelId: data.channelId, messages: data.messages }));
+    const onJoinedChannel = (data: { messages: Message[]; hasMore: boolean; channelId: string }) => {
+      dispatch(setMessages({ channelId: data.channelId, messages: data.messages, hasMore: data.hasMore }));
     };
 
     socket.on('connect', onConnect);

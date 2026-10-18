@@ -18,18 +18,24 @@ export class MessagesService {
     }
   }
 
-  async getChannelMessages(params: { channelId: string; before?: string; limit?: number }): Promise<Message[]> {
+  async getChannelMessagePage(params: {
+    channelId: string;
+    before?: string;
+    limit?: number;
+  }): Promise<{ messages: Message[]; hasMore: boolean }> {
     const { channelId, before, limit = 20 } = params;
     await this.assertRoomIsLive(channelId);
 
-    const messages = await this.prisma.message.findMany({
+    const newestFirst = await this.prisma.message.findMany({
       ...(before && { cursor: { id: before }, skip: 1 }),
       where: { textChannelId: channelId },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-      take: limit,
+      take: limit + 1,
     });
 
-    return messages.reverse();
+    const hasMore = newestFirst.length > limit;
+
+    return { messages: newestFirst.slice(0, limit).reverse(), hasMore };
   }
 
   async createMessage(params: { channelId: string; payload: string; senderId: string }): Promise<Message> {

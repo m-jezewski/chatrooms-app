@@ -56,9 +56,9 @@ export class MessagesGateway implements OnGatewayInit {
     }
 
     try {
-      const recentMessages = await this.messagesService.getChannelMessages({ channelId });
+      const { messages, hasMore } = await this.messagesService.getChannelMessagePage({ channelId });
       client.join(`channel_${channelId}`);
-      client.emit('joinedChannel', { messages: recentMessages, channelId });
+      client.emit('joinedChannel', { messages, hasMore, channelId });
     } catch {
       client.emit('error', { message: 'Failed to join the channel' });
     }
