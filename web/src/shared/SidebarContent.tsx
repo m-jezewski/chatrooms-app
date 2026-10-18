@@ -55,7 +55,7 @@ export const SidebarContent = ({ onNavigate }: SidebarContentProps) => {
         inviteCode={inviteCode}
       />
 
-      <span className={styles.sectionLabel}>{loggedUser ? 'Saved' : 'Recent'}</span>
+      <span className={styles.sectionLabel}>{loggedUser ? 'Your rooms' : 'Recent'}</span>
       {loggedUser ? <SavedRoomsList /> : <RecentRoomsList />}
       <div className={styles.spacer} />
 

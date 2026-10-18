@@ -18,12 +18,7 @@ import { Throttle } from '@nestjs/throttler';
 import { TextChannelsService, ManageContext } from './textChannels.service';
 import { SessionGuard } from '../auth/guards/session-guard';
 import { User } from '@prisma/client';
-import {
-  CreateTextChannelDto,
-  JoinTextChannelDto,
-  SaveRoomDto,
-  UpdateTextChannelDto,
-} from './dto/textChannels-crud.dto';
+import { CreateTextChannelDto, JoinTextChannelDto, UpdateTextChannelDto } from './dto/textChannels-crud.dto';
 import { Request } from 'express';
 
 function manageContext(req: Request): ManageContext {
@@ -86,23 +81,24 @@ export class TextChannelsController {
     if (!joinedChannels.includes(id)) {
       req.session.joinedChannels = [...joinedChannels, id];
     }
+
+    const user = req.user as User | undefined;
+    if (user) {
+      await this.textChannelsService.rememberRoom({ userId: user.id, roomId: id });
+    }
+
     return { joined: true };
   }
 
-  @UseGuards(SessionGuard)
-  @HttpCode(HttpStatus.OK)
-  @Post(':id/save')
-  async saveRoom(@Param('id') id: string, @Body() { name }: SaveRoomDto, @Req() req: Request) {
-    const user = req.user as User;
-    return this.textChannelsService.saveRoom({ userId: user.id, roomId: id, name });
-  }
-
-  @UseGuards(SessionGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Delete(':id/save')
-  async unsaveRoom(@Param('id') id: string, @Req() req: Request) {
-    const user = req.user as User;
-    await this.textChannelsService.unsaveRoom({ userId: user.id, roomId: id });
+  @Post(':id/leave')
+  async leaveRoom(@Param('id') id: string, @Req() req: Request) {
+    req.session.joinedChannels = (req.session.joinedChannels ?? []).filter((channelId) => channelId !== id);
+
+    const user = req.user as User | undefined;
+    if (user) {
+      await this.textChannelsService.forgetRoom({ userId: user.id, roomId: id });
+    }
   }
 
   @HttpCode(HttpStatus.OK)

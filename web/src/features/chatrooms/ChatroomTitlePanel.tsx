@@ -1,6 +1,6 @@
 import { AppButton } from '../../shared/AppButton.tsx';
 import React, { useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { Chatroom, RoomEntry } from '../../interfaces.ts';
@@ -13,12 +13,8 @@ import { AppModal } from '../../shared/AppModal.tsx';
 import { AppIcon } from '../../shared/AppIcon.tsx';
 import GearIcon from '../../assets/icons/gear.svg?react';
 import { getOwnerToken } from '../../utils/session.ts';
-import {
-  useGetSavedRoomsQuery,
-  useRotateInviteCodeMutation,
-  useSaveRoomMutation,
-  useUnsaveRoomMutation,
-} from '../../services/chatroomsApi.ts';
+import { useRoomKeyContext } from './RoomKeyContext.tsx';
+import { useLeaveRoomMutation, useRotateInviteCodeMutation } from '../../services/chatroomsApi.ts';
 import styles from './ChatroomTitlePanel.module.scss';
 
 interface ChatroomTitlePanelProps {
@@ -28,14 +24,12 @@ interface ChatroomTitlePanelProps {
 
 export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelProps) => {
   const { roomId } = useParams();
+  const navigate = useNavigate();
   const loggedUser = useSelector(selectLoggedUser);
+  const { clearKey } = useRoomKeyContext();
 
   const [rotateInviteCode] = useRotateInviteCodeMutation();
-  const [saveRoom] = useSaveRoomMutation();
-  const [unsaveRoom] = useUnsaveRoomMutation();
-
-  const { data: savedRooms = [] } = useGetSavedRoomsQuery(undefined, { skip: !loggedUser });
-  const isSaved = !!roomId && savedRooms.some((room) => room.roomId === roomId);
+  const [leaveRoom, { isLoading: leaving }] = useLeaveRoomMutation();
 
   const [expiryOpen, setExpiryOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
@@ -54,17 +48,16 @@ export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelPro
     }
   };
 
-  const toggleSaved = async () => {
+  const handleLeave = async () => {
     if (!roomId) return;
     try {
-      if (isSaved) {
-        await unsaveRoom(roomId).unwrap();
-      } else {
-        await saveRoom({ id: roomId }).unwrap();
-      }
+      await leaveRoom(roomId).unwrap();
     } catch {
-      toast.error('Could not update saved rooms.');
+      toast.error('Could not leave the room.');
+      return;
     }
+    clearKey(roomId);
+    navigate('/');
   };
 
   const copyInvite = () => {
@@ -99,6 +92,12 @@ export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelPro
               { label: 'Delete room', onSelect: () => setDeleteOpen(true), danger: true },
             ]}
           />
+        )}
+
+        {loggedUser && (
+          <AppButton compact={true} variant={'transparent'} onClick={handleLeave} disabled={leaving}>
+            {leaving ? 'Leaving…' : 'Leave room'}
+          </AppButton>
         )}
 
         {channelData && (

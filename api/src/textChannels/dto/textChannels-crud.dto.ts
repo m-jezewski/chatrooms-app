@@ -145,14 +145,6 @@ export class RoomEntryDto {
   salt: string;
 }
 
-export class SaveRoomDto {
-  @ApiPropertyOptional({ description: 'Optional custom label; falls back to the room name.' })
-  @IsOptional()
-  @IsString()
-  @MaxLength(50)
-  name?: string;
-}
-
 export class SavedRoomDto {
   @ApiProperty({ example: 'a1b2c3d4-...' })
   roomId: string;

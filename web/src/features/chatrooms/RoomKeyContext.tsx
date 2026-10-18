@@ -4,6 +4,7 @@ import { RoomSecrets } from '../../utils/roomCrypto.ts';
 interface RoomKeyCtx {
   keys: Map<string, RoomSecrets>;
   setKey: (roomId: string, secrets: RoomSecrets) => void;
+  clearKey: (roomId: string) => void;
   clear: () => void;
 }
 
@@ -16,9 +17,17 @@ export const RoomKeyContextProvider = ({ children }: { children: ReactNode }) =>
     setKeys((prev) => new Map(prev).set(roomId, secrets));
   }, []);
 
+  const clearKey = useCallback((roomId: string) => {
+    setKeys((prev) => {
+      const next = new Map(prev);
+      next.delete(roomId);
+      return next;
+    });
+  }, []);
+
   const clear = useCallback(() => setKeys(new Map()), []);
 
-  const value = useMemo<RoomKeyCtx>(() => ({ keys, setKey, clear }), [keys, setKey, clear]);
+  const value = useMemo<RoomKeyCtx>(() => ({ keys, setKey, clearKey, clear }), [keys, setKey, clearKey, clear]);
 
   return <RoomKeyContext.Provider value={value}>{children}</RoomKeyContext.Provider>;
 };

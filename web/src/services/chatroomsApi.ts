@@ -84,20 +84,12 @@ export const chatroomsApi = api.injectEndpoints({
       query: () => '/textChannels/saved',
       providesTags: ['SavedRooms'],
     }),
-    saveRoom: builder.mutation<SavedRoom, { id: string; name?: string }>({
-      query: ({ id, name }) => ({
-        url: `/textChannels/${id}/save`,
-        method: 'POST',
-        body: name ? { name } : {},
-      }),
-      invalidatesTags: ['SavedRooms'],
-    }),
-    unsaveRoom: builder.mutation<void, string>({
+    leaveRoom: builder.mutation<void, string>({
       query: (id) => ({
-        url: `/textChannels/${id}/save`,
-        method: 'DELETE',
+        url: `/textChannels/${id}/leave`,
+        method: 'POST',
       }),
-      invalidatesTags: ['SavedRooms'],
+      invalidatesTags: (_result, _error, id) => [{ type: 'Chatroom', id }, 'SavedRooms'],
     }),
   }),
 });
@@ -113,6 +105,5 @@ export const {
   useDeleteChatroomMutation,
   useLazyGetOlderMessagesQuery,
   useGetSavedRoomsQuery,
-  useSaveRoomMutation,
-  useUnsaveRoomMutation,
+  useLeaveRoomMutation,
 } = chatroomsApi;

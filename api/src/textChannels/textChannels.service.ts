@@ -215,27 +215,18 @@ export class TextChannelsService {
     return this.prisma.textChannel.delete({ where: { id: channelId }, omit: SECRET_FIELDS });
   }
 
-  async saveRoom(params: { userId: string; roomId: string; name?: string }): Promise<SavedRoomDto> {
-    const { userId, roomId, name } = params;
-    const room = await this.prisma.textChannel.findUnique({
-      where: activeRoomWhere({ id: roomId }),
-      select: { name: true },
-    });
-    if (!room) {
-      throw new NotFoundException('Room not found');
-    }
-
-    const saved = await this.prisma.savedRoom.upsert({
+  async rememberRoom(params: { userId: string; roomId: string }): Promise<void> {
+    const { userId, roomId } = params;
+    await this.prisma.savedRoom.upsert({
       where: { userId_roomId: { userId, roomId } },
-      create: { userId, roomId, name: name ?? null },
-      update: { name: name ?? null },
+      create: { userId, roomId },
+      update: {},
     });
-
-    return { roomId, name: saved.name ?? room.name };
   }
 
-  async unsaveRoom(params: { userId: string; roomId: string }): Promise<void> {
-    await this.prisma.savedRoom.deleteMany({ where: params });
+  async forgetRoom(params: { userId: string; roomId: string }): Promise<void> {
+    const { userId, roomId } = params;
+    await this.prisma.savedRoom.deleteMany({ where: { userId, roomId } });
   }
 
   async getSavedRooms(userId: string): Promise<SavedRoomDto[]> {
