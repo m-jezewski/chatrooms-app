@@ -13,6 +13,7 @@ import { AppModal } from '../../shared/AppModal.tsx';
 import { AppIcon } from '../../shared/AppIcon.tsx';
 import GearIcon from '../../assets/icons/gear.svg?react';
 import { getOwnerToken } from '../../utils/session.ts';
+import { removeRecentRoom } from '../../utils/recentRooms.ts';
 import { useRoomKeyContext } from './RoomKeyContext.tsx';
 import { useLeaveRoomMutation, useRotateInviteCodeMutation } from '../../services/chatroomsApi.ts';
 import styles from './ChatroomTitlePanel.module.scss';
@@ -60,6 +61,15 @@ export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelPro
     navigate('/');
   };
 
+  const handleForget = async () => {
+    if (!roomId) return;
+
+    await leaveRoom(roomId);
+    removeRecentRoom(roomId);
+    clearKey(roomId);
+    navigate('/');
+  };
+
   const copyInvite = () => {
     if (!channelData) return;
     const link = `${window.location.origin}/join/${channelData.inviteCode}`;
@@ -94,9 +104,13 @@ export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelPro
           />
         )}
 
-        {loggedUser && (
+        {loggedUser ? (
           <AppButton compact={true} variant={'transparent'} onClick={handleLeave} disabled={leaving}>
             {leaving ? 'Leaving…' : 'Leave room'}
+          </AppButton>
+        ) : (
+          <AppButton compact={true} variant={'transparent'} onClick={handleForget} disabled={leaving}>
+            {leaving ? 'Forgetting…' : 'Forget room'}
           </AppButton>
         )}
 
