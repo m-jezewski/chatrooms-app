@@ -12,6 +12,7 @@ import {
 } from './dto/textChannels-crud.dto';
 import * as bcrypt from 'bcrypt';
 import { activeRoomWhere, ANONYMOUS_TTL_MAX_MS } from './room-expiry';
+import { MessagesGateway } from '../messages/MessagesGateway';
 
 const AUTH_KEY_SALT_ROUNDS = 10;
 const OWNER_TOKEN_BYTES = 32;
@@ -29,7 +30,10 @@ export interface ManageContext {
 
 @Injectable()
 export class TextChannelsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly messagesGateway: MessagesGateway,
+  ) {}
 
   private sha256(value: string): string {
     return createHash('sha256').update(value).digest('hex');
@@ -212,7 +216,11 @@ export class TextChannelsService {
     const { channelId, ctx } = params;
     const channel = await this.getManageableChannel(channelId);
     this.assertCanManage(channel, ctx);
-    return this.prisma.textChannel.delete({ where: { id: channelId }, omit: SECRET_FIELDS });
+
+    const deleted = await this.prisma.textChannel.delete({ where: { id: channelId }, omit: SECRET_FIELDS });
+    this.messagesGateway.closeChannel(channelId);
+
+    return deleted;
   }
 
   async rememberRoom(params: { userId: string; roomId: string }): Promise<void> {
