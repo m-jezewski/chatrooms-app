@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useSyncExternalStore } from 'react';
 import { Link, useParams } from 'react-router';
-import { getRecentRooms } from '../../utils/recentRooms.ts';
+import { getRecentRooms, subscribeToRecentRooms } from '../../utils/recentRooms.ts';
 import styles from './RecentRoomsList.module.scss';
 
 export const RecentRoomsList = () => {
   const { roomId } = useParams();
-  const rooms = getRecentRooms();
+  const rooms = useSyncExternalStore(subscribeToRecentRooms, getRecentRooms);
 
   if (rooms.length === 0) {
     return <p className={styles.empty}>No recent rooms yet.</p>;
