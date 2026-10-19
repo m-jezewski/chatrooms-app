@@ -37,3 +37,9 @@ export interface Message {
   createdAt: Date;
   textChannelId: string;
 }
+
+export interface OutgoingMessage {
+  channelId: string;
+  payload: string;
+  senderId: string;
+}

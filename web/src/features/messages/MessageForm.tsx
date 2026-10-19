@@ -1,27 +1,45 @@
 import { TextInput } from '../../shared/TextInput.tsx';
 import { Form, Formik, FormikHelpers } from 'formik';
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 import { AppButton } from '../../shared/AppButton.tsx';
 import { AppIcon } from '../../shared/AppIcon.tsx';
 import SendIcon from '../../assets/icons/send.svg?react';
+import { useRoomKey } from '../chatrooms/RoomKeyContext.tsx';
+import { selectJoinedChannelId } from '../chatrooms/roomMembershipSlice.ts';
+import { messageSubmitted } from './messagesSlice.ts';
+import { encrypt } from '../../utils/roomCrypto.ts';
+import { getNickname, getSenderId } from '../../utils/session.ts';
+import { RootState } from '../../store.ts';
 import styles from './MessageForm.module.scss';
 
 interface MessageFormValues {
   message: string;
 }
 
-interface MessageFormProps {
-  sendMessage: (message: string) => void;
-  disabled?: boolean;
-}
+export const MessageForm = () => {
+  const dispatch = useDispatch();
+  const channelId = useSelector(selectJoinedChannelId);
+  const isConnected = useSelector((state: RootState) => state.messages.isConnected);
+  const { secrets } = useRoomKey(channelId ?? undefined);
+  const disabled = !isConnected;
 
-export const MessageForm = ({ sendMessage, disabled = false }: MessageFormProps) => {
-  const handleSubmit = (values: MessageFormValues, formikHelpers: FormikHelpers<MessageFormValues>) => {
-    if (values.message.trim().length < 1) {
+  const handleSubmit = async (values: MessageFormValues, formikHelpers: FormikHelpers<MessageFormValues>) => {
+    const text = values.message.trim();
+    if (text.length < 1 || !channelId || !secrets) {
       return;
     }
 
-    sendMessage(values.message);
+    let payload: string;
+    try {
+      payload = await encrypt(secrets.key, JSON.stringify({ nickname: getNickname(), text }));
+    } catch {
+      toast.error('Could not encrypt that message — nothing was sent.');
+      return;
+    }
+
+    dispatch(messageSubmitted({ channelId, payload, senderId: getSenderId() }));
     formikHelpers.resetForm();
   };
 

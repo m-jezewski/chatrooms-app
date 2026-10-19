@@ -12,6 +12,8 @@ import { Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { SessionData } from 'express-session';
 import { JoinChannelDto, LeaveChannelDto, SendMessageDto } from './dto/messages.dto';
 
+export const NOT_IN_CHANNEL = 'NOT_IN_CHANNEL';
+
 @WebSocketGateway(parseInt(process.env.WEBSOCKET_PORT), {
   cors: {
     origin: process.env.CORS_ORIGIN,
@@ -54,7 +56,7 @@ export class MessagesGateway implements OnGatewayInit {
   async handleJoinChannel(@MessageBody() { channelId }: JoinChannelDto, @ConnectedSocket() client: Socket) {
     const session = await this.reloadSession(client);
     if (!session?.joinedChannels?.includes(channelId)) {
-      return client.emit('error', { message: 'Unauthorized' });
+      return client.emit('error', { message: 'Unauthorized', code: NOT_IN_CHANNEL });
     }
 
     try {

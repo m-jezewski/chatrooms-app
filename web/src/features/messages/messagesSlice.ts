@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Message } from '../../interfaces.ts';
+import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Message, OutgoingMessage } from '../../interfaces.ts';
 
 interface MessagesState {
   channelId: string | null;
@@ -56,6 +56,8 @@ const messagesSlice = createSlice({
     },
   },
 });
+
+export const messageSubmitted = createAction<OutgoingMessage>('messages/messageSubmitted');
 
 export const {
   connectionOpened,
