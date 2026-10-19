@@ -11,7 +11,7 @@ import { useJoinChatroomMutation } from '../../services/chatroomsApi.ts';
 import styles from './RoomPasswordGate.module.scss';
 
 interface RoomPasswordGateProps {
-  entry?: RoomEntry;
+  entry: RoomEntry;
   onJoin: (secrets: RoomSecrets) => void;
 }
 
@@ -26,8 +26,6 @@ export const RoomPasswordGate = ({ entry, onJoin }: RoomPasswordGateProps) => {
     { password }: RoomPasswordFormValues,
     formikHelpers: FormikHelpers<RoomPasswordFormValues>,
   ) => {
-    if (!entry) return;
-
     let secrets: RoomSecrets;
     try {
       secrets = await deriveRoomSecrets(password, base64ToUint8(entry.salt));

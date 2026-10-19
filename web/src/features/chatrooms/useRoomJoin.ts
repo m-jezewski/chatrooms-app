@@ -28,8 +28,9 @@ export const useRoomJoin = ({ channelId, secrets, entry }: RoomJoinParams) => {
       .then(() => {
         if (!cancelled) dispatch(joinedRoom(channelId));
       })
-      .catch(() => {
-        if (!cancelled) toast.error('Failed to join the room.');
+      .catch((error) => {
+        const status = (error as { status?: number | string })?.status;
+        if (!cancelled && status !== 404) toast.error('Failed to join the room.');
       });
 
     return () => {
