@@ -86,6 +86,13 @@ export class MessagesGateway implements OnGatewayInit {
     }
   }
 
+  closeChannel(channelId: string): void {
+    const room = `channel_${channelId}`;
+
+    this.server.to(room).emit('roomExpired', { channelId });
+    this.server.in(room).socketsLeave(room);
+  }
+
   @SubscribeMessage('leaveChannel')
   handleLeaveChannel(@MessageBody() { channelId }: LeaveChannelDto, @ConnectedSocket() client: Socket) {
     client.leave(`channel_${channelId}`);

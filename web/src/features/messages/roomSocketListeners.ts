@@ -10,6 +10,7 @@ import {
   setMessages,
 } from './messagesSlice.ts';
 import { joinedRoom, membershipRefused } from '../chatrooms/roomMembershipSlice.ts';
+import { api } from '../../services/api.ts';
 import { Message } from '../../interfaces.ts';
 import type { AppStartListening } from '../../listenerMiddleware.ts';
 
@@ -51,6 +52,10 @@ export const addRoomSocketListeners = (startListening: AppStartListening) => {
 
       socket.on('newMessage', (message: Message) => {
         listenerApi.dispatch(receivedMessage(message));
+      });
+
+      socket.on('roomExpired', () => {
+        listenerApi.dispatch(api.util.invalidateTags([{ type: 'Chatroom', id: channelId }]));
       });
 
       socket.on('joinedChannel', (data: { messages: Message[]; hasMore: boolean; channelId: string }) => {
