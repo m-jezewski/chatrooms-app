@@ -18,10 +18,12 @@ const askForStatus = async (
 describe('what happens when the server stops recognising the session', () => {
   beforeEach(() => {
     vi.resetModules();
+    vi.stubEnv('VITE_API_URL', 'http://api.test');
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
   });
 
   it('drops the local user the moment any request comes back unauthorized', async () => {
