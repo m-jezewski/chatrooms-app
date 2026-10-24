@@ -7,11 +7,10 @@ do
   sleep 1
 done
 
-echo "DB available. Running migrations and adding default data"
+echo "DB available. Running migrations"
 
 npx prisma migrate deploy
 npx prisma generate
-npx prisma db seed
 
 echo "Starting dev"
 nodemon -L
