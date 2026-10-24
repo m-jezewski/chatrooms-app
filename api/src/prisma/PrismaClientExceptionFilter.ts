@@ -23,7 +23,8 @@ export class PrismaExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
-    const mapped = exception instanceof Prisma.PrismaClientKnownRequestError ? RESPONSE_BY_CODE[exception.code] : undefined;
+    const mapped =
+      exception instanceof Prisma.PrismaClientKnownRequestError ? RESPONSE_BY_CODE[exception.code] : undefined;
 
     if (!mapped) {
       this.logger.error(`Unhandled Prisma exception on ${request.url}`, exception);
