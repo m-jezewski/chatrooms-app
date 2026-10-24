@@ -5,9 +5,3 @@ export class EmailInUseError extends ConflictException {
     super(message);
   }
 }
-
-export class ChannelWithProvidedNameExistError extends ConflictException {
-  constructor(message = 'Channel with provided name already exists') {
-    super(message);
-  }
-}

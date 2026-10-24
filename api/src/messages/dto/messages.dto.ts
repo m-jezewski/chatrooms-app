@@ -1,32 +1,6 @@
 import { IsBase64, IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { Message } from '@prisma/client';
-
-export class MessageDto implements Message {
-  @ApiProperty({ example: 'a1b2c3d4-...' })
-  @IsUUID()
-  @IsNotEmpty()
-  id: string;
-
-  @ApiProperty({ example: 'base64 value', description: 'Client-side encrypted message blob.' })
-  @IsString()
-  @IsNotEmpty()
-  payload: string;
-
-  @ApiProperty({ example: '...', description: 'Per-session sender token.' })
-  @IsString()
-  @IsNotEmpty()
-  senderId: string;
-
-  @ApiProperty({ example: 'a1b2c3d4-...' })
-  @IsUUID()
-  @IsNotEmpty()
-  textChannelId: string;
-
-  @ApiProperty()
-  createdAt: Date;
-}
 
 // REST DTOs
 export class GetMessagesQueryDto {

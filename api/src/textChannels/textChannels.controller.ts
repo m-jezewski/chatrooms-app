@@ -1,18 +1,4 @@
-import {
-  Body,
-  ClassSerializerInterceptor,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-  Req,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { TextChannelsService, ManageContext } from './textChannels.service';
@@ -50,7 +36,6 @@ export class TextChannelsController {
     return this.textChannelsService.getRoomEntryById(id);
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   async getTextChannelById(@Param('id') id: string, @Req() req: Request) {
     return this.textChannelsService.getChannel({
@@ -61,7 +46,6 @@ export class TextChannelsController {
   }
 
   @Throttle({ default: { limit: 5, ttl: 3600_000 } })
-  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
   async create(@Body() textChannel: CreateTextChannelDto, @Req() req: Request) {
     const user = req.user as User | undefined;
@@ -107,7 +91,6 @@ export class TextChannelsController {
     return this.textChannelsService.rotateInviteCode({ channelId: id, ctx: manageContext(req) });
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   async updateTextChannel(@Param('id') id: string, @Body() data: UpdateTextChannelDto, @Req() req: Request) {
     return this.textChannelsService.updateTextChannel({
@@ -117,7 +100,6 @@ export class TextChannelsController {
     });
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
   async deleteTextChannel(@Param('id') id: string, @Req() req: Request) {
     return this.textChannelsService.deleteTextChannel({

@@ -14,7 +14,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { OmitType, PartialType, PickType, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ANONYMOUS_TTL_MAX_MS, TTL_MAX_MS, TTL_MIN_MS } from '../room-expiry';
+import { TTL_MAX_MS, TTL_MIN_MS } from '../room-expiry';
 
 export class TextChannelDto implements TextChannel {
   @ApiProperty({ example: 'a1b2c3d4-...' })

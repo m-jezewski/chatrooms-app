@@ -1,7 +1,6 @@
 import {
   Body,
   ClassSerializerInterceptor,
-  ConflictException,
   Controller,
   Delete,
   Get,
@@ -15,7 +14,6 @@ import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { RegisterUserDto, UserEntity, UserProfile } from '../users/dto/user-crud.dto';
 import { SessionGuard } from './guards/session-guard';
-import { EmailInUseError } from '../utils/customExceptions';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/auth-dto';
 import { Request } from 'express';
@@ -53,16 +51,9 @@ export class AuthController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('register')
   async register(@Body() registerDto: RegisterUserDto, @Req() req: Request): Promise<UserEntity> {
-    try {
-      const { email, password, name } = registerDto;
-      const userDb = await this.authService.register(email, password, name);
-      await this.authService.login(registerDto.email, registerDto.password, req);
-      return new UserEntity(userDb);
-    } catch (error) {
-      if (error instanceof EmailInUseError) {
-        throw new ConflictException(error.message);
-      }
-      throw error;
-    }
+    const { email, password, name } = registerDto;
+    const userDb = await this.authService.register(email, password, name);
+    await this.authService.login(registerDto.email, registerDto.password, req);
+    return new UserEntity(userDb);
   }
 }
