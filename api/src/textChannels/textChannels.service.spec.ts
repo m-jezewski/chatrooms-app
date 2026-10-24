@@ -156,6 +156,40 @@ describe('TextChannelsService delete', () => {
     await expect(service.deleteTextChannel({ channelId: 'room-1', ctx: { user: owner } })).rejects.toThrow();
     expect(closeChannel).not.toHaveBeenCalled();
   });
+
+  it('accepts the owner token of an anonymous room', async () => {
+    const ownerToken = 'the-real-token';
+    findUnique.mockResolvedValue({
+      id: 'room-1',
+      ownerId: null,
+      ownerTokenHash: createHash('sha256').update(ownerToken).digest('hex'),
+    });
+
+    await service.deleteTextChannel({ channelId: 'room-1', ctx: { ownerToken } });
+    expect(remove).toHaveBeenCalled();
+  });
+
+  it('refuses a wrong owner token', async () => {
+    findUnique.mockResolvedValue({
+      id: 'room-1',
+      ownerId: null,
+      ownerTokenHash: createHash('sha256').update('the-real-token').digest('hex'),
+    });
+
+    const attempt = service.deleteTextChannel({ channelId: 'room-1', ctx: { ownerToken: 'a-guess' } });
+
+    await expect(attempt).rejects.toBeInstanceOf(ForbiddenException);
+    expect(remove).not.toHaveBeenCalled();
+  });
+
+  it('refuses rather than crashes when the stored token hash is malformed', async () => {
+    findUnique.mockResolvedValue({ id: 'room-1', ownerId: null, ownerTokenHash: 'not-a-hash' });
+
+    const attempt = service.deleteTextChannel({ channelId: 'room-1', ctx: { ownerToken: 'the-real-token' } });
+
+    await expect(attempt).rejects.toBeInstanceOf(ForbiddenException);
+    expect(remove).not.toHaveBeenCalled();
+  });
 });
 
 describe('TextChannelsService invite codes', () => {
