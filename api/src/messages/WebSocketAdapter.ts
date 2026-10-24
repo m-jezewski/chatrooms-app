@@ -5,9 +5,11 @@ import * as sharedSession from 'express-socket.io-session';
 
 export class WebSocketAdapter extends IoAdapter {
   private sessionMiddleware: any;
+  private corsOrigin: string;
 
-  constructor(app: INestApplication, sessionMiddleware: any) {
+  constructor(app: INestApplication, sessionMiddleware: any, corsOrigin: string) {
     super(app);
+    this.corsOrigin = corsOrigin;
     this.sessionMiddleware = sharedSession(sessionMiddleware, {
       autoSave: true,
       saveUninitialized: false,
@@ -15,7 +17,10 @@ export class WebSocketAdapter extends IoAdapter {
   }
 
   createIOServer(port: number, options?: any): any {
-    const server: Server = super.createIOServer(port, options);
+    const server: Server = super.createIOServer(port, {
+      ...options,
+      cors: { origin: this.corsOrigin, credentials: true },
+    });
     server.use(this.sessionMiddleware);
     return server;
   }

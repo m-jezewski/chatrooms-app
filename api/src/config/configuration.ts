@@ -5,7 +5,6 @@ export default () => {
     nodeEnv: process.env.NODE_ENV || 'DEV',
     isProduction,
     port: parseInt(process.env.PORT, 10) || 3000,
-    websocketPort: parseInt(process.env.WEBSOCKET_PORT, 10) || 3001,
     cors: {
       origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     },

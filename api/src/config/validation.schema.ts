@@ -4,7 +4,6 @@ export const validationSchema = Joi.object({
   NODE_ENV: Joi.string().valid('DEV', 'PROD', 'TEST').default('DEV'),
 
   PORT: Joi.number().default(3000),
-  WEBSOCKET_PORT: Joi.number().default(3001),
   CORS_ORIGIN: Joi.string().default('http://localhost:5173'),
 
   SESSION_SECRET: Joi.string().min(32).required().messages({

@@ -14,13 +14,7 @@ import { JoinChannelDto, LeaveChannelDto, SendMessageDto } from './dto/messages.
 
 export const NOT_IN_CHANNEL = 'NOT_IN_CHANNEL';
 
-@WebSocketGateway(parseInt(process.env.WEBSOCKET_PORT), {
-  cors: {
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  },
-  cookie: true,
-})
+@WebSocketGateway({ cookie: true })
 @UsePipes(new ValidationPipe({ whitelist: true }))
 export class MessagesGateway implements OnGatewayInit {
   @WebSocketServer() server: Server;
@@ -29,7 +23,7 @@ export class MessagesGateway implements OnGatewayInit {
   constructor(private readonly messagesService: MessagesService) {}
 
   afterInit(server: Server) {
-    this.logger.log(`WebSocket Gateway initialized on port ${process.env.WEBSOCKET_PORT}`);
+    this.logger.log('WebSocket gateway attached to the main HTTP server');
 
     server.on('connection', (socket) => {
       this.logger.log(`Socket ${socket.id} connected`);

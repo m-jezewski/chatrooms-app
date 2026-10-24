@@ -25,7 +25,7 @@ export const addRoomSocketListeners = (startListening: AppStartListening) => {
       const channelId = action.payload;
       listenerApi.dispatch(openedChannel(channelId));
 
-      const socket = io(import.meta.env.VITE_WS_URL, { withCredentials: true });
+      const socket = io(import.meta.env.VITE_API_URL, { withCredentials: true });
       roomSocket = socket;
 
       socket.on('connect', () => {

@@ -15,6 +15,7 @@ async function bootstrap() {
   const sessionMaxAge = configService.get<number>('session.maxAge');
   const isSecureCookie = configService.get<boolean>('session.cookie.secure');
   const sameSiteCookie = configService.get<'strict' | 'lax' | 'none'>('session.cookie.sameSite');
+  const corsOrigin = configService.get<string>('cors.origin');
 
   const expressSession = session({
     secret: configService.get('session.secret'),
@@ -31,7 +32,7 @@ async function bootstrap() {
   app.use(expressSession);
 
   app.enableCors({
-    origin: configService.get('cors.origin'),
+    origin: corsOrigin,
     credentials: true,
   });
 
@@ -48,7 +49,7 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  app.useWebSocketAdapter(new WebSocketAdapter(app, expressSession));
+  app.useWebSocketAdapter(new WebSocketAdapter(app, expressSession, corsOrigin));
 
   if (!configService.get('isProduction')) {
     const swaggerConfig = new DocumentBuilder()
