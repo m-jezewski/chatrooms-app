@@ -1,5 +1,5 @@
 import { PassportSerializer } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { UserProfile } from '../users/dto/user-crud.dto';
 
@@ -18,6 +18,10 @@ export class SessionSerializer extends PassportSerializer {
       const user = await this.usersService.getUser({ userId: userId });
       done(null, user || null);
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        done(null, null);
+        return;
+      }
       done(error, null);
     }
   }

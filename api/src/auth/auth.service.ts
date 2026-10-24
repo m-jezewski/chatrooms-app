@@ -21,7 +21,7 @@ export class AuthService {
     return new Promise((resolve, reject) => {
       req.login(validatedUser, (err) => {
         if (err) {
-          reject(new UnauthorizedException(err.message));
+          return reject(new UnauthorizedException(err.message));
         }
         resolve(validatedUser);
       });

@@ -86,12 +86,22 @@ describe('SessionSerializer', () => {
     expect(done).toHaveBeenCalledWith(null, user);
   });
 
-  it('hands passport an error when the account behind the cookie is gone', async () => {
+  it('treats a cookie for a deleted account as simply not being logged in', async () => {
     getUser.mockRejectedValue(new NotFoundException('User not found'));
     const done = jest.fn();
 
     await serializer.deserializeUser('deleted-user', done);
 
-    expect(done).toHaveBeenCalledWith(expect.any(NotFoundException), null);
+    expect(done).toHaveBeenCalledWith(null, null);
+  });
+
+  it('still hands passport the error when the lookup itself fails', async () => {
+    const outage = new Error('connection refused');
+    getUser.mockRejectedValue(outage);
+    const done = jest.fn();
+
+    await serializer.deserializeUser('user-1', done);
+
+    expect(done).toHaveBeenCalledWith(outage, null);
   });
 });
