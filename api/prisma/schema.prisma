@@ -52,6 +52,15 @@ model SavedRoom {
   @@unique([userId, roomId])
 }
 
+model Session {
+  sid    String   @id
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire])
+  @@map("session")
+}
+
 model Message {
   id        String   @id @default(uuid()) @db.Uuid
   payload   String

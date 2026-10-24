@@ -7,6 +7,9 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import * as passport from 'passport';
 import { PrismaExceptionFilter } from './prisma/PrismaClientExceptionFilter';
 import { WebSocketAdapter } from './messages/WebSocketAdapter';
+import * as connectPgSimple from 'connect-pg-simple';
+
+const SESSION_POOL_MAX = 3;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,10 +20,20 @@ async function bootstrap() {
   const sameSiteCookie = configService.get<'strict' | 'lax' | 'none'>('session.cookie.sameSite');
   const corsOrigin = configService.get<string>('cors.origin');
 
+  const PgSession = connectPgSimple(session);
+  const storeLogger = new Logger('SessionStore');
+
   const expressSession = session({
     secret: configService.get('session.secret'),
     resave: false,
     saveUninitialized: false,
+    rolling: true,
+    store: new PgSession({
+      conObject: { connectionString: configService.get<string>('database.url'), max: SESSION_POOL_MAX },
+      createTableIfMissing: false,
+      pruneSessionInterval: false,
+      errorLog: (message, ...rest) => storeLogger.error(message, ...rest),
+    }),
     cookie: {
       maxAge: sessionMaxAge,
       httpOnly: true,
@@ -38,13 +51,6 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalFilters(new PrismaExceptionFilter());
-
-  app.use((req, res, next) => {
-    if (req.session) {
-      req.session.cookie.maxAge = sessionMaxAge;
-    }
-    next();
-  });
 
   app.use(passport.initialize());
   app.use(passport.session());
