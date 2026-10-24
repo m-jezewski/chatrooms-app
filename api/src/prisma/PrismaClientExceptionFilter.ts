@@ -1,6 +1,13 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
+const RESPONSE_BY_CODE: Record<string, { statusCode: HttpStatus; message: string }> = {
+  P2002: { statusCode: HttpStatus.CONFLICT, message: 'A record with these values already exists' },
+  P2003: { statusCode: HttpStatus.BAD_REQUEST, message: 'Related record does not exist' },
+  P2023: { statusCode: HttpStatus.BAD_REQUEST, message: 'Malformed identifier' },
+  P2025: { statusCode: HttpStatus.NOT_FOUND, message: 'Record not found' },
+};
+
 @Catch(
   Prisma.PrismaClientKnownRequestError,
   Prisma.PrismaClientUnknownRequestError,
@@ -11,39 +18,22 @@ import { Prisma } from '@prisma/client';
 export class PrismaExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(PrismaExceptionFilter.name);
 
-  catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
-    let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'An unexpected error occurred';
+    const mapped = exception instanceof Prisma.PrismaClientKnownRequestError ? RESPONSE_BY_CODE[exception.code] : undefined;
 
-    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (exception.code) {
-        case 'P2002': // Unique constraint violation
-          statusCode = HttpStatus.CONFLICT;
-          message = `Unique constraint failed on ${exception.meta.target}`;
-          break;
-        case 'P2003': // Foreign key constraint violation
-          statusCode = HttpStatus.BAD_REQUEST;
-          message = 'Foreign key constraint violation';
-          break;
-        case 'P2025': // Record not found
-          statusCode = HttpStatus.NOT_FOUND;
-          message = 'Record not found';
-          break;
-        default:
-          message = exception.message;
-          break;
-      }
-    } else {
-      this.logger.error('Unhandled Prisma exception', exception);
+    if (!mapped) {
+      this.logger.error(`Unhandled Prisma exception on ${request.url}`, exception);
     }
+
+    const statusCode = mapped ? mapped.statusCode : HttpStatus.INTERNAL_SERVER_ERROR;
 
     response.status(statusCode).json({
       statusCode,
-      message,
+      message: mapped ? mapped.message : 'An unexpected error occurred',
       timestamp: new Date().toISOString(),
       path: request.url,
     });

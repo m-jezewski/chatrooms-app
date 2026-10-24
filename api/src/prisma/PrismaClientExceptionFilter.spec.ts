@@ -32,7 +32,7 @@ describe('PrismaExceptionFilter', () => {
     filter.catch(knownRequestError('P2002', { target: ['email'] }), host);
 
     expect(status).toHaveBeenCalledWith(409);
-    expect(answer().message).toContain('email');
+    expect(answer().message).toBe('A record with these values already exists');
   });
 
   it('answers 404 when the row the query needed is not there', () => {
@@ -45,7 +45,7 @@ describe('PrismaExceptionFilter', () => {
   it('says nothing about the database when the error is not one it knows', () => {
     const notKnownToTheFilter = new Prisma.PrismaClientValidationError('invalid invocation', {
       clientVersion: '6.19.2',
-    }) as unknown as Prisma.PrismaClientKnownRequestError;
+    });
 
     filter.catch(notKnownToTheFilter, host);
 
@@ -54,12 +54,23 @@ describe('PrismaExceptionFilter', () => {
     expect(Logger.prototype.error).toHaveBeenCalled();
   });
 
-  it('hands the raw Prisma message to the client for an unmapped code (review 1.12)', () => {
+  it('answers 400 for a malformed identifier', () => {
     filter.catch(knownRequestError('P2023'), host);
+    expect(status).toHaveBeenCalledWith(400);
+    expect(answer().message).toBe('Malformed identifier');
+  });
+
+  it('keeps a mapped client error out of the error log', () => {
+    filter.catch(knownRequestError('P2025'), host);
+    expect(Logger.prototype.error).not.toHaveBeenCalled();
+  });
+
+  it('logs and hides a Prisma code it has no mapping for', () => {
+    filter.catch(knownRequestError('P2037'), host);
 
     expect(status).toHaveBeenCalledWith(500);
-    expect(answer().message).toContain('Inconsistent column data');
-    expect(Logger.prototype.error).not.toHaveBeenCalled();
+    expect(answer().message).toBe('An unexpected error occurred');
+    expect(Logger.prototype.error).toHaveBeenCalled();
   });
 
   it('puts the path and a timestamp in every answer', () => {
