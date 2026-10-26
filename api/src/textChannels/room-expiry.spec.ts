@@ -1,4 +1,4 @@
-import { activeRoomWhere, ANONYMOUS_TTL_MAX_MS, TTL_MAX_MS, TTL_MIN_MS } from './room-expiry';
+import { activeRoomsWhere, activeRoomWhere, ANONYMOUS_TTL_MAX_MS, TTL_MAX_MS, TTL_MIN_MS } from './room-expiry';
 
 describe('room expiry limits', () => {
   it('pins the lifetimes the client is allowed to ask for', () => {
@@ -34,5 +34,21 @@ describe('activeRoomWhere', () => {
     const second = activeRoomWhere({ id: 'room-1' });
 
     expect(first.OR).not.toBe(second.OR);
+  });
+});
+
+describe('activeRoomsWhere', () => {
+  it('keeps the filter it was given and only adds the expiry condition', () => {
+    const where = activeRoomsWhere({ id: { in: ['room-1', 'room-2'] } });
+
+    expect(where.id).toEqual({ in: ['room-1', 'room-2'] });
+    expect(where.OR).toHaveLength(2);
+  });
+
+  it('treats a room without an expiry and a room expiring later as alive', () => {
+    const [never, later] = activeRoomsWhere({}).OR as [{ expiresAt: null }, { expiresAt: { gt: Date } }];
+
+    expect(never).toEqual({ expiresAt: null });
+    expect(later.expiresAt.gt).toBeInstanceOf(Date);
   });
 });

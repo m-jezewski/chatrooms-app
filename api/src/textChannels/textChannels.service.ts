@@ -11,7 +11,7 @@ import {
   UpdateTextChannelDto,
 } from './dto/textChannels-crud.dto';
 import * as bcrypt from 'bcrypt';
-import { activeRoomWhere, ANONYMOUS_TTL_MAX_MS } from './room-expiry';
+import { activeRoomsWhere, activeRoomWhere, ANONYMOUS_TTL_MAX_MS } from './room-expiry';
 import { MessagesGateway } from '../messages/MessagesGateway';
 
 const AUTH_KEY_SALT_ROUNDS = 10;
@@ -229,6 +229,26 @@ export class TextChannelsService {
       where: { userId_roomId: { userId, roomId } },
       create: { userId, roomId },
       update: {},
+    });
+  }
+
+  async rememberRooms(params: { userId: string; roomIds: string[] }): Promise<void> {
+    const { userId, roomIds } = params;
+    if (roomIds.length === 0) {
+      return;
+    }
+
+    const alive = await this.prisma.textChannel.findMany({
+      where: activeRoomsWhere({ id: { in: roomIds } }),
+      select: { id: true },
+    });
+    if (alive.length === 0) {
+      return;
+    }
+
+    await this.prisma.savedRoom.createMany({
+      data: alive.map((room) => ({ userId, roomId: room.id })),
+      skipDuplicates: true,
     });
   }
 

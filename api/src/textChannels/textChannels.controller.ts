@@ -52,6 +52,11 @@ export class TextChannelsController {
 
     const channel = await this.textChannelsService.createTextChannel({ textChannel, user });
     req.session.joinedChannels = [...(req.session.joinedChannels ?? []), channel.id];
+
+    if (user) {
+      await this.textChannelsService.rememberRoom({ userId: user.id, roomId: channel.id });
+    }
+
     return channel;
   }
 

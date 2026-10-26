@@ -97,6 +97,22 @@ describe('TextChannelsController session bookkeeping', () => {
     expect(joinedChannelsSeenBy(0)).toEqual(['room-1']);
   });
 
+  it('saves a freshly created room to the account of its creator', async () => {
+    const client = await startApp(owner);
+
+    await client.post('/textChannels').send({ name: 'Alpha', salt, authKey, ttlMs: 60_000 }).expect(201);
+
+    expect(rememberRoom).toHaveBeenCalledWith({ userId: owner.id, roomId: 'room-1' });
+  });
+
+  it('saves nothing to an account when the creator is anonymous', async () => {
+    const client = await startApp();
+
+    await client.post('/textChannels').send({ name: 'Alpha', salt, authKey, ttlMs: 60_000 }).expect(201);
+
+    expect(rememberRoom).not.toHaveBeenCalled();
+  });
+
   it('takes only the room it was asked to leave out of the session', async () => {
     const client = await startApp();
 

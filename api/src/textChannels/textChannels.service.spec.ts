@@ -250,3 +250,63 @@ describe('TextChannelsService invite codes', () => {
     expect(update).not.toHaveBeenCalled();
   });
 });
+
+describe('TextChannelsService rememberRooms', () => {
+  const findMany = jest.fn();
+  const createMany = jest.fn();
+  const prisma = { textChannel: { findMany }, savedRoom: { createMany } } as unknown as PrismaService;
+  let service: TextChannelsService;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    findMany.mockResolvedValue([{ id: 'room-1' }, { id: 'room-2' }]);
+    createMany.mockResolvedValue({ count: 2 });
+    service = new TextChannelsService(prisma, { closeChannel: jest.fn() } as unknown as MessagesGateway);
+  });
+
+  it('saves every room the session still has access to', async () => {
+    await service.rememberRooms({ userId: 'user-1', roomIds: ['room-1', 'room-2'] });
+
+    expect(createMany).toHaveBeenCalledWith({
+      data: [
+        { userId: 'user-1', roomId: 'room-1' },
+        { userId: 'user-1', roomId: 'room-2' },
+      ],
+      skipDuplicates: true,
+    });
+  });
+
+  it('leaves out rooms that expired while the user was still anonymous', async () => {
+    findMany.mockResolvedValue([{ id: 'room-2' }]);
+
+    await service.rememberRooms({ userId: 'user-1', roomIds: ['room-1', 'room-2'] });
+
+    expect(createMany).toHaveBeenCalledWith({
+      data: [{ userId: 'user-1', roomId: 'room-2' }],
+      skipDuplicates: true,
+    });
+  });
+
+  it('asks only about the rooms from the session, and only about live ones', async () => {
+    await service.rememberRooms({ userId: 'user-1', roomIds: ['room-1'] });
+
+    const [query] = findMany.mock.calls[0];
+    expect(query.where.id).toEqual({ in: ['room-1'] });
+    expect(query.where.OR).toHaveLength(2);
+  });
+
+  it('does not touch the database when the session joined nothing', async () => {
+    await service.rememberRooms({ userId: 'user-1', roomIds: [] });
+
+    expect(findMany).not.toHaveBeenCalled();
+    expect(createMany).not.toHaveBeenCalled();
+  });
+
+  it('writes nothing when every joined room is already gone', async () => {
+    findMany.mockResolvedValue([]);
+
+    await service.rememberRooms({ userId: 'user-1', roomIds: ['room-1'] });
+
+    expect(createMany).not.toHaveBeenCalled();
+  });
+});

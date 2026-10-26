@@ -1,31 +1,51 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { comparePasswords } from '../utils/bcrypt';
 import { UserProfile } from '../users/dto/user-crud.dto';
 import { Request } from 'express';
+import { TextChannelsService } from '../textChannels/textChannels.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  private readonly logger = new Logger(AuthService.name);
+
+  constructor(
+    private usersService: UsersService,
+    private readonly textChannelsService: TextChannelsService,
+  ) {}
 
   async login(email: string, password: string, req: Request): Promise<UserProfile> {
-    if (req.isAuthenticated()) {
-      return req.user as UserProfile;
-    }
+    const user = req.isAuthenticated() ? (req.user as UserProfile) : await this.startSession(email, password, req);
 
+    await this.carryJoinedRooms(req, user.id);
+    return user;
+  }
+
+  private async startSession(email: string, password: string, req: Request): Promise<UserProfile> {
     const validatedUser = await this.validateUser(email, password);
     if (!validatedUser) {
       throw new UnauthorizedException();
     }
 
     return new Promise((resolve, reject) => {
-      req.login(validatedUser, (err) => {
+      req.login(validatedUser, { session: true, keepSessionInfo: true }, (err) => {
         if (err) {
           return reject(new UnauthorizedException(err.message));
         }
         resolve(validatedUser);
       });
     });
+  }
+
+  private async carryJoinedRooms(req: Request, userId: string): Promise<void> {
+    try {
+      await this.textChannelsService.rememberRooms({ userId, roomIds: req.session?.joinedChannels ?? [] });
+    } catch (error) {
+      this.logger.error(
+        'Failed to carry joined rooms over to the account',
+        error instanceof Error ? error.stack : error,
+      );
+    }
   }
 
   async register(email: string, password: string, name: string): Promise<UserProfile> {

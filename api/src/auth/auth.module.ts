@@ -5,9 +5,10 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './guards/local.strategy';
 import { AuthController } from './auth.controller';
 import { SessionSerializer } from './SessionSerializer';
+import { TextChannelsModule } from '../textChannels/textChannels.module';
 
 @Module({
-  imports: [UsersModule, PassportModule.register({ session: true })],
+  imports: [UsersModule, TextChannelsModule, PassportModule.register({ session: true })],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, SessionSerializer],
   exports: [PassportModule],
