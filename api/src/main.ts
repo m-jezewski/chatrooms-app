@@ -6,10 +6,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as session from 'express-session';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import * as passport from 'passport';
+import helmet from 'helmet';
 import { PrismaExceptionFilter } from './prisma/PrismaClientExceptionFilter';
 import { WebSocketAdapter } from './messages/WebSocketAdapter';
 import { SessionStore } from './session/sessionStore';
 import { WEB_CLIENT_ROOT } from './web/webClient';
+import { securityHeaders } from './security/securityHeaders';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -20,6 +22,8 @@ async function bootstrap() {
   const sameSiteCookie = configService.get<'strict' | 'lax' | 'none'>('session.cookie.sameSite');
   const corsOrigin = configService.get<string>('cors.origin');
   const isProduction = configService.get<boolean>('isProduction');
+
+  app.use(helmet(securityHeaders(isProduction)));
 
   if (isProduction) {
     app.set('trust proxy', 1);
