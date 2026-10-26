@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -7,33 +8,28 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import * as passport from 'passport';
 import { PrismaExceptionFilter } from './prisma/PrismaClientExceptionFilter';
 import { WebSocketAdapter } from './messages/WebSocketAdapter';
-import * as connectPgSimple from 'connect-pg-simple';
-
-const SESSION_POOL_MAX = 3;
+import { SessionStore } from './session/sessionStore';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
 
   const sessionMaxAge = configService.get<number>('session.maxAge');
   const isSecureCookie = configService.get<boolean>('session.cookie.secure');
   const sameSiteCookie = configService.get<'strict' | 'lax' | 'none'>('session.cookie.sameSite');
   const corsOrigin = configService.get<string>('cors.origin');
+  const isProduction = configService.get<boolean>('isProduction');
 
-  const PgSession = connectPgSimple(session);
-  const storeLogger = new Logger('SessionStore');
+  if (isProduction) {
+    app.set('trust proxy', 1);
+  }
 
   const expressSession = session({
     secret: configService.get('session.secret'),
     resave: false,
     saveUninitialized: false,
     rolling: true,
-    store: new PgSession({
-      conObject: { connectionString: configService.get<string>('database.url'), max: SESSION_POOL_MAX },
-      createTableIfMissing: false,
-      pruneSessionInterval: false,
-      errorLog: (message, ...rest) => storeLogger.error(message, ...rest),
-    }),
+    store: app.get(SessionStore).store,
     cookie: {
       maxAge: sessionMaxAge,
       httpOnly: true,
@@ -57,7 +53,7 @@ async function bootstrap() {
 
   app.useWebSocketAdapter(new WebSocketAdapter(app, expressSession, corsOrigin));
 
-  if (!configService.get('isProduction')) {
+  if (!isProduction) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('Chatrooms API')
       .setDescription('API for chatrooms application')
@@ -66,6 +62,8 @@ async function bootstrap() {
     const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('docs', app, swaggerDocument);
   }
+
+  app.enableShutdownHooks();
 
   const port = configService.get('port');
   await app.listen(port);

@@ -1,8 +1,8 @@
 export default () => {
-  const isProduction = process.env.NODE_ENV === 'PROD';
+  const isProduction = process.env.NODE_ENV === 'production';
 
   return {
-    nodeEnv: process.env.NODE_ENV || 'DEV',
+    nodeEnv: process.env.NODE_ENV || 'development',
     isProduction,
     port: parseInt(process.env.PORT, 10) || 3000,
     cors: {

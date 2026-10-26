@@ -11,6 +11,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { TextChannelsModule } from './textChannels/textChannels.module';
 import { RoomExpiryModule } from './roomExpiry/roomExpiry.module';
 import { SessionExpiryModule } from './sessionExpiry/sessionExpiry.module';
+import { SessionModule } from './session/session.module';
 import configuration from './config/configuration';
 import { validationSchema } from './config/validation.schema';
 
@@ -33,6 +34,7 @@ import { validationSchema } from './config/validation.schema';
     TextChannelsModule,
     RoomExpiryModule,
     SessionExpiryModule,
+    SessionModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
