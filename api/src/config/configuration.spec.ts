@@ -29,7 +29,7 @@ describe('configuration', () => {
     expect(config.isProduction).toBe(false);
     expect(config.session.cookie.secure).toBe(false);
     expect(config.session.cookie.sameSite).toBe('lax');
-  })
+  });
 
   it('falls back to development when nothing is set', () => {
     delete process.env.NODE_ENV;

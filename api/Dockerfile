@@ -1,33 +1,55 @@
-# Use the official Node.js image as the base image
-FROM node:22
+FROM node:22-slim AS build
 
-# Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
 
-# Install the application dependencies
-RUN npm install
+COPY package.json package-lock.json ./
+COPY api/package.json api/
+COPY web/package.json web/
 
-#Install ts-node and nodemon globally
-RUN npm install -g ts-node nodemon
+RUN npm ci
 
-RUN apt-get update && apt-get install -y netcat-openbsd
+COPY api api
+COPY web web
 
-# Copy the rest of the application files
-COPY . .
+RUN npx prisma generate --schema api/prisma/schema.prisma
 
-RUN npx prisma generate
 
-# Build the NestJS application
-RUN npm run build
+FROM build AS development
 
-COPY entrypoint.sh /usr/src/app/entrypoint.sh
-RUN chmod +x /usr/src/app/entrypoint.sh
+WORKDIR /usr/src/app/api
 
-# Expose the application port
 EXPOSE 3000
 
-# Use custom entrypoint
-CMD ["/usr/src/app/entrypoint.sh"]
+CMD ["sh", "./entrypoint.sh"]
+
+
+FROM build AS compiled
+
+RUN npm run build --workspace chatrooms-app-web
+RUN npm run build --workspace chatrooms-app-api
+
+
+FROM node:22-slim AS production
+
+ENV NODE_ENV=production
+
+WORKDIR /usr/src/app/api
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY --from=compiled /usr/src/app/node_modules /usr/src/app/node_modules
+COPY --from=compiled /usr/src/app/package.json /usr/src/app/package.json
+COPY --from=compiled /usr/src/app/api/package.json ./package.json
+COPY --from=compiled /usr/src/app/api/prisma ./prisma
+COPY --from=compiled /usr/src/app/api/dist ./dist
+COPY --from=compiled /usr/src/app/web/dist ./web
+
+EXPOSE 3000
+
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]

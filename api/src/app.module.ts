@@ -12,6 +12,7 @@ import { TextChannelsModule } from './textChannels/textChannels.module';
 import { RoomExpiryModule } from './roomExpiry/roomExpiry.module';
 import { SessionExpiryModule } from './sessionExpiry/sessionExpiry.module';
 import { SessionModule } from './session/session.module';
+import { WebClientController } from './web/webClient.controller';
 import configuration from './config/configuration';
 import { validationSchema } from './config/validation.schema';
 
@@ -36,7 +37,7 @@ import { validationSchema } from './config/validation.schema';
     SessionExpiryModule,
     SessionModule,
   ],
-  controllers: [HealthController],
+  controllers: [HealthController, WebClientController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

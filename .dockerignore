@@ -1,0 +1,12 @@
+**/node_modules
+api/dist
+web/dist
+.git
+.github
+.claude
+coverage
+*.log
+*.md
+**/.env
+**/.env.*
+!**/.env.example

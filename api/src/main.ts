@@ -9,6 +9,7 @@ import * as passport from 'passport';
 import { PrismaExceptionFilter } from './prisma/PrismaClientExceptionFilter';
 import { WebSocketAdapter } from './messages/WebSocketAdapter';
 import { SessionStore } from './session/sessionStore';
+import { WEB_CLIENT_ROOT } from './web/webClient';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -22,6 +23,7 @@ async function bootstrap() {
 
   if (isProduction) {
     app.set('trust proxy', 1);
+    app.useStaticAssets(WEB_CLIENT_ROOT, { index: false });
   }
 
   const expressSession = session({
