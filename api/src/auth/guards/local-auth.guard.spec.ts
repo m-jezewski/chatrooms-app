@@ -1,4 +1,4 @@
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { LocalAuthGuard } from './local-auth.guard';
 
 describe('LocalAuthGuard', () => {
@@ -48,6 +48,13 @@ describe('LocalAuthGuard', () => {
     await guard.canActivate(context());
 
     expect(request.logIn.mock.calls[0][0]).toBe(user);
+  });
+
+  it('refuses the request when the strategy let it through without a user', async () => {
+    request.user = undefined;
+
+    await expect(guard.canActivate(context())).rejects.toThrow(UnauthorizedException);
+    expect(request.logIn).not.toHaveBeenCalled();
   });
 
   it('refuses the request when the session cannot be established', async () => {

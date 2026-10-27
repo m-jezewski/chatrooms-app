@@ -1,4 +1,5 @@
 import { INestApplication, ModuleMetadata, ValidationPipe } from '@nestjs/common';
+import { NextFunction, Request, Response } from 'express';
 import { Test } from '@nestjs/testing';
 import { User } from '@prisma/client';
 import * as session from 'express-session';
@@ -18,7 +19,7 @@ export const createTestApp = async ({ user, ...metadata }: TestAppOptions): Prom
   app.use(passport.session());
 
   if (user) {
-    app.use((req, _res, next) => {
+    app.use((req: Request, _res: Response, next: NextFunction) => {
       req.user = user;
       next();
     });

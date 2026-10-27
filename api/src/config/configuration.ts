@@ -4,13 +4,13 @@ export default () => {
   return {
     nodeEnv: process.env.NODE_ENV || 'development',
     isProduction,
-    port: parseInt(process.env.PORT, 10) || 3000,
+    port: parseInt(process.env.PORT ?? '', 10) || 3000,
     cors: {
       origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     },
     session: {
       secret: process.env.SESSION_SECRET,
-      maxAge: parseInt(process.env.SESSION_MAX_AGE, 10) || 1000 * 60 * 30, // 30 minutes
+      maxAge: parseInt(process.env.SESSION_MAX_AGE ?? '', 10) || 1000 * 60 * 30, // 30 minutes
       cookie: {
         secure: isProduction,
         sameSite: isProduction ? 'strict' : 'lax',

@@ -17,11 +17,11 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
 
-  const sessionMaxAge = configService.get<number>('session.maxAge');
-  const isSecureCookie = configService.get<boolean>('session.cookie.secure');
-  const sameSiteCookie = configService.get<'strict' | 'lax' | 'none'>('session.cookie.sameSite');
-  const corsOrigin = configService.get<string>('cors.origin');
-  const isProduction = configService.get<boolean>('isProduction');
+  const sessionMaxAge = configService.getOrThrow<number>('session.maxAge');
+  const isSecureCookie = configService.getOrThrow<boolean>('session.cookie.secure');
+  const sameSiteCookie = configService.getOrThrow<'strict' | 'lax' | 'none'>('session.cookie.sameSite');
+  const corsOrigin = configService.getOrThrow<string>('cors.origin');
+  const isProduction = configService.getOrThrow<boolean>('isProduction');
 
   app.use(helmet(securityHeaders(isProduction)));
 
@@ -31,7 +31,7 @@ async function bootstrap() {
   }
 
   const expressSession = session({
-    secret: configService.get('session.secret'),
+    secret: configService.getOrThrow<string>('session.secret'),
     resave: false,
     saveUninitialized: false,
     rolling: true,
@@ -71,7 +71,7 @@ async function bootstrap() {
 
   app.enableShutdownHooks();
 
-  const port = configService.get('port');
+  const port = configService.getOrThrow<number>('port');
   await app.listen(port);
 }
 

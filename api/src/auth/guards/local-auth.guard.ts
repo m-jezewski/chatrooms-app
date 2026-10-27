@@ -1,4 +1,4 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 
@@ -12,10 +12,14 @@ export class LocalAuthGuard extends AuthGuard('local') {
   }
 
   private async establishSession(request: Request): Promise<void> {
+    const { user } = request;
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
     await new Promise<void>((resolve, reject) =>
-      request.logIn(request.user, { session: true, keepSessionInfo: true }, (error) =>
-        error ? reject(error) : resolve(),
-      ),
+      request.logIn(user, { session: true, keepSessionInfo: true }, (error) => (error ? reject(error) : resolve())),
     );
   }
 }
