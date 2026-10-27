@@ -39,8 +39,8 @@ describe('securityHeaders', () => {
     expect(productionDirective('connect-src')).toBe("connect-src 'self'");
   });
 
-  it('leaves insecure requests alone so the built client can be opened over plain http', () => {
-    expect(productionDirective('upgrade-insecure-requests')).toBeUndefined();
+  it('upgrades insecure subresource requests, so a stray http url cannot downgrade the page', () => {
+    expect(productionDirective('upgrade-insecure-requests')).toBe('upgrade-insecure-requests');
   });
 
   it('refuses framing by other origins', () => {
