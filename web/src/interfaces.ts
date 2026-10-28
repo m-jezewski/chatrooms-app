@@ -2,13 +2,13 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  createdAt: Date;
+  createdAt: string;
 }
 
 export interface Chatroom {
   id: string;
   name: string;
-  createdAt: Date;
+  createdAt: string;
   ownerId: string | null;
   salt: string;
   inviteCode: string;
@@ -34,7 +34,7 @@ export interface Message {
   id: string;
   payload: string;
   senderId: string;
-  createdAt: Date;
+  createdAt: string;
   textChannelId: string;
 }
 

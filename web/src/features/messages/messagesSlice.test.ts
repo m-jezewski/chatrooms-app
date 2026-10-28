@@ -14,7 +14,7 @@ const message = (id: string, textChannelId: string): Message => ({
   id,
   payload: `cipher-${id}`,
   senderId: 'sender',
-  createdAt: new Date('2026-10-18T10:00:00Z'),
+  createdAt: '2026-10-18T10:00:00.000Z',
   textChannelId,
 });
 

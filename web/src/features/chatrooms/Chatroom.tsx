@@ -10,6 +10,7 @@ import { Loader } from '../../shared/Loader.tsx';
 import { useRoomKey } from './RoomKeyContext.tsx';
 import { decrypt } from '../../utils/roomCrypto.ts';
 import { getSenderId } from '../../utils/session.ts';
+import { startsRun } from './messageRuns.ts';
 import styles from './Chatroom.module.scss';
 
 export interface DecryptedMessage {
@@ -111,9 +112,10 @@ export const Chatroom = () => {
       {messages.map((message: Message, index: number) => (
         <ChatMessage
           key={message.id}
-          previousMessageFromThisAuthor={index === 0 ? false : messages[index - 1]?.senderId === message?.senderId}
           decrypted={decrypted.get(message.id)}
           mine={message.senderId === senderId}
+          createdAt={message.createdAt}
+          firstOfRun={startsRun(message, messages[index - 1])}
         />
       ))}
     </div>
