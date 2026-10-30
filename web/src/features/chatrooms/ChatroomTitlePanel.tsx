@@ -1,5 +1,5 @@
 import { AppButton } from '../../shared/AppButton.tsx';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';

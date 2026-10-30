@@ -1,5 +1,4 @@
 import { useParams } from 'react-router';
-import React from 'react';
 import { MessageForm } from '../messages/MessageForm.tsx';
 import { ConnectionBanner } from '../messages/ConnectionBanner.tsx';
 import { useGetChatroomByIdQuery, useGetRoomEntryQuery } from '../../services/chatroomsApi.ts';

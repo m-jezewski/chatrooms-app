@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { cx } from '../utils/cx.ts';
 import styles from './FormActions.module.scss';
 
@@ -7,7 +7,7 @@ export const FormActions = ({
   className = '',
   equalWidth = false,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   equalWidth?: boolean;
 }) => {

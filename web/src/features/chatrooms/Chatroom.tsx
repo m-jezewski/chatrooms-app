@@ -1,6 +1,6 @@
 import { Message } from '../../interfaces.ts';
 import { ChatMessage } from './ChatMessage.tsx';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store.ts';
 import { useParams } from 'react-router';

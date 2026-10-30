@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router';
 import toast from 'react-hot-toast';
 import { ConfirmModal } from '../../shared/ConfirmModal.tsx';

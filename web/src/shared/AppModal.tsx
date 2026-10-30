@@ -1,5 +1,5 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
-import React, { cloneElement, MouseEvent, MouseEventHandler, ReactElement, ReactNode, useState } from 'react';
+import { cloneElement, MouseEvent, MouseEventHandler, ReactElement, ReactNode, useState } from 'react';
 import styles from './AppModal.module.scss';
 
 export type TriggerElement = ReactElement<{ onClick?: MouseEventHandler<HTMLElement> }>;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { AppButton } from '../../shared/AppButton.tsx';
 import styles from './HomePage.module.scss';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router';
 import { FormHeading } from '../../shared/FormHeading.tsx';
 import { LoginForm } from './LoginForm.tsx';

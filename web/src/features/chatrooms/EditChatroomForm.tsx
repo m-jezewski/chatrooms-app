@@ -3,7 +3,6 @@ import { object, string } from 'yup';
 import { InputLabel } from '../../shared/InputLabel.tsx';
 import { TextInput } from '../../shared/TextInput.tsx';
 import { AppButton } from '../../shared/AppButton.tsx';
-import React from 'react';
 import { FormActions } from '../../shared/FormActions.tsx';
 import { FormContainer } from '../../shared/FormContainer.tsx';
 import { Chatroom } from '../../interfaces.ts';

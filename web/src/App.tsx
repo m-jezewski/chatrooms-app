@@ -2,7 +2,6 @@ import styles from './App.module.scss';
 import { Navigate, Route, Routes } from 'react-router';
 import { Login } from './features/auth/Login.tsx';
 import { Register } from './features/auth/Register.tsx';
-import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Loader } from './shared/Loader.tsx';
 import { EntryLayout } from './shared/EntryLayout.tsx';

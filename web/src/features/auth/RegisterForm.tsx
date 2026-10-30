@@ -1,4 +1,3 @@
-import React from 'react';
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
 import toast from 'react-hot-toast';

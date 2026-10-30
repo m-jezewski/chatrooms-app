@@ -1,6 +1,5 @@
 import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
-import React from 'react';
 import { InputLabel } from '../../shared/InputLabel.tsx';
 import { TextInput } from '../../shared/TextInput.tsx';
 import { AppButton } from '../../shared/AppButton.tsx';

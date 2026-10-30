@@ -1,6 +1,5 @@
 import { TextInput } from '../../shared/TextInput.tsx';
 import { Form, Formik, FormikHelpers } from 'formik';
-import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { AppButton } from '../../shared/AppButton.tsx';

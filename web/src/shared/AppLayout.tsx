@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AppIcon } from './AppIcon.tsx';
 import CloseIcon from '../assets/icons/close.svg?react';
 import MenuIcon from '../assets/icons/menu.svg?react';

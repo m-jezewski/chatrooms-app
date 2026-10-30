@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FormHeading } from '../../shared/FormHeading.tsx';
 import { CreateRoomForm } from './CreateRoomForm.tsx';
 import styles from './CreateRoomPage.module.scss';

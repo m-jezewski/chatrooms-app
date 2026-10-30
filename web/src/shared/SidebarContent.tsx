@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router';
-import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppButton } from './AppButton.tsx';
 import { useEntryHandoff } from './entryHandoff.ts';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AppModal, TriggerElement } from '../../shared/AppModal.tsx';
 import { JoinRoomForm } from './JoinRoomForm.tsx';
 

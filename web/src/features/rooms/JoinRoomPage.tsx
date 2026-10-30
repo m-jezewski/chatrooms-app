@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router';
 import { FormHeading } from '../../shared/FormHeading.tsx';
 import { JoinRoomForm } from './JoinRoomForm.tsx';

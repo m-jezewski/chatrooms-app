@@ -1,4 +1,4 @@
-import React, { useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 import { Link, useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 import { selectLoggedUser } from '../auth/authSlice.ts';

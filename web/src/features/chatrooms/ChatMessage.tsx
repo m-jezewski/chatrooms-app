@@ -1,4 +1,3 @@
-import React from 'react';
 import type { DecryptedMessage } from './Chatroom.tsx';
 import { cx } from '../../utils/cx.ts';
 import styles from './ChatMessage.module.scss';
