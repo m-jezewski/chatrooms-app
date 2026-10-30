@@ -3,8 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppButton } from './AppButton.tsx';
 import { useEntryHandoff } from './entryHandoff.ts';
-import { RecentRoomsList } from '../features/rooms/RecentRoomsList.tsx';
-import { SavedRoomsList } from '../features/rooms/SavedRoomsList.tsx';
+import { RoomList } from '../features/rooms/RoomList.tsx';
 import { CreateRoomDialog } from '../features/rooms/CreateRoomDialog.tsx';
 import { JoinRoomDialog } from '../features/rooms/JoinRoomDialog.tsx';
 import { AuthDialog } from '../features/auth/AuthDialog.tsx';
@@ -55,8 +54,7 @@ export const SidebarContent = ({ onNavigate }: SidebarContentProps) => {
         inviteCode={inviteCode}
       />
 
-      <span className={styles.sectionLabel}>{loggedUser ? 'Your rooms' : 'Recent'}</span>
-      {loggedUser ? <SavedRoomsList /> : <RecentRoomsList />}
+      <RoomList />
       <div className={styles.spacer} />
 
       {loggedUser ? (
