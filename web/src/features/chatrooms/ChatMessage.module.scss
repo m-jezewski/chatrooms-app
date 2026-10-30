@@ -45,12 +45,12 @@
 }
 
 .bubbleMine {
-  background-color: #2563eb;
+  background-color: $bubble-mine;
   margin-left: auto;
 }
 
 .bubbleTheirs {
-  background-color: #121d41;
+  background-color: $bubble-theirs;
   margin-right: auto;
 }
 

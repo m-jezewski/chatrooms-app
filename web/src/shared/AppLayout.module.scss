@@ -26,11 +26,11 @@ $md: 768px;
 }
 
 .toggleButton {
-  color: #fff;
+  color: $text-bright;
   padding: 0.75rem;
   background-color: $input-bg;
   border-radius: $radius-lg;
-  box-shadow: 0 1px 2px 0 #334155;
+  box-shadow: 0 1px 2px 0 $shadow-color;
 }
 
 .icon {
@@ -60,7 +60,7 @@ $md: 768px;
 }
 
 .closeButton {
-  color: #fff;
+  color: $text-bright;
   padding: 0.6em 1.2em;
   background-color: $input-bg;
   border-radius: $radius-lg;

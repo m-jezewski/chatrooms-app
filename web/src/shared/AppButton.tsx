@@ -1,6 +1,7 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Link, LinkProps } from 'react-router';
 import { Loader } from './Loader.tsx';
+import { cx } from '../utils/cx.ts';
 import styles from './AppButton.module.scss';
 
 type AppButtonVariant = 'neutral' | 'slate' | 'purple' | 'transparent' | 'red';
@@ -28,7 +29,6 @@ export const AppButton = ({
   ...otherProps
 }: AppButtonProps) => {
   const roundedClass = rounded ? styles.round : styles.rounded;
-  const compactClass = compact ? styles.compact : '';
 
   const content = loader ? <Loader /> : children;
 
@@ -36,10 +36,7 @@ export const AppButton = ({
     const { as: _as, ...linkProps } = otherProps;
 
     return (
-      <Link
-        {...linkProps}
-        className={[styles.button, styles[variant], styles.link, roundedClass, className].filter(Boolean).join(' ')}
-      >
+      <Link {...linkProps} className={cx(styles.button, styles[variant], styles.link, roundedClass, className)}>
         {content}
       </Link>
     );
@@ -47,15 +44,18 @@ export const AppButton = ({
 
   const { as: _as, type = 'button', ...buttonProps } = otherProps;
 
-  const disabledClass = buttonProps.disabled ? styles.disabled : '';
-
   return (
     <button
       type={type}
       {...buttonProps}
-      className={[styles.button, styles[variant], compactClass, roundedClass, disabledClass, className]
-        .filter(Boolean)
-        .join(' ')}
+      className={cx(
+        styles.button,
+        styles[variant],
+        compact && styles.compact,
+        roundedClass,
+        buttonProps.disabled && styles.disabled,
+        className,
+      )}
     >
       {content}
     </button>

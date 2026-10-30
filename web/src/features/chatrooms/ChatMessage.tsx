@@ -1,5 +1,6 @@
 import React from 'react';
 import type { DecryptedMessage } from './Chatroom.tsx';
+import { cx } from '../../utils/cx.ts';
 import styles from './ChatMessage.module.scss';
 
 interface ChatMessageProps {
@@ -18,16 +19,16 @@ export const ChatMessage = ({ decrypted, mine, createdAt, firstOfRun }: ChatMess
 
   return (
     <div className={styles.row}>
-      <div className={[styles.wrap, mine ? styles.mine : styles.theirs].join(' ')}>
+      <div className={cx(styles.wrap, mine ? styles.mine : styles.theirs)}>
         {firstOfRun && (
-          <p className={[styles.label, mine ? styles.labelMine : styles.labelTheirs].join(' ')}>
+          <p className={cx(styles.label, mine ? styles.labelMine : styles.labelTheirs)}>
             {author}
             <time className={styles.sentAt} dateTime={createdAt} title={new Date(createdAt).toLocaleString()}>
               {formatSentAt(createdAt)}
             </time>
           </p>
         )}
-        <div className={[styles.bubble, mine ? styles.bubbleMine : styles.bubbleTheirs].join(' ')}>
+        <div className={cx(styles.bubble, mine ? styles.bubbleMine : styles.bubbleTheirs)}>
           <span className={styles.text}>{text}</span>
         </div>
       </div>

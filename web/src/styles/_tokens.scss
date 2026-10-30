@@ -9,12 +9,21 @@ $bg-color-2: #10141e;
 $accent: #01a29d;
 $accent-darker: #017a76;
 $red: #881337;
+$amber: #b45309;
+$olive: #4d7c0f;
+$green: #15803d;
 
 $surface-tint: rgba(17, 21, 32);
 $text-main: #e5e7eb;
 $text-secondary: #6b7280;
 $text-dark: #030712;
 $text-red: #fca5a5;
+$text-bright: #fff;
+$text-on-accent: #02050e;
+
+$bubble-mine: #2563eb;
+$bubble-theirs: #121d41;
+$shadow-color: #334155;
 
 $radius: 0.25rem;
 $radius-lg: 0.5rem;
@@ -23,6 +32,22 @@ $radius-lg: 0.5rem;
   background:
     radial-gradient(1000px 600px at 50% -15%, rgba(59, 130, 246, 0.12), transparent 65%),
     linear-gradient(to bottom, $bg-color, #0b1220);
+}
+
+@mixin input-box {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 14px;
+  line-height: 1.5rem;
+  border-radius: $radius;
+  background-color: $input-bg;
+  border: 1px solid $border-color;
+  transition: box-shadow 75ms ease-out;
+}
+
+@mixin focus-ring($color: $accent) {
+  outline: 0;
+  box-shadow: 0 0 2px 1px inset $color;
 }
 
 @mixin logo-font {

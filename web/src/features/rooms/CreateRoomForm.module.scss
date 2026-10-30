@@ -46,13 +46,13 @@
   @include fill(30%, $red);
 }
 .meterFill2 {
-  @include fill(55%, #b45309);
+  @include fill(55%, $amber);
 }
 .meterFill3 {
-  @include fill(80%, #4d7c0f);
+  @include fill(80%, $olive);
 }
 .meterFill4 {
-  @include fill(100%, #15803d);
+  @include fill(100%, $green);
 }
 
 .copyRow {

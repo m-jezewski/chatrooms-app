@@ -7,18 +7,10 @@
 }
 
 .input {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  font-size: 14px;
-  line-height: 1.5rem;
-  border-radius: $radius;
-  background-color: $input-bg;
-  border: 1px solid $border-color;
-  transition: box-shadow 75ms ease-out;
+  @include input-box;
 
   &:focus-visible {
-    outline: 0;
-    box-shadow: 0 0 2px 1px inset $accent;
+    @include focus-ring;
   }
 }
 

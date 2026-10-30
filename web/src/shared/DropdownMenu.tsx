@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { cx } from '../utils/cx.ts';
 import styles from './DropdownMenu.module.scss';
 
 export interface DropdownOption {
@@ -21,18 +22,14 @@ interface DropdownMenuProps {
 export const DropdownMenu = ({ label, options, className, 'aria-label': ariaLabel }: DropdownMenuProps) => {
   return (
     <Menu>
-      <MenuButton className={[styles.trigger, className].filter(Boolean).join(' ')} aria-label={ariaLabel}>
+      <MenuButton className={cx(styles.trigger, className)} aria-label={ariaLabel}>
         {label}
       </MenuButton>
 
       <MenuItems anchor="bottom end" className={styles.items}>
         {options.map((option) => (
           <MenuItem key={option.label} disabled={option.disabled}>
-            <button
-              type="button"
-              onClick={option.onSelect}
-              className={[styles.item, option.danger ? styles.danger : ''].filter(Boolean).join(' ')}
-            >
+            <button type="button" onClick={option.onSelect} className={cx(styles.item, option.danger && styles.danger)}>
               {option.label}
             </button>
           </MenuItem>

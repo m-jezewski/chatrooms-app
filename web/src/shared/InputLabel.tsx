@@ -1,4 +1,5 @@
 import { HTMLProps } from 'react';
+import { cx } from '../utils/cx.ts';
 import styles from './InputLabel.module.scss';
 
 interface InputLabelProps extends HTMLProps<HTMLLabelElement> {
@@ -7,7 +8,7 @@ interface InputLabelProps extends HTMLProps<HTMLLabelElement> {
 
 export const InputLabel = ({ children, className, ...otherProps }: InputLabelProps) => {
   return (
-    <label {...otherProps} className={[styles.label, className].filter(Boolean).join(' ')}>
+    <label {...otherProps} className={cx(styles.label, className)}>
       {children}
     </label>
   );

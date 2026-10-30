@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { selectLoggedUser } from '../auth/authSlice.ts';
 import { useGetSavedRoomsQuery } from '../../services/chatroomsApi.ts';
 import { getRecentRooms, subscribeToRecentRooms } from '../../utils/recentRooms.ts';
+import { cx } from '../../utils/cx.ts';
 import styles from './RoomList.module.scss';
 
 export const RoomList = () => {
@@ -25,7 +26,7 @@ export const RoomList = () => {
         <div className={styles.list}>
           {section.rooms.map((room) => (
             <Link to={`/chatrooms/${room.roomId}`} key={room.roomId}>
-              <div className={[styles.item, room.roomId === roomId ? styles.active : ''].join(' ')}># {room.name}</div>
+              <div className={cx(styles.item, room.roomId === roomId && styles.active)}># {room.name}</div>
             </Link>
           ))}
         </div>

@@ -36,17 +36,16 @@
 
 .purple {
   background-color: $accent;
-  color: #02050eff;
+  color: $text-on-accent;
 
   &:hover {
     background-color: $accent-darker;
-    color: #02050eff;
+    color: $text-on-accent;
   }
 
   &:focus-visible,
   &:focus {
-    outline: 0;
-    box-shadow: 0 0 2px 1px inset white;
+    @include focus-ring($text-bright);
   }
 }
 

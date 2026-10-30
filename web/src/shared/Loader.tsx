@@ -1,3 +1,4 @@
+import { cx } from '../utils/cx.ts';
 import styles from './Loader.module.scss';
 
 interface LoaderInterface {
@@ -5,6 +6,5 @@ interface LoaderInterface {
 }
 
 export const Loader = ({ variant = 'small' }: LoaderInterface) => {
-  const variantClass = variant === 'small' ? styles.small : styles.large;
-  return <span className={[styles.loader, variantClass].join(' ')} />;
+  return <span className={cx(styles.loader, variant === 'small' ? styles.small : styles.large)} />;
 };

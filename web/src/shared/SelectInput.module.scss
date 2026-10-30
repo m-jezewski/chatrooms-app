@@ -7,20 +7,13 @@
 }
 
 .button {
+  @include input-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  font-size: 14px;
-  line-height: 1.5rem;
   text-align: left;
   color: $text-main;
-  border-radius: $radius;
-  background-color: $input-bg;
-  border: 1px solid $border-color;
-  transition: box-shadow 75ms ease-out;
 
   &:focus {
     outline: 0;
@@ -28,8 +21,7 @@
 
   &[data-focus],
   &[data-open] {
-    outline: 0;
-    box-shadow: 0 0 2px 1px inset $accent;
+    @include focus-ring;
   }
 }
 
