@@ -12,10 +12,10 @@ import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 interface DeleteRoomDialogProps {
   room: Chatroom;
   isOpen: boolean;
-  closeModal: () => void;
+  onClose: () => void;
 }
 
-export const DeleteRoomDialog = ({ room, isOpen, closeModal }: DeleteRoomDialogProps) => {
+export const DeleteRoomDialog = ({ room, isOpen, onClose }: DeleteRoomDialogProps) => {
   const navigate = useNavigate();
   const [deleteChatroom] = useDeleteChatroomMutation();
 
@@ -40,7 +40,7 @@ export const DeleteRoomDialog = ({ room, isOpen, closeModal }: DeleteRoomDialogP
     <ConfirmModal
       title={'Delete room'}
       isOpen={isOpen}
-      closeModal={closeModal}
+      onClose={onClose}
       confirmLabel={'Delete'}
       danger
       onConfirm={handleConfirm}

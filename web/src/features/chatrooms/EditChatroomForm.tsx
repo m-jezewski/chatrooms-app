@@ -14,18 +14,18 @@ import { getOwnerToken } from '../../utils/session.ts';
 
 interface EditChatroomFormProps {
   initialValues: Chatroom;
-  closeModal: () => void;
+  onClose: () => void;
   onSuccess?: () => void;
 }
 
-interface EditChatroomFormState {
+interface EditChatroomFormValues {
   name: string;
 }
 
-export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditChatroomFormProps) => {
+export const EditChatroomForm = ({ initialValues, onClose, onSuccess }: EditChatroomFormProps) => {
   const [updateChatroom] = useUpdateChatroomMutation();
 
-  const handleSubmit = async (values: EditChatroomFormState, formikHelpers: FormikHelpers<EditChatroomFormState>) => {
+  const handleSubmit = async (values: EditChatroomFormValues, formikHelpers: FormikHelpers<EditChatroomFormValues>) => {
     try {
       await updateChatroom({
         id: initialValues.id,
@@ -34,7 +34,7 @@ export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditC
       }).unwrap();
       toast.success('Successfully edited the room!');
       onSuccess?.();
-      closeModal();
+      onClose();
     } catch (error) {
       toast.error(
         failureMessage(error, 'Failed to edit the room.', {
@@ -62,7 +62,7 @@ export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditC
             <TextInput name={'name'} type={'text'} placeholder={'Room name'} />
           </div>
           <FormActions equalWidth>
-            <AppButton onClick={() => closeModal()}>Cancel</AppButton>
+            <AppButton onClick={onClose}>Cancel</AppButton>
             <AppButton variant={'purple'} type={'submit'}>
               Save
             </AppButton>

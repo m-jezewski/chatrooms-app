@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useJoinChatroomMutation } from '../../services/chatroomsApi.ts';
@@ -50,7 +50,7 @@ export const useRoomJoin = ({ channelId, secrets, entry }: RoomJoinParams) => {
     };
   }, [channelId, dispatch]);
 
-  const markJoined = useCallback((roomId: string) => dispatch(joinedRoom(roomId)), [dispatch]);
+  const markJoined = (roomId: string) => dispatch(joinedRoom(roomId));
 
   return { joined, markJoined };
 };

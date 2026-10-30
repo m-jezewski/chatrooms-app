@@ -1,35 +1,33 @@
-import { createContext, useCallback, useContext, useMemo, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { RoomSecrets } from '../../utils/roomCrypto.ts';
 
-interface RoomKeyCtx {
+interface RoomKeyContextValue {
   keys: Map<string, RoomSecrets>;
   setKey: (roomId: string, secrets: RoomSecrets) => void;
   clearKey: (roomId: string) => void;
   clear: () => void;
 }
 
-const RoomKeyContext = createContext<RoomKeyCtx | null>(null);
+const RoomKeyContext = createContext<RoomKeyContextValue | null>(null);
 
 export const RoomKeyContextProvider = ({ children }: { children: ReactNode }) => {
   const [keys, setKeys] = useState(new Map<string, RoomSecrets>());
 
-  const setKey = useCallback((roomId: string, secrets: RoomSecrets) => {
+  const setKey = (roomId: string, secrets: RoomSecrets) => {
     setKeys((prev) => new Map(prev).set(roomId, secrets));
-  }, []);
+  };
 
-  const clearKey = useCallback((roomId: string) => {
+  const clearKey = (roomId: string) => {
     setKeys((prev) => {
       const next = new Map(prev);
       next.delete(roomId);
       return next;
     });
-  }, []);
+  };
 
-  const clear = useCallback(() => setKeys(new Map()), []);
+  const clear = () => setKeys(new Map());
 
-  const value = useMemo<RoomKeyCtx>(() => ({ keys, setKey, clearKey, clear }), [keys, setKey, clearKey, clear]);
-
-  return <RoomKeyContext.Provider value={value}>{children}</RoomKeyContext.Provider>;
+  return <RoomKeyContext.Provider value={{ keys, setKey, clearKey, clear }}>{children}</RoomKeyContext.Provider>;
 };
 
 export const useRoomKeyContext = () => {

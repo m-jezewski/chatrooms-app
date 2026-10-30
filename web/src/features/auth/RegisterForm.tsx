@@ -11,7 +11,7 @@ import { useRegisterMutation } from '../../services/authApi.ts';
 import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 import styles from './RegisterForm.module.scss';
 
-interface formValues {
+interface RegisterFormValues {
   email: string;
   name: string;
   password: string;
@@ -25,7 +25,7 @@ interface RegisterFormProps {
 export const RegisterForm = ({ onSuccess, onSwitchToLogin }: RegisterFormProps) => {
   const [register, { isLoading }] = useRegisterMutation();
 
-  const handleSubmit = async (values: formValues, formikHelpers: FormikHelpers<formValues>) => {
+  const handleSubmit = async (values: RegisterFormValues, formikHelpers: FormikHelpers<RegisterFormValues>) => {
     try {
       await register(values).unwrap();
       formikHelpers.resetForm();

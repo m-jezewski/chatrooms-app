@@ -11,7 +11,7 @@ import { useLoginMutation } from '../../services/authApi.ts';
 import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 import styles from './LoginForm.module.scss';
 
-interface formValues {
+interface LoginFormValues {
   email: string;
   password: string;
 }
@@ -24,7 +24,7 @@ interface LoginFormProps {
 export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
   const [login, { isLoading }] = useLoginMutation();
 
-  const handleSubmit = async (values: formValues, formikHelpers: FormikHelpers<formValues>) => {
+  const handleSubmit = async (values: LoginFormValues, formikHelpers: FormikHelpers<LoginFormValues>) => {
     try {
       await login(values).unwrap();
       formikHelpers.resetForm();
@@ -39,7 +39,7 @@ export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => 
     }
   };
 
-  const handleDemoButtonClick = async (formikConfig: FormikProps<formValues>) => {
+  const handleDemoButtonClick = async (formikConfig: FormikProps<LoginFormValues>) => {
     await formikConfig.setValues(
       {
         email: 'public_user@chatrooms.com',

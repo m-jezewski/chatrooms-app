@@ -33,7 +33,7 @@ interface CreateRoomFormProps {
   onCancel?: () => void;
 }
 
-interface CreatedInfo {
+interface CreatedRoom {
   roomId: string;
   inviteCode: string;
   ownerToken?: string;
@@ -44,7 +44,7 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
   const loggedUser = useSelector(selectLoggedUser);
   const [createChatroom] = useCreateChatroomMutation();
   const { setKey } = useRoomKeyContext();
-  const [created, setCreated] = useState<CreatedInfo | null>(null);
+  const [created, setCreated] = useState<CreatedRoom | null>(null);
 
   const ttlOptions = ttlOptionsFor(!!loggedUser);
 

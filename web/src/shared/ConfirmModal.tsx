@@ -5,7 +5,7 @@ import { FormActions } from './FormActions.tsx';
 
 interface ConfirmModalProps {
   isOpen: boolean;
-  closeModal: () => void;
+  onClose: () => void;
   title: string;
   children: ReactNode;
   confirmLabel?: string;
@@ -16,7 +16,7 @@ interface ConfirmModalProps {
 
 export const ConfirmModal = ({
   isOpen,
-  closeModal,
+  onClose,
   title,
   children,
   confirmLabel = 'Confirm',
@@ -30,7 +30,7 @@ export const ConfirmModal = ({
     setIsConfirming(true);
     try {
       await onConfirm();
-      closeModal();
+      onClose();
     } catch {
       // onConfirm reports its own failure (toast); we only need to stop the spinner and keep the modal open.
     }
@@ -38,10 +38,10 @@ export const ConfirmModal = ({
   };
 
   return (
-    <AppModal title={title} isOpen={isOpen} onClose={closeModal}>
+    <AppModal title={title} isOpen={isOpen} onClose={onClose}>
       {children}
       <FormActions equalWidth>
-        <AppButton type="button" onClick={closeModal} disabled={isConfirming}>
+        <AppButton type="button" onClick={onClose} disabled={isConfirming}>
           {cancelLabel}
         </AppButton>
         <AppButton type="button" variant={danger ? 'red' : 'purple'} onClick={handleConfirm} disabled={isConfirming}>

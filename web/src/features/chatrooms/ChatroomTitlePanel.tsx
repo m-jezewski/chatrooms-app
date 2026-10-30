@@ -138,14 +138,14 @@ export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelPro
       {channelData && (
         <>
           <AppModal title={'Change expiry'} isOpen={expiryOpen} onClose={() => setExpiryOpen(false)}>
-            {(close) => <EditRoomTtlForm room={channelData} closeModal={close} />}
+            {(close) => <EditRoomTtlForm room={channelData} onClose={close} />}
           </AppModal>
 
           <AppModal title={'Change name'} isOpen={renameOpen} onClose={() => setRenameOpen(false)}>
-            {(close) => <EditChatroomForm initialValues={channelData} closeModal={close} />}
+            {(close) => <EditChatroomForm initialValues={channelData} onClose={close} />}
           </AppModal>
 
-          <DeleteRoomDialog room={channelData} isOpen={deleteOpen} closeModal={() => setDeleteOpen(false)} />
+          <DeleteRoomDialog room={channelData} isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} />
         </>
       )}
     </div>

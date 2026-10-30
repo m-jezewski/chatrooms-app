@@ -15,14 +15,14 @@ import styles from './EditRoomTtlForm.module.scss';
 
 interface EditRoomTtlFormProps {
   room: Chatroom;
-  closeModal: () => void;
+  onClose: () => void;
 }
 
 interface EditRoomTtlFormValues {
   ttl: number | null;
 }
 
-export const EditRoomTtlForm = ({ room, closeModal }: EditRoomTtlFormProps) => {
+export const EditRoomTtlForm = ({ room, onClose }: EditRoomTtlFormProps) => {
   const [updateChatroom] = useUpdateChatroomMutation();
   const isAccountOwned = !!room.ownerId;
   const options = ttlOptionsFor(isAccountOwned);
@@ -35,7 +35,7 @@ export const EditRoomTtlForm = ({ room, closeModal }: EditRoomTtlFormProps) => {
         ownerToken: getOwnerToken(room.id),
       }).unwrap();
       toast.success('Room expiry updated!');
-      closeModal();
+      onClose();
     } catch (error) {
       toast.error(
         failureMessage(error, 'Failed to update the expiry.', {
@@ -66,7 +66,7 @@ export const EditRoomTtlForm = ({ room, closeModal }: EditRoomTtlFormProps) => {
             </p>
           </div>
           <FormActions equalWidth>
-            <AppButton type="button" onClick={closeModal}>
+            <AppButton type="button" onClick={onClose}>
               Cancel
             </AppButton>
             <AppButton variant="purple" type="submit" disabled={isSubmitting}>
