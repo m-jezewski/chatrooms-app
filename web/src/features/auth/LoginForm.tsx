@@ -8,6 +8,7 @@ import { AppButton } from '../../shared/AppButton.tsx';
 import { FormActions } from '../../shared/FormActions.tsx';
 import { FormContainer } from '../../shared/FormContainer.tsx';
 import { useLoginMutation } from '../../services/authApi.ts';
+import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 import styles from './LoginForm.module.scss';
 
 interface formValues {
@@ -28,8 +29,13 @@ export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => 
       await login(values).unwrap();
       formikHelpers.resetForm();
       onSuccess?.();
-    } catch {
-      toast.error('Failed to log in.');
+    } catch (error) {
+      toast.error(
+        failureMessage(error, 'Failed to log in.', {
+          401: 'Wrong email or password',
+          429: ERROR_MESSAGES.RETRY_IN_A_MINUTE,
+        }),
+      );
     }
   };
 

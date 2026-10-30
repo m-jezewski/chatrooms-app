@@ -6,6 +6,7 @@ import { recordRecentRoom } from '../../utils/recentRooms.ts';
 import { RoomSecrets } from '../../utils/roomCrypto.ts';
 import { RoomEntry } from '../../interfaces.ts';
 import { closedRoom, joinedRoom, selectJoinedChannelId } from './roomMembershipSlice.ts';
+import { failureMessage, getErrorStatus } from '../../shared/requestError.ts';
 
 interface RoomJoinParams {
   channelId?: string;
@@ -29,8 +30,7 @@ export const useRoomJoin = ({ channelId, secrets, entry }: RoomJoinParams) => {
         if (!cancelled) dispatch(joinedRoom(channelId));
       })
       .catch((error) => {
-        const status = (error as { status?: number | string })?.status;
-        if (!cancelled && status !== 404) toast.error('Failed to join the room.');
+        if (!cancelled && getErrorStatus(error) !== 404) toast.error(failureMessage(error, 'Failed to join the room.'));
       });
 
     return () => {

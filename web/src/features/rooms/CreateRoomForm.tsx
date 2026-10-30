@@ -16,7 +16,7 @@ import { deriveRoomSecrets, generateSalt, uint8ToBase64 } from '../../utils/room
 import { saveOwnerToken } from '../../utils/session.ts';
 import { recordRecentRoom } from '../../utils/recentRooms.ts';
 import { useRoomKeyContext } from '../chatrooms/RoomKeyContext.tsx';
-import { getErrorMessage } from '../../shared/getErrorMessage.ts';
+import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 import { passwordStrength } from '../../utils/passwordStrength.ts';
 import { DEFAULT_TTL_MS, ttlOptionsFor } from '../../utils/ttl.ts';
 import styles from './CreateRoomForm.module.scss';
@@ -68,7 +68,7 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
       setCreated({ roomId: room.id, inviteCode: room.inviteCode, ownerToken: room.ownerToken });
       onCreated?.();
     } catch (error) {
-      toast.error('Failed to create room. ' + (getErrorMessage(error) || ''));
+      toast.error(failureMessage(error, 'Failed to create the room.', { 429: ERROR_MESSAGES.RETRY_LATER }));
     }
     helpers.setSubmitting(false);
   };

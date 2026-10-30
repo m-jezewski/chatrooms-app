@@ -7,6 +7,7 @@ import { useDeleteChatroomMutation } from '../../services/chatroomsApi.ts';
 import { getOwnerToken } from '../../utils/session.ts';
 import { removeRecentRoom } from '../../utils/recentRooms.ts';
 import styles from './DeleteRoomDialog.module.scss';
+import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 
 interface DeleteRoomDialogProps {
   room: Chatroom;
@@ -22,7 +23,12 @@ export const DeleteRoomDialog = ({ room, isOpen, closeModal }: DeleteRoomDialogP
     try {
       await deleteChatroom({ id: room.id, ownerToken: getOwnerToken(room.id) }).unwrap();
     } catch (error) {
-      toast.error('Cannot remove room');
+      toast.error(
+        failureMessage(error, 'Could not remove the room.', {
+          403: ERROR_MESSAGES.OWNER_ONLY,
+          404: ERROR_MESSAGES.ROOM_IS_GONE,
+        }),
+      );
       throw error;
     }
     removeRecentRoom(room.id);

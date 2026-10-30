@@ -8,6 +8,7 @@ import { AppButton } from '../../shared/AppButton.tsx';
 import { FormActions } from '../../shared/FormActions.tsx';
 import { FormContainer } from '../../shared/FormContainer.tsx';
 import { useRegisterMutation } from '../../services/authApi.ts';
+import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 import styles from './RegisterForm.module.scss';
 
 interface formValues {
@@ -30,8 +31,13 @@ export const RegisterForm = ({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
       formikHelpers.resetForm();
       toast.success('Successfully registered!');
       onSuccess?.();
-    } catch {
-      toast.error('Failed to register.');
+    } catch (error) {
+      toast.error(
+        failureMessage(error, 'Failed to register.', {
+          409: 'That email is already registered',
+          429: ERROR_MESSAGES.RETRY_LATER,
+        }),
+      );
     }
   };
 

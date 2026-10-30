@@ -14,6 +14,7 @@ import { recordRecentRoom } from '../../utils/recentRooms.ts';
 import { useRoomKeyContext } from '../chatrooms/RoomKeyContext.tsx';
 import { RoomEntry } from '../../interfaces.ts';
 import styles from './JoinRoomForm.module.scss';
+import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 
 interface JoinRoomFormProps {
   inviteCode?: string;
@@ -38,8 +39,7 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
       setLocator(room);
       onRoomResolved?.(room);
     } catch (error) {
-      const status = (error as { status?: number | string })?.status;
-      setLookupError(status === 429 ? 'Too many attempts — try again in a minute' : 'No room found for this code');
+      setLookupError(failureMessage(error, 'No room found for this code', { 429: ERROR_MESSAGES.RETRY_IN_A_MINUTE }));
     }
   };
 
@@ -59,17 +59,16 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
     try {
       secrets = await deriveRoomSecrets(values.password, base64ToUint8(locator.salt));
     } catch {
-      helpers.setFieldError('password', 'Could not unlock this room — its encryption data looks damaged');
+      helpers.setFieldError('password', ERROR_MESSAGES.DAMAGED_ROOM_KEY);
       return;
     }
 
     try {
       await joinChatroom({ channelId: locator.roomId, authKey: secrets.authKey }).unwrap();
     } catch (error) {
-      const status = (error as { status?: number | string })?.status;
       helpers.setFieldError(
         'password',
-        status === 429 ? 'Too many attempts — try again in a minute' : 'Incorrect password',
+        failureMessage(error, ERROR_MESSAGES.INCORRECT_PASSWORD, { 429: ERROR_MESSAGES.RETRY_IN_A_MINUTE }),
       );
       helpers.setSubmitting(false);
       return;

@@ -9,6 +9,7 @@ import { RoomEntry } from '../../interfaces.ts';
 import { base64ToUint8, deriveRoomSecrets, RoomSecrets } from '../../utils/roomCrypto.ts';
 import { useJoinChatroomMutation } from '../../services/chatroomsApi.ts';
 import styles from './RoomPasswordGate.module.scss';
+import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 
 interface RoomPasswordGateProps {
   entry: RoomEntry;
@@ -30,17 +31,16 @@ export const RoomPasswordGate = ({ entry, onJoin }: RoomPasswordGateProps) => {
     try {
       secrets = await deriveRoomSecrets(password, base64ToUint8(entry.salt));
     } catch {
-      formikHelpers.setFieldError('password', 'Could not unlock this room — its encryption data looks damaged');
+      formikHelpers.setFieldError('password', ERROR_MESSAGES.DAMAGED_ROOM_KEY);
       return;
     }
 
     try {
       await joinChatroom({ channelId: entry.roomId, authKey: secrets.authKey }).unwrap();
     } catch (error) {
-      const status = (error as { status?: number | string })?.status;
       formikHelpers.setFieldError(
         'password',
-        status === 429 ? 'Too many attempts — try again in a minute' : 'Incorrect password',
+        failureMessage(error, ERROR_MESSAGES.INCORRECT_PASSWORD, { 429: ERROR_MESSAGES.RETRY_IN_A_MINUTE }),
       );
       return;
     }

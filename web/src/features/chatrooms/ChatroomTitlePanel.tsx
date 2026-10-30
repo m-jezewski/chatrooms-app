@@ -17,6 +17,7 @@ import { removeRecentRoom } from '../../utils/recentRooms.ts';
 import { useRoomKeyContext } from './RoomKeyContext.tsx';
 import { useLeaveRoomMutation, useRotateInviteCodeMutation } from '../../services/chatroomsApi.ts';
 import styles from './ChatroomTitlePanel.module.scss';
+import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 
 interface ChatroomTitlePanelProps {
   entry?: RoomEntry;
@@ -44,8 +45,13 @@ export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelPro
     try {
       await rotateInviteCode({ id: roomId, ownerToken }).unwrap();
       toast.success('Invite code rotated — the old link is now dead.');
-    } catch {
-      toast.error('Could not rotate the invite code.');
+    } catch (error) {
+      toast.error(
+        failureMessage(error, 'Could not rotate the invite code.', {
+          403: ERROR_MESSAGES.OWNER_ONLY,
+          404: ERROR_MESSAGES.ROOM_IS_GONE,
+        }),
+      );
     }
   };
 
@@ -53,8 +59,8 @@ export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelPro
     if (!roomId) return;
     try {
       await leaveRoom(roomId).unwrap();
-    } catch {
-      toast.error('Could not leave the room.');
+    } catch (error) {
+      toast.error(failureMessage(error, 'Could not leave the room.', { 404: ERROR_MESSAGES.ROOM_IS_GONE }));
       return;
     }
     clearKey(roomId);

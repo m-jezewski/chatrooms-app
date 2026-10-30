@@ -8,7 +8,7 @@ import { FormActions } from '../../shared/FormActions.tsx';
 import { FormContainer } from '../../shared/FormContainer.tsx';
 import { Chatroom } from '../../interfaces.ts';
 import toast from 'react-hot-toast';
-import { getErrorMessage } from '../../shared/getErrorMessage.ts';
+import { ERROR_MESSAGES, failureMessage } from '../../shared/requestError.ts';
 import { useUpdateChatroomMutation } from '../../services/chatroomsApi.ts';
 import { getOwnerToken } from '../../utils/session.ts';
 
@@ -36,7 +36,12 @@ export const EditChatroomForm = ({ initialValues, closeModal, onSuccess }: EditC
       onSuccess?.();
       closeModal();
     } catch (error) {
-      toast.error('Failed to edit the room. ' + (getErrorMessage(error) || ''));
+      toast.error(
+        failureMessage(error, 'Failed to edit the room.', {
+          403: ERROR_MESSAGES.OWNER_ONLY,
+          404: ERROR_MESSAGES.ROOM_IS_GONE,
+        }),
+      );
     }
     formikHelpers.resetForm();
   };

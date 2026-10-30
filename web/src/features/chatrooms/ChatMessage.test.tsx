@@ -30,11 +30,11 @@ const sentAt = () => screen.queryByText(/^\d{1,2}:\d{2}$/);
 describe('ChatMessage', () => {
   afterEach(cleanup);
 
-  it('credits my own message to me instead of to the nickname inside it', () => {
-    show({ mine: true });
+  it('leaves my own message unnamed, because the side it sits on already says who wrote it', () => {
+    const { container } = show({ mine: true });
 
-    expect(screen.getByText('You')).toBeInTheDocument();
     expect(screen.queryByText('Ada')).not.toBeInTheDocument();
+    expect(container.querySelector('p')?.textContent).toBe(sentAt()?.textContent);
   });
 
   it('credits someone else by the nickname carried inside the encrypted payload', () => {
