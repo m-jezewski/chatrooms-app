@@ -45,6 +45,42 @@ $radius-lg: 0.5rem;
   transition: box-shadow 75ms ease-out;
 }
 
+@mixin popover-panel {
+  --anchor-gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: $radius;
+  background-color: $input-bg;
+  border: 1px solid $border-color;
+  transition: opacity 100ms ease-in;
+
+  &:focus {
+    outline: none;
+  }
+
+  &[data-leave][data-closed] {
+    opacity: 0;
+  }
+}
+
+@mixin popover-item {
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  font-size: 14px;
+  line-height: 1.5rem;
+  cursor: pointer;
+  border-radius: $radius;
+  color: $text-main;
+
+  &[data-focus] {
+    background-color: $border-color;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 @mixin focus-ring($color: $accent) {
   outline: 0;
   box-shadow: 0 0 2px 1px inset $color;

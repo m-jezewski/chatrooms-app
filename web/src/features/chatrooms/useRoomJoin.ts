@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useJoinChatroomMutation } from '../../services/chatroomsApi.ts';
 import { RoomSecrets } from '../../utils/roomCrypto.ts';
-import { closedRoom, joinedRoom, selectJoinedChannelId } from './roomMembershipSlice.ts';
+import { roomLeft, roomJoined, selectJoinedChannelId } from './roomMembershipSlice.ts';
 import { failureMessage, getErrorStatus } from '../../shared/requestError.ts';
 
 interface RoomJoinParams {
@@ -24,7 +24,7 @@ export const useRoomJoin = ({ channelId, secrets }: RoomJoinParams) => {
     joinChatroom({ channelId, authKey: secrets.authKey })
       .unwrap()
       .then(() => {
-        if (!cancelled) dispatch(joinedRoom(channelId));
+        if (!cancelled) dispatch(roomJoined(channelId));
       })
       .catch((error) => {
         if (!cancelled && getErrorStatus(error) !== 404) toast.error(failureMessage(error, 'Failed to join the room.'));
@@ -37,11 +37,11 @@ export const useRoomJoin = ({ channelId, secrets }: RoomJoinParams) => {
 
   useEffect(() => {
     return () => {
-      dispatch(closedRoom());
+      dispatch(roomLeft());
     };
   }, [channelId, dispatch]);
 
-  const markJoined = (roomId: string) => dispatch(joinedRoom(roomId));
+  const markJoined = (roomId: string) => dispatch(roomJoined(roomId));
 
   return { joined, markJoined };
 };

@@ -17,7 +17,7 @@ const roomMembershipSlice = createSlice({
   name: 'roomMembership',
   initialState,
   reducers: {
-    joinedRoom(state, action: PayloadAction<string>) {
+    roomJoined(state, action: PayloadAction<string>) {
       if (state.rejoinedFor !== action.payload) {
         state.rejoinedFor = null;
       }
@@ -38,13 +38,13 @@ const roomMembershipSlice = createSlice({
       state.rejoinedFor = state.joinedChannelId;
       state.joinedChannelId = null;
     },
-    closedRoom() {
+    roomLeft() {
       return initialState;
     },
   },
 });
 
-export const { joinedRoom, membershipRefused, closedRoom } = roomMembershipSlice.actions;
+export const { roomJoined, membershipRefused, roomLeft } = roomMembershipSlice.actions;
 
 export const selectJoinedChannelId = (state: RootState) => state.roomMembership.joinedChannelId;
 export const selectLostAccessTo = (state: RootState) => state.roomMembership.lostAccessTo;

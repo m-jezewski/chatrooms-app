@@ -28,42 +28,14 @@
 // Portaled and anchored to the trigger, styled like SelectInput's option list.
 .items {
   min-width: 10rem;
-  --anchor-gap: 0.25rem;
-  padding: 0.25rem;
-  border-radius: $radius;
-  background-color: $input-bg;
-  border: 1px solid $border-color;
-  transition: opacity 100ms ease-in;
-
-  &:focus {
-    outline: none;
-  }
-
-  &[data-leave][data-closed] {
-    opacity: 0;
-  }
+  @include popover-panel;
 }
 
 .item {
   display: block;
-  width: 100%;
-  padding: 0.4rem 0.5rem;
-  font-size: 14px;
-  line-height: 1.5rem;
   text-align: left;
-  cursor: pointer;
-  border-radius: $radius;
   background-color: transparent;
-  color: $text-main;
-
-  &[data-focus] {
-    background-color: $border-color;
-  }
-
-  &[data-disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  @include popover-item;
 }
 
 .danger {

@@ -3,13 +3,13 @@ import io, { Socket } from 'socket.io-client';
 import {
   connectionOpened,
   connectionClosed,
-  connectionError,
+  connectionFailed,
   messageSubmitted,
-  openedChannel,
-  receivedMessage,
-  setMessages,
+  channelOpened,
+  messageReceived,
+  historyLoaded,
 } from './messagesSlice.ts';
-import { joinedRoom, membershipRefused } from '../chatrooms/roomMembershipSlice.ts';
+import { roomJoined, membershipRefused } from '../chatrooms/roomMembershipSlice.ts';
 import { api } from '../../services/api.ts';
 import { Message } from '../../interfaces.ts';
 import type { AppStartListening } from '../../listenerMiddleware.ts';
@@ -18,12 +18,12 @@ let roomSocket: Socket | null = null;
 
 export const addRoomSocketListeners = (startListening: AppStartListening) => {
   startListening({
-    actionCreator: joinedRoom,
+    actionCreator: roomJoined,
     effect: async (action, listenerApi) => {
       listenerApi.cancelActiveListeners();
 
       const channelId = action.payload;
-      listenerApi.dispatch(openedChannel(channelId));
+      listenerApi.dispatch(channelOpened(channelId));
 
       const socket = io(import.meta.env.VITE_API_URL, { withCredentials: true });
       roomSocket = socket;
@@ -38,7 +38,7 @@ export const addRoomSocketListeners = (startListening: AppStartListening) => {
       });
 
       socket.on('connect_error', (error: Error) => {
-        listenerApi.dispatch(connectionError(error.message || 'Cannot reach the chat server'));
+        listenerApi.dispatch(connectionFailed(error.message || 'Cannot reach the chat server'));
       });
 
       socket.on('error', ({ message, code }: { message?: string; code?: string }) => {
@@ -51,7 +51,7 @@ export const addRoomSocketListeners = (startListening: AppStartListening) => {
       });
 
       socket.on('newMessage', (message: Message) => {
-        listenerApi.dispatch(receivedMessage(message));
+        listenerApi.dispatch(messageReceived(message));
       });
 
       socket.on('roomClosed', () => {
@@ -60,7 +60,7 @@ export const addRoomSocketListeners = (startListening: AppStartListening) => {
 
       socket.on('joinedChannel', (data: { messages: Message[]; hasMore: boolean; channelId: string }) => {
         listenerApi.dispatch(
-          setMessages({ channelId: data.channelId, messages: data.messages, hasMore: data.hasMore }),
+          historyLoaded({ channelId: data.channelId, messages: data.messages, hasMore: data.hasMore }),
         );
       });
 

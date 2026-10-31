@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { joinedRoom } from './roomMembershipSlice.ts';
+import { roomJoined } from './roomMembershipSlice.ts';
 
 const { recordRecentRoom, io } = vi.hoisted(() => ({
   recordRecentRoom: vi.fn(),
@@ -43,7 +43,7 @@ describe('keeping the recent rooms list up to date', () => {
     const { store, knownRoom } = await loadApp();
     await knownRoom('room-1', 'Design crit');
 
-    store.dispatch(joinedRoom('room-1'));
+    store.dispatch(roomJoined('room-1'));
 
     expect(recordRecentRoom).toHaveBeenCalledWith({ roomId: 'room-1', name: 'Design crit' });
   });
@@ -53,7 +53,7 @@ describe('keeping the recent rooms list up to date', () => {
     await knownRoom('room-1', 'Design crit');
     await knownRoom('room-2', 'Standup');
 
-    store.dispatch(joinedRoom('room-2'));
+    store.dispatch(roomJoined('room-2'));
 
     expect(recordRecentRoom).toHaveBeenCalledTimes(1);
     expect(recordRecentRoom).toHaveBeenCalledWith({ roomId: 'room-2', name: 'Standup' });
@@ -62,7 +62,7 @@ describe('keeping the recent rooms list up to date', () => {
   it('records nothing it would have to invent a name for', async () => {
     const { store } = await loadApp();
 
-    store.dispatch(joinedRoom('room-1'));
+    store.dispatch(roomJoined('room-1'));
 
     expect(recordRecentRoom).not.toHaveBeenCalled();
   });

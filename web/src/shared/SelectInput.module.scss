@@ -43,20 +43,7 @@
 
 .options {
   width: var(--button-width);
-  --anchor-gap: 0.25rem;
-  padding: 0.25rem;
-  border-radius: $radius;
-  background-color: $input-bg;
-  border: 1px solid $border-color;
-  transition: opacity 100ms ease-in;
-
-  &:focus {
-    outline: none;
-  }
-
-  &[data-leave][data-closed] {
-    opacity: 0;
-  }
+  @include popover-panel;
 }
 
 .option {
@@ -64,22 +51,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  width: 100%;
-  padding: 0.4rem 0.5rem;
-  font-size: 14px;
-  line-height: 1.5rem;
-  cursor: pointer;
-  border-radius: $radius;
-  color: $text-main;
-
-  &[data-focus] {
-    background-color: $border-color;
-  }
-
-  &[data-disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  @include popover-item;
 
   .check {
     visibility: hidden;

@@ -6,7 +6,7 @@ import { MemoryRouter, Route, Routes } from 'react-router';
 import '@testing-library/jest-dom/vitest';
 import { store } from '../../store.ts';
 import { Message } from '../../interfaces.ts';
-import { openedChannel, setMessages } from '../messages/messagesSlice.ts';
+import { channelOpened, historyLoaded } from '../messages/messagesSlice.ts';
 import { Chatroom } from './Chatroom.tsx';
 
 const { decrypt, roomKey } = vi.hoisted(() => {
@@ -26,7 +26,7 @@ const message = (id: string): Message => ({
 });
 
 const logContains = (...messages: Message[]) => {
-  store.dispatch(setMessages({ channelId: 'room-1', messages, hasMore: true }));
+  store.dispatch(historyLoaded({ channelId: 'room-1', messages, hasMore: true }));
 };
 
 const show = () =>
@@ -46,7 +46,7 @@ describe('Chatroom', () => {
     decrypt.mockImplementation(async (_key: unknown, cipher: string) =>
       JSON.stringify({ nickname: `Author of ${cipher}`, text: `text for ${cipher}` }),
     );
-    store.dispatch(openedChannel('room-1'));
+    store.dispatch(channelOpened('room-1'));
   });
 
   afterEach(cleanup);

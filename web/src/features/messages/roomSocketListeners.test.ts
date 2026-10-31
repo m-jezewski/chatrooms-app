@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { messageSubmitted } from './messagesSlice.ts';
-import { closedRoom, joinedRoom } from '../chatrooms/roomMembershipSlice.ts';
+import { roomLeft, roomJoined } from '../chatrooms/roomMembershipSlice.ts';
 
 const { sockets, io, toastError } = vi.hoisted(() => {
   const createFakeSocket = () => {
@@ -58,7 +58,7 @@ const message = (id: string, textChannelId: string) => ({
 
 const openRoom = async (channelId: string) => {
   const { store } = await import('../../store.ts');
-  store.dispatch(joinedRoom(channelId));
+  store.dispatch(roomJoined(channelId));
   return store;
 };
 
@@ -159,7 +159,7 @@ describe('leaving a room', () => {
     const store = await openRoom('room-1');
     sockets[0].connect();
 
-    store.dispatch(joinedRoom('room-2'));
+    store.dispatch(roomJoined('room-2'));
     await flush();
 
     expect(sockets).toHaveLength(2);
@@ -173,7 +173,7 @@ describe('leaving a room', () => {
     const store = await openRoom('room-1');
     sockets[0].connect();
 
-    store.dispatch(joinedRoom('room-1'));
+    store.dispatch(roomJoined('room-1'));
     await flush();
 
     expect(sockets).toHaveLength(2);
@@ -184,7 +184,7 @@ describe('leaving a room', () => {
   it('says goodbye only over a socket that is still connected', async () => {
     const store = await openRoom('room-1');
 
-    store.dispatch(closedRoom());
+    store.dispatch(roomLeft());
     await flush();
 
     expect(sockets[0].socket.emit).not.toHaveBeenCalled();
@@ -208,7 +208,7 @@ describe('sending a message', () => {
   it('has nowhere to go once the room is closed', async () => {
     const store = await openRoom('room-1');
     sockets[0].connect();
-    store.dispatch(closedRoom());
+    store.dispatch(roomLeft());
     await flush();
 
     store.dispatch(messageSubmitted(outgoing));

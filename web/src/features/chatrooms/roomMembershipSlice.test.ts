@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import reducer, { closedRoom, joinedRoom, membershipRefused } from './roomMembershipSlice';
+import reducer, { roomLeft, roomJoined, membershipRefused } from './roomMembershipSlice';
 
-const inRoom = (roomId: string) => reducer(undefined, joinedRoom(roomId));
+const inRoom = (roomId: string) => reducer(undefined, roomJoined(roomId));
 
-describe('joinedRoom', () => {
+describe('roomJoined', () => {
   it('records the room the server let us into', () => {
     expect(inRoom('room-a').joinedChannelId).toBe('room-a');
   });
 
   it('gives another room a fresh attempt', () => {
     const refused = reducer(inRoom('room-a'), membershipRefused());
-    expect(reducer(refused, joinedRoom('room-b')).rejoinedFor).toBeNull();
+    expect(reducer(refused, roomJoined('room-b')).rejoinedFor).toBeNull();
   });
 });
 
@@ -21,7 +21,7 @@ describe('membershipRefused', () => {
   });
 
   it('keeps the room on a second refusal instead of looping', () => {
-    const rejoined = reducer(reducer(inRoom('room-a'), membershipRefused()), joinedRoom('room-a'));
+    const rejoined = reducer(reducer(inRoom('room-a'), membershipRefused()), roomJoined('room-a'));
     const state = reducer(rejoined, membershipRefused());
 
     expect(state).toMatchObject({ joinedChannelId: 'room-a', lostAccessTo: 'room-a' });
@@ -32,9 +32,9 @@ describe('membershipRefused', () => {
   });
 });
 
-describe('closedRoom', () => {
+describe('roomLeft', () => {
   it('forgets everything so the next visit starts over', () => {
-    const state = reducer(reducer(inRoom('room-a'), membershipRefused()), closedRoom());
+    const state = reducer(reducer(inRoom('room-a'), membershipRefused()), roomLeft());
     expect(state).toEqual({ joinedChannelId: null, rejoinedFor: null, lostAccessTo: null });
   });
 });

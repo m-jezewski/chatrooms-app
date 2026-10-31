@@ -1,12 +1,10 @@
 import { TextChannel } from '@prisma/client';
 import {
   IsBase64,
-  IsDate,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
   Length,
   Max,
   MaxLength,
@@ -18,8 +16,6 @@ import { TTL_MAX_MS, TTL_MIN_MS } from '../room-expiry';
 
 export class TextChannelDto implements TextChannel {
   @ApiProperty({ example: 'a1b2c3d4-...' })
-  @IsUUID()
-  @IsNotEmpty()
   id: string;
 
   @ApiProperty({ example: 'name', minLength: 3, maxLength: 50 })
@@ -37,35 +33,24 @@ export class TextChannelDto implements TextChannel {
   salt: string;
 
   @ApiProperty({ description: 'bcrypt hash of the room auth key.' })
-  @IsString()
-  @IsNotEmpty()
   authKeyHash: string;
 
   @ApiProperty({ example: 'K7QF9M2X', description: 'Public locator token used to share/find the room.' })
-  @IsString()
-  @IsNotEmpty()
   inviteCode: string;
 
   @ApiPropertyOptional({
     nullable: true,
     description: 'SHA-256 of the anonymous owner token; null for account-owned rooms.',
   })
-  @IsOptional()
-  @IsString()
   ownerTokenHash: string | null;
 
   @ApiPropertyOptional({ nullable: true, description: 'When the room self-destructs; null means never.' })
-  @IsOptional()
-  @IsDate()
   expiresAt: Date | null;
 
   @ApiProperty()
-  @IsDate()
   createdAt: Date;
 
   @ApiPropertyOptional({ example: 'a1b2c3d4-...', nullable: true })
-  @IsOptional()
-  @IsUUID()
   ownerId: string | null;
 }
 

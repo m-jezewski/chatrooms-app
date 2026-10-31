@@ -1,11 +1,11 @@
 import { Message } from '../../interfaces.ts';
 import { ChatMessage } from './ChatMessage.tsx';
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store.ts';
 import { useParams } from 'react-router';
 import { useLazyGetOlderMessagesQuery } from '../../services/chatroomsApi.ts';
-import { prependMessages } from '../messages/messagesSlice.ts';
+import { olderMessagesLoaded } from '../messages/messagesSlice.ts';
 import { Loader } from '../../shared/Loader.tsx';
 import { useRoomKey } from './RoomKeyContext.tsx';
 import { getSenderId } from '../../utils/session.ts';
@@ -28,7 +28,7 @@ export const Chatroom = () => {
   const [fetchOlderMessages, { isFetching }] = useLazyGetOlderMessagesQuery();
 
   // Auto-scroll to bottom only on new messages
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!channelId || !chatContainerRef.current) return;
     const lastMessageId = messages.length > 0 ? messages[messages.length - 1].id : null;
 
@@ -39,7 +39,7 @@ export const Chatroom = () => {
   }, [messages, channelId]);
 
   // Restore scroll position after prepending older messages
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isLoadingOlderRef.current && chatContainerRef.current) {
       const newScrollHeight = chatContainerRef.current.scrollHeight;
       chatContainerRef.current.scrollTop = newScrollHeight - prevScrollHeightRef.current;
@@ -62,7 +62,7 @@ export const Chatroom = () => {
         channelId: channelId,
         before: oldestMessageId,
       }).unwrap();
-      dispatch(prependMessages({ channelId, messages: result.messages, hasMore: result.hasMore }));
+      dispatch(olderMessagesLoaded({ channelId, messages: result.messages, hasMore: result.hasMore }));
     } catch {
       isLoadingOlderRef.current = false;
     }

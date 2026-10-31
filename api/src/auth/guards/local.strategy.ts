@@ -2,6 +2,7 @@ import { Strategy } from 'passport-local';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from '../auth.service';
+import { UserProfile } from '../../users/dto/user-crud.dto';
 
 // forces user to provide valid "email" and "password" fields in request body
 
@@ -14,7 +15,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(email: string, password: string): Promise<any> {
+  async validate(email: string, password: string): Promise<UserProfile> {
     const user = await this.authService.validateUser(email, password);
     if (!user) {
       throw new UnauthorizedException();
