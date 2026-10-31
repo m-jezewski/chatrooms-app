@@ -25,7 +25,7 @@ const show = (options: ShowOptions) =>
     />,
   );
 
-const sentAt = () => screen.queryByText(/^\d{1,2}:\d{2}$/);
+const sentAt = () => document.querySelector('time');
 
 describe('ChatMessage', () => {
   afterEach(cleanup);
@@ -54,7 +54,7 @@ describe('ChatMessage', () => {
     const { container } = show({ mine: false });
 
     expect(sentAt()).toHaveAttribute('datetime', SENT_AT);
-    expect(sentAt()?.tagName).toBe('TIME');
+    expect(sentAt()?.textContent).toMatch(/^\d{1,2}:\d{2}(\s[AP]M)?$/);
     expect(sentAt()?.parentElement).toBe(container.querySelector('p'));
   });
 
