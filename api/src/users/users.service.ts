@@ -5,6 +5,8 @@ import { getHashedPassword } from '../utils/bcrypt';
 import { CreateUserDto, UserProfile } from './dto/user-crud.dto';
 import { EmailInUseError } from '../utils/customExceptions';
 
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
@@ -21,7 +23,7 @@ export class UsersService {
   }
 
   async findUserByEmail(params: { email: string }): Promise<User | null> {
-    return this.prisma.user.findUnique({ where: { email: params.email } });
+    return this.prisma.user.findUnique({ where: { email: params.email.trim().toLowerCase() } });
   }
 
   async createUser(params: CreateUserDto): Promise<UserProfile> {
@@ -31,7 +33,7 @@ export class UsersService {
       return await this.prisma.user.create({
         data: {
           name: name,
-          email: email,
+          email: normalizeEmail(email),
           password: getHashedPassword(password),
         },
         omit: { password: true },

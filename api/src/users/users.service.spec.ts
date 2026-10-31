@@ -36,6 +36,12 @@ describe('UsersService', () => {
       expect(create.mock.calls[0][0].omit).toEqual({ password: true });
     });
 
+    it('stores the email in one shape so the same mailbox cannot sign up twice', async () => {
+      await service.createUser({ ...newUser, email: '  Maciej@Example.COM ' });
+
+      expect(create.mock.calls[0][0].data.email).toBe('maciej@example.com');
+    });
+
     it('turns a taken email into an error the controller can map to 409', async () => {
       create.mockRejectedValue(knownRequestError('P2002'));
 
@@ -46,6 +52,16 @@ describe('UsersService', () => {
       create.mockRejectedValue(knownRequestError('P2003'));
 
       await expect(service.createUser(newUser)).rejects.not.toBeInstanceOf(EmailInUseError);
+    });
+  });
+
+  describe('findUserByEmail', () => {
+    it('looks the user up in the shape their email was stored in', async () => {
+      findUnique.mockResolvedValue(null);
+
+      await service.findUserByEmail({ email: '  Maciej@Example.COM ' });
+
+      expect(findUnique).toHaveBeenCalledWith({ where: { email: 'maciej@example.com' } });
     });
   });
 
