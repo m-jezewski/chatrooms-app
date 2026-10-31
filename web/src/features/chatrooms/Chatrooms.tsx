@@ -22,7 +22,7 @@ export const Chatrooms = () => {
   });
   const { data: channelData } = useGetChatroomByIdQuery(channelId!, { skip: !channelId });
   const { secrets, setSecrets } = useRoomKey(channelId);
-  const { joined, markJoined } = useRoomJoin({ channelId, secrets, entry });
+  const { joined, markJoined } = useRoomJoin({ channelId, secrets });
   const notFound = !!entryError && 'status' in entryError && entryError.status === 404;
 
   if (!channelId) {
