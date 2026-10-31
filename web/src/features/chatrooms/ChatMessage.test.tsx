@@ -1,13 +1,17 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { ChatMessage } from './ChatMessage.tsx';
-import { DecryptedMessage } from './Chatroom.tsx';
+import { DecryptedMessage } from './useDecryptedMessage.ts';
+
+const { useDecryptedMessage } = vi.hoisted(() => ({ useDecryptedMessage: vi.fn() }));
+
+vi.mock('./useDecryptedMessage.ts', () => ({ useDecryptedMessage }));
 
 const SENT_AT = '2026-10-18T10:31:00.000Z';
 
-const decrypted: DecryptedMessage = { nickname: 'Ada', text: 'hello there', cipher: 'cipher' };
+const decrypted: DecryptedMessage = { nickname: 'Ada', text: 'hello there' };
 
 interface ShowOptions {
   mine: boolean;
@@ -15,15 +19,13 @@ interface ShowOptions {
   decrypted?: DecryptedMessage;
 }
 
-const show = (options: ShowOptions) =>
-  render(
-    <ChatMessage
-      mine={options.mine}
-      firstOfRun={options.firstOfRun ?? true}
-      decrypted={'decrypted' in options ? options.decrypted : decrypted}
-      createdAt={SENT_AT}
-    />,
+const show = (options: ShowOptions) => {
+  useDecryptedMessage.mockReturnValue('decrypted' in options ? options.decrypted : decrypted);
+
+  return render(
+    <ChatMessage mine={options.mine} firstOfRun={options.firstOfRun ?? true} payload="cipher-1" createdAt={SENT_AT} />,
   );
+};
 
 const sentAt = () => document.querySelector('time');
 

@@ -1,9 +1,10 @@
-import type { DecryptedMessage } from './Chatroom.tsx';
+import { useDecryptedMessage } from './useDecryptedMessage.ts';
 import { cx } from '../../utils/cx.ts';
 import styles from './ChatMessage.module.scss';
 
 interface ChatMessageProps {
-  decrypted?: DecryptedMessage;
+  payload: string;
+  roomKey?: CryptoKey;
   mine: boolean;
   createdAt: string;
   firstOfRun: boolean;
@@ -12,7 +13,8 @@ interface ChatMessageProps {
 const formatSentAt = (createdAt: string) =>
   new Date(createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-export const ChatMessage = ({ decrypted, mine, createdAt, firstOfRun }: ChatMessageProps) => {
+export const ChatMessage = ({ payload, roomKey, mine, createdAt, firstOfRun }: ChatMessageProps) => {
+  const decrypted = useDecryptedMessage(roomKey, payload);
   const text = decrypted?.text ?? '…';
   const author = mine ? '' : (decrypted?.nickname ?? 'User');
 

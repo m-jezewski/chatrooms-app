@@ -1,6 +1,6 @@
 import { Message } from '../../interfaces.ts';
 import { ChatMessage } from './ChatMessage.tsx';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store.ts';
 import { useParams } from 'react-router';
@@ -8,22 +8,15 @@ import { useLazyGetOlderMessagesQuery } from '../../services/chatroomsApi.ts';
 import { prependMessages } from '../messages/messagesSlice.ts';
 import { Loader } from '../../shared/Loader.tsx';
 import { useRoomKey } from './RoomKeyContext.tsx';
-import { decrypt } from '../../utils/roomCrypto.ts';
 import { getSenderId } from '../../utils/session.ts';
 import { startsRun } from './messageRuns.ts';
 import styles from './Chatroom.module.scss';
-
-export interface DecryptedMessage {
-  nickname: string;
-  text: string;
-  cipher: string;
-}
 
 export const Chatroom = () => {
   const { roomId: channelId } = useParams();
   const dispatch = useDispatch();
   const { secrets } = useRoomKey(channelId);
-  const key = secrets?.key;
+  const roomKey = secrets?.key;
   const senderId = getSenderId();
   const messages = useSelector((state: RootState) => state.messages.messages);
   const hasMore = useSelector((state: RootState) => state.messages.hasMore);
@@ -32,36 +25,9 @@ export const Chatroom = () => {
   const prevScrollHeightRef = useRef(0);
   const isLoadingOlderRef = useRef(false);
 
-  const [decrypted, setDecrypted] = useState<Map<string, DecryptedMessage>>(new Map());
   const [fetchOlderMessages, { isFetching }] = useLazyGetOlderMessagesQuery();
 
-  useEffect(() => {
-    const pending = messages.filter((message) => decrypted.get(message.id)?.cipher !== message.payload);
-    if (pending.length === 0 || !key) {
-      return;
-    }
-
-    (async () => {
-      const decryptedEntries = await Promise.all(
-        pending.map(async (message): Promise<[string, DecryptedMessage]> => {
-          try {
-            const { nickname, text } = JSON.parse(await decrypt(key, message.payload));
-            return [message.id, { nickname, text, cipher: message.payload }];
-          } catch {
-            return [message.id, { nickname: 'Unknown', text: '[unable to decrypt]', cipher: message.payload }];
-          }
-        }),
-      );
-
-      setDecrypted((prev) => {
-        const next = new Map(prev);
-        for (const [id, value] of decryptedEntries) next.set(id, value);
-        return next;
-      });
-    })();
-  }, [messages, key, decrypted]);
-
-  // Auto-scroll to bottom only on new messages (not on prepend)
+  // Auto-scroll to bottom only on new messages
   useEffect(() => {
     if (!channelId || !chatContainerRef.current) return;
     const lastMessageId = messages.length > 0 ? messages[messages.length - 1].id : null;
@@ -112,7 +78,8 @@ export const Chatroom = () => {
       {messages.map((message: Message, index: number) => (
         <ChatMessage
           key={message.id}
-          decrypted={decrypted.get(message.id)}
+          payload={message.payload}
+          roomKey={roomKey}
           mine={message.senderId === senderId}
           createdAt={message.createdAt}
           firstOfRun={startsRun(message, messages[index - 1])}
