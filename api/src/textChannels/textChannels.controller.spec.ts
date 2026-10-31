@@ -152,3 +152,60 @@ describe('TextChannelsController session bookkeeping', () => {
     expect(verifyChannelAuthKey).not.toHaveBeenCalled();
   });
 });
+
+describe('the rooms kept on an account', () => {
+  const getSavedRooms = jest.fn();
+  const getChannel = jest.fn();
+
+  const service = { getSavedRooms, getChannel } as unknown as TextChannelsService;
+
+  const owner = { id: 'user-1' } as User;
+  const room = { id: 'room-1', name: 'Alpha' };
+  const saved = [{ roomId: 'room-1', name: 'Alpha' }];
+
+  let app: INestApplication;
+
+  const startApp = async (user?: User) => {
+    app = await createTestApp({
+      controllers: [TextChannelsController],
+      providers: [{ provide: TextChannelsService, useValue: service }],
+      user,
+    });
+
+    return request.agent(app.getHttpServer());
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    getSavedRooms.mockResolvedValue(saved);
+    getChannel.mockResolvedValue(room);
+  });
+
+  afterEach(async () => {
+    await app?.close();
+  });
+
+  it('stay hidden from a caller with no session', async () => {
+    const client = await startApp();
+
+    await client.get('/textChannels/saved').expect(401);
+
+    expect(getSavedRooms).not.toHaveBeenCalled();
+  });
+
+  it('are read under the id of the caller and nobody else', async () => {
+    const client = await startApp(owner);
+
+    await client.get('/textChannels/saved').expect(200, saved);
+
+    expect(getSavedRooms).toHaveBeenCalledWith('user-1');
+  });
+
+  it('are not mistaken for a room whose id happens to be saved', async () => {
+    const client = await startApp(owner);
+
+    await client.get('/textChannels/saved').expect(200);
+
+    expect(getChannel).not.toHaveBeenCalled();
+  });
+});
