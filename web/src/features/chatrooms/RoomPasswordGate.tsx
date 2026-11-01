@@ -64,7 +64,7 @@ export const RoomPasswordGate = ({ entry, onJoin }: RoomPasswordGateProps) => {
               <InputLabel htmlFor={'password'}>Room password</InputLabel>
               <TextInput name={'password'} type={'password'} placeholder={'Room password'} autoFocus />
             </div>
-            <AppButton variant={'purple'} type={'submit'} disabled={isSubmitting}>
+            <AppButton variant={'accent'} type={'submit'} disabled={isSubmitting}>
               {isSubmitting ? 'Joining…' : 'Join room'}
             </AppButton>
           </FormContainer>

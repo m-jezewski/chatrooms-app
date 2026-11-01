@@ -26,7 +26,7 @@ export const EntryLayout = () => {
         <AppButton as="link" to="/login" variant="transparent">
           Sign in
         </AppButton>
-        <AppButton as="link" to="/register" variant="purple">
+        <AppButton as="link" to="/register" variant="accent">
           Register
         </AppButton>
       </div>

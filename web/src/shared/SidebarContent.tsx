@@ -1,7 +1,10 @@
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppButton } from './AppButton.tsx';
+import { SidebarAction } from './SidebarAction.tsx';
 import { useEntryHandoff } from './entryHandoff.ts';
+import PlusIcon from '../assets/icons/plus.svg?react';
+import EnterIcon from '../assets/icons/enter.svg?react';
 import { RoomList } from '../features/rooms/RoomList.tsx';
 import { CreateRoomDialog } from '../features/rooms/CreateRoomDialog.tsx';
 import { JoinRoomDialog } from '../features/rooms/JoinRoomDialog.tsx';
@@ -12,9 +15,6 @@ import { useRoomKeyContext } from '../features/chatrooms/RoomKeyContext.tsx';
 import { clearRoomSession } from '../utils/session.ts';
 import styles from './SidebarContent.module.scss';
 
-// Contents only — the shell renders this twice, once in the desktop sidebar and once in the
-// mobile menu, each bringing its own container. Every dialog here carries its own trigger and
-// open state, so neither container holds any.
 interface SidebarContentProps {
   onNavigate?: () => void;
 }
@@ -42,16 +42,22 @@ export const SidebarContent = ({ onNavigate }: SidebarContentProps) => {
 
   return (
     <>
-      <CreateRoomDialog
-        trigger={<AppButton variant="transparent">Create room</AppButton>}
-        defaultOpen={action === 'create'}
-      />
+      <div className={styles.actions}>
+        <CreateRoomDialog
+          trigger={
+            <SidebarAction icon={PlusIcon} variant="accent">
+              New Room
+            </SidebarAction>
+          }
+          defaultOpen={action === 'create'}
+        />
 
-      <JoinRoomDialog
-        trigger={<AppButton variant="slate">Join room</AppButton>}
-        defaultOpen={action === 'join'}
-        inviteCode={inviteCode}
-      />
+        <JoinRoomDialog
+          trigger={<SidebarAction icon={EnterIcon}>Join room</SidebarAction>}
+          defaultOpen={action === 'join'}
+          inviteCode={inviteCode}
+        />
+      </div>
 
       <RoomList />
       <div className={styles.spacer} />
@@ -59,7 +65,7 @@ export const SidebarContent = ({ onNavigate }: SidebarContentProps) => {
       {loggedUser ? (
         <AppButton onClick={handleLogout}>Logout</AppButton>
       ) : (
-        <AuthDialog trigger={<AppButton>Log in</AppButton>} />
+        <AuthDialog trigger={<AppButton variant={'accent'}>Log in</AppButton>} />
       )}
     </>
   );

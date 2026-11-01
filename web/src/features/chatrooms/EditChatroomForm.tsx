@@ -62,7 +62,7 @@ export const EditChatroomForm = ({ initialValues, onClose, onSuccess }: EditChat
           </div>
           <FormActions equalWidth>
             <AppButton onClick={onClose}>Cancel</AppButton>
-            <AppButton variant={'purple'} type={'submit'}>
+            <AppButton variant={'accent'} type={'submit'}>
               Save
             </AppButton>
           </FormActions>

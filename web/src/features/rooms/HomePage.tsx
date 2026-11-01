@@ -21,7 +21,7 @@ export const HomePage = () => {
       </p>
       <div className={styles.card}>
         <div className={styles.block}>
-          <AppButton as="link" to="/create" variant="purple" className={styles.createBtn}>
+          <AppButton as="link" to="/create" variant="accent" className={styles.createBtn}>
             Create a room
           </AppButton>
 
@@ -41,7 +41,7 @@ export const HomePage = () => {
               placeholder="e.g. K7QF9M2X"
               aria-label="Invitation code"
             />
-            <AppButton variant="purple" type="submit">
+            <AppButton variant="accent" type="submit">
               Join
             </AppButton>
           </form>

@@ -65,12 +65,12 @@ describe('AppButton', () => {
 
   it('uses styles it was asked for', () => {
     render(
-      <AppButton variant="purple" compact rounded>
+      <AppButton variant="accent" compact rounded>
         Save
       </AppButton>,
     );
 
-    expect(screen.getByRole('button', { name: 'Save' })).toHaveClass(styles.purple, styles.compact, styles.round);
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveClass(styles.accent, styles.compact, styles.round);
   });
 
   it('looks neutral when no styling props was provided', () => {

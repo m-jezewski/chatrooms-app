@@ -68,7 +68,7 @@ export const EditRoomTtlForm = ({ room, onClose }: EditRoomTtlFormProps) => {
             <AppButton type="button" onClick={onClose}>
               Cancel
             </AppButton>
-            <AppButton variant="purple" type="submit" disabled={isSubmitting}>
+            <AppButton variant="accent" type="submit" disabled={isSubmitting}>
               Save
             </AppButton>
           </FormActions>

@@ -69,13 +69,13 @@ export const RegisterForm = ({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
               <InputLabel htmlFor={'password'}>Password</InputLabel>
               <TextInput name={'password'} type={'password'} autoComplete={'new-password'} placeholder={'********'} />
             </div>
-            <AppButton variant={'purple'} loader={isLoading} type={'submit'} className={styles.register}>
+            <AppButton variant={'accent'} loader={isLoading} type={'submit'} className={styles.register}>
               Register
             </AppButton>
           </FormContainer>
           <p className={styles.subtext}>Already have an account?</p>
-          <FormActions className={styles.noMargin}>
-            <AppButton type={'button'} variant={'slate'} className={styles.full} onClick={onSwitchToLogin}>
+          <FormActions className={styles.switchAction}>
+            <AppButton type={'button'} variant={'slate'} className={styles.half} onClick={onSwitchToLogin}>
               Sign in
             </AppButton>
           </FormActions>

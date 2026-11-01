@@ -44,7 +44,7 @@ export const ConfirmModal = ({
         <AppButton type="button" onClick={onClose} disabled={isConfirming}>
           {cancelLabel}
         </AppButton>
-        <AppButton type="button" variant={danger ? 'red' : 'purple'} onClick={handleConfirm} disabled={isConfirming}>
+        <AppButton type="button" variant={danger ? 'red' : 'accent'} onClick={handleConfirm} disabled={isConfirming}>
           {confirmLabel}
         </AppButton>
       </FormActions>

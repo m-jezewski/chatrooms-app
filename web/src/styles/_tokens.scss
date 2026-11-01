@@ -1,10 +1,13 @@
 $bg-color: #070c16;
 $input-bg: #0e172a;
 $border-color: #162341;
+$border-color-2: #161c29;
 $active-color: #1f315b;
 
 $bg-color-3: #171717;
 $bg-color-2: #10141e;
+
+$bg-color-4: rgb(10, 14, 23);
 
 $accent: #01a29d;
 $accent-darker: #017a76;
@@ -20,6 +23,9 @@ $text-dark: #030712;
 $text-red: #fca5a5;
 $text-bright: #fff;
 $text-on-accent: #02050e;
+
+$row-hover: rgba(255, 255, 255, 0.05);
+$row-hover-active: rgba(255, 255, 255, 0.1);
 
 $bubble-mine: #2563eb;
 $bubble-theirs: #121d41;
@@ -62,7 +68,7 @@ $radius-lg: 0.5rem;
   }
 }
 
-@mixin popover-item {
+@mixin popover-item($highlight: $border-color) {
   width: 100%;
   padding: 0.4rem 0.5rem;
   font-size: 14px;
@@ -71,8 +77,10 @@ $radius-lg: 0.5rem;
   border-radius: $radius;
   color: $text-main;
 
-  &[data-focus] {
-    background-color: $border-color;
+  &[data-focus],
+  &:hover,
+  &:focus-visible {
+    background-color: $highlight;
   }
 
   &[data-disabled] {

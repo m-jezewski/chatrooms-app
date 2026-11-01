@@ -100,12 +100,12 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
                 <AppButton type="button" onClick={onCancel}>
                   Cancel
                 </AppButton>
-                <AppButton variant="purple" type="submit" disabled={isSubmitting}>
+                <AppButton variant="accent" type="submit" disabled={isSubmitting}>
                   {isSubmitting ? 'Looking up…' : 'Find room'}
                 </AppButton>
               </FormActions>
             ) : (
-              <AppButton variant="purple" type="submit" disabled={isSubmitting}>
+              <AppButton variant="accent" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Looking up…' : 'Find room'}
               </AppButton>
             )}
@@ -138,12 +138,12 @@ export const JoinRoomForm = ({ inviteCode, onRoomResolved, onJoined, onCancel }:
                 <AppButton type="button" onClick={onCancel}>
                   Cancel
                 </AppButton>
-                <AppButton variant="purple" type="submit" disabled={isSubmitting}>
+                <AppButton variant="accent" type="submit" disabled={isSubmitting}>
                   {isSubmitting ? 'Joining…' : 'Join room'}
                 </AppButton>
               </FormActions>
             ) : (
-              <AppButton variant="purple" type="submit" disabled={isSubmitting}>
+              <AppButton variant="accent" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Joining…' : 'Join room'}
               </AppButton>
             )}

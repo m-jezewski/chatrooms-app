@@ -1,4 +1,4 @@
-import { Formik, FormikHelpers, FormikProps } from 'formik';
+import { Formik, FormikHelpers } from 'formik';
 import { object, string } from 'yup';
 import toast from 'react-hot-toast';
 import { TextInput } from '../../shared/TextInput.tsx';
@@ -38,16 +38,6 @@ export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => 
     }
   };
 
-  const handleDemoButtonClick = async (formikConfig: FormikProps<LoginFormValues>) => {
-    await formikConfig.setValues(
-      {
-        email: 'public_user@chatrooms.com',
-        password: 'public_user_password',
-      },
-      true,
-    );
-  };
-
   return (
     <Formik
       initialValues={{
@@ -60,7 +50,7 @@ export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => 
       })}
       onSubmit={handleSubmit}
     >
-      {(formikConfig) => (
+      {() => (
         <>
           <FormContainer>
             <div>
@@ -76,21 +66,14 @@ export const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => 
                 placeholder={'********'}
               />
             </div>
-            <AppButton variant={'purple'} type={'submit'} loader={isLoading} className={styles.signIn}>
+            <AppButton variant={'accent'} type={'submit'} loader={isLoading} className={styles.signIn}>
               Sign in
             </AppButton>
           </FormContainer>
           <p className={styles.subtext}>New to Chatrooms?</p>
-          <FormActions className={styles.noMargin}>
+          <FormActions className={styles.switchAction}>
             <AppButton type={'button'} variant={'slate'} className={styles.half} onClick={onSwitchToRegister}>
               Register
-            </AppButton>
-            <AppButton
-              type={'button'}
-              className={styles.halfNowrap}
-              onClick={() => handleDemoButtonClick(formikConfig)}
-            >
-              Demo account
             </AppButton>
           </FormActions>
         </>

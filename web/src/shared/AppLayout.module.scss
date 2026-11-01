@@ -74,12 +74,13 @@ $md: 768px;
 .sidebar {
   display: none;
   flex-direction: column;
-  flex-basis: 20%;
+  flex-basis: 25%;
   max-width: 18rem;
   min-width: 13rem;
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   overflow-y: auto;
-  background-color: $bg-color-2;
+  background-color: $bg-color;
+  border-right: $border-color-2 1px solid;
 
   @media (min-width: $md) {
     display: flex;
@@ -95,7 +96,7 @@ $md: 768px;
 }
 
 .main {
-  flex-basis: 80%;
+  flex-basis: 75%;
   flex-grow: 1;
   overflow-y: auto;
   background-color: $bg-color;

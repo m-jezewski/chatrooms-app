@@ -39,14 +39,14 @@
   transition: all 150ms ease;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: $row-hover;
   }
 }
 
 .active {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: $row-hover;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: $row-hover-active;
   }
 }

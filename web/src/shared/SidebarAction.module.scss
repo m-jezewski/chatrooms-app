@@ -1,0 +1,38 @@
+@use '../styles/tokens' as *;
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+  @include popover-item($row-hover);
+
+  &:hover .outline {
+    color: $text-main;
+  }
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: $radius;
+}
+
+.accent {
+  background-color: $accent;
+  color: $text-on-accent;
+}
+
+.outline {
+  border: 1px solid $active-color;
+  color: $text-secondary;
+}
+
+.icon {
+  width: 0.9rem;
+  height: 0.9rem;
+}

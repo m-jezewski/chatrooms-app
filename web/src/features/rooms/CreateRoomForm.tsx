@@ -111,7 +111,7 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
           </div>
         )}
 
-        <AppButton variant="purple" type="button" onClick={enterRoom}>
+        <AppButton variant="accent" type="button" onClick={enterRoom}>
           Enter room
         </AppButton>
       </>
@@ -157,12 +157,12 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
                 <AppButton type="button" onClick={onCancel}>
                   Cancel
                 </AppButton>
-                <AppButton variant="purple" type="submit" disabled={isSubmitting}>
+                <AppButton variant="accent" type="submit" disabled={isSubmitting}>
                   {isSubmitting ? 'Creating…' : 'Create room'}
                 </AppButton>
               </FormActions>
             ) : (
-              <AppButton variant="purple" type="submit" disabled={isSubmitting}>
+              <AppButton variant="accent" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Creating…' : 'Create room'}
               </AppButton>
             )}

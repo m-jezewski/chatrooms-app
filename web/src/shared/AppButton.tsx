@@ -4,7 +4,7 @@ import { Loader } from './Loader.tsx';
 import { cx } from '../utils/cx.ts';
 import styles from './AppButton.module.scss';
 
-type AppButtonVariant = 'neutral' | 'slate' | 'purple' | 'transparent' | 'red';
+type AppButtonVariant = 'neutral' | 'slate' | 'accent' | 'transparent' | 'red';
 
 interface AppButtonBaseProps {
   className?: string;

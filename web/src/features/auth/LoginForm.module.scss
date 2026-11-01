@@ -11,15 +11,11 @@
   color: $text-main;
 }
 
-.noMargin {
+.switchAction {
   margin-top: 0;
+  justify-content: center;
 }
 
 .half {
   width: 50%;
-}
-
-.halfNowrap {
-  width: 50%;
-  white-space: nowrap;
 }
