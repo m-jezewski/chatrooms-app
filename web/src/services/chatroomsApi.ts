@@ -31,6 +31,7 @@ export const chatroomsApi = api.injectEndpoints({
         method: 'POST',
         body: channelData,
       }),
+      invalidatesTags: ['SavedRooms'],
     }),
     joinChatroom: builder.mutation<{ joined: boolean }, { channelId: string; authKey: string }>({
       query: ({ channelId, authKey }) => ({
@@ -38,7 +39,7 @@ export const chatroomsApi = api.injectEndpoints({
         method: 'POST',
         body: { authKey },
       }),
-      invalidatesTags: (_result, _error, { channelId }) => [{ type: 'Chatroom', id: channelId }],
+      invalidatesTags: (_result, _error, { channelId }) => [{ type: 'Chatroom', id: channelId }, 'SavedRooms'],
     }),
     updateChatroom: builder.mutation<
       Chatroom,
@@ -55,7 +56,7 @@ export const chatroomsApi = api.injectEndpoints({
         body,
         headers: ownerHeaders(ownerToken),
       }),
-      invalidatesTags: (_result, _error, { id }) => [{ type: 'Chatroom', id }],
+      invalidatesTags: (_result, _error, { id }) => [{ type: 'Chatroom', id }, 'SavedRooms'],
     }),
     rotateInviteCode: builder.mutation<{ inviteCode: string }, { id: string; ownerToken?: string | null }>({
       query: ({ id, ownerToken }) => ({
