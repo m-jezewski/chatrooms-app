@@ -111,9 +111,11 @@ export const CreateRoomForm = ({ onCreated, onEntered, onCancel }: CreateRoomFor
           </div>
         )}
 
-        <AppButton variant="accent" type="button" onClick={enterRoom}>
-          Enter room
-        </AppButton>
+        <FormActions equalWidth={true}>
+          <AppButton variant="accent" type="button" onClick={enterRoom}>
+            Enter room
+          </AppButton>
+        </FormActions>
       </>
     );
   }
