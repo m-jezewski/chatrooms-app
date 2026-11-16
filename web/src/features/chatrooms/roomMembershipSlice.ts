@@ -47,6 +47,5 @@ const roomMembershipSlice = createSlice({
 export const { roomJoined, membershipRefused, roomLeft } = roomMembershipSlice.actions;
 
 export const selectJoinedChannelId = (state: RootState) => state.roomMembership.joinedChannelId;
-export const selectLostAccessTo = (state: RootState) => state.roomMembership.lostAccessTo;
 
 export default roomMembershipSlice.reducer;

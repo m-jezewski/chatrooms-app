@@ -21,12 +21,11 @@ const authSlice = createSlice({
     },
   },
   selectors: {
-    selectAuthState: (state) => state,
     selectLoggedUser: (state) => state.user,
   },
 });
 
-export const { selectLoggedUser, selectAuthState } = authSlice.selectors;
+export const { selectLoggedUser } = authSlice.selectors;
 
 export const { setUser, clearUser } = authSlice.actions;
 
