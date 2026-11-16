@@ -76,10 +76,17 @@ export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelPro
     navigate('/');
   };
 
-  const copyInvite = () => {
+  const copyInvite = async () => {
     if (!channelData) return;
     const link = `${window.location.origin}/join/${channelData.inviteCode}`;
-    navigator.clipboard?.writeText(link);
+
+    try {
+      await navigator.clipboard.writeText(link);
+    } catch {
+      toast.error('Could not reach the clipboard — copy the invite code instead.');
+      return;
+    }
+
     toast.success('Invite link copied.');
   };
 
