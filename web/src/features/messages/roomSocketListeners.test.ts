@@ -65,6 +65,7 @@ const openRoom = async (channelId: string) => {
 beforeEach(() => {
   vi.resetModules();
   vi.clearAllMocks();
+  vi.unstubAllGlobals();
   sockets.length = 0;
 });
 
@@ -190,6 +191,35 @@ describe('leaving a room', () => {
     expect(sockets[0].socket.emit).not.toHaveBeenCalled();
     expect(sockets[0].socket.disconnect).toHaveBeenCalled();
     expect(store.getState().messages.isConnected).toBe(false);
+  });
+});
+
+describe('when the server closes the room', () => {
+  it('drops the saved rooms list so a deleted room leaves the sidebar', async () => {
+    const savedRooms = [{ roomId: 'room-1', name: 'Design crit' }];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify(savedRooms), { status: 200, headers: { 'content-type': 'application/json' } }),
+      ),
+    );
+
+    const { store } = await import('../../store.ts');
+    const { chatroomsApi } = await import('../../services/chatroomsApi.ts');
+    const savedRoomsQuery = chatroomsApi.endpoints.getSavedRooms;
+
+    const subscription = store.dispatch(savedRoomsQuery.initiate());
+    await subscription;
+
+    store.dispatch(roomJoined('room-1'));
+    sockets[0].connect();
+    savedRooms.length = 0;
+
+    sockets[0].fire('roomClosed');
+
+    await vi.waitFor(() => expect(savedRoomsQuery.select()(store.getState()).data).toEqual([]));
+    subscription.unsubscribe();
   });
 });
 

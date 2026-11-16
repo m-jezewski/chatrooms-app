@@ -55,7 +55,7 @@ export const addRoomSocketListeners = (startListening: AppStartListening) => {
       });
 
       socket.on('roomClosed', () => {
-        listenerApi.dispatch(api.util.invalidateTags([{ type: 'Chatroom', id: channelId }]));
+        listenerApi.dispatch(api.util.invalidateTags([{ type: 'Chatroom', id: channelId }, 'SavedRooms']));
       });
 
       socket.on('joinedChannel', (data: { messages: Message[]; hasMore: boolean; channelId: string }) => {

@@ -39,6 +39,7 @@ export const authApi = api.injectEndpoints({
         url: '/auth/logout',
         method: 'DELETE',
       }),
+      invalidatesTags: ['SavedRooms'],
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
