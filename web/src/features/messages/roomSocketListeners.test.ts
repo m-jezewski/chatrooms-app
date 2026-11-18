@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { messageSubmitted } from './messagesSlice.ts';
 import { roomLeft, roomJoined } from '../chatrooms/roomMembershipSlice.ts';
 
@@ -66,7 +66,12 @@ beforeEach(() => {
   vi.resetModules();
   vi.clearAllMocks();
   vi.unstubAllGlobals();
+  vi.stubEnv('VITE_API_URL', 'http://api.test');
   sockets.length = 0;
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe('joining a room', () => {
