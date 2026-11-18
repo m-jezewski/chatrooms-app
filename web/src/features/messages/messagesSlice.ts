@@ -6,6 +6,7 @@ interface MessagesState {
   messages: Message[];
   hasMore: boolean;
   isConnected: boolean;
+  onlineCount: number;
   error: string | null;
 }
 
@@ -14,6 +15,7 @@ const initialState: MessagesState = {
   messages: [],
   hasMore: true,
   isConnected: false,
+  onlineCount: 0,
   error: null,
 };
 
@@ -27,11 +29,18 @@ const messagesSlice = createSlice({
     },
     connectionClosed(state) {
       state.isConnected = false;
+      state.onlineCount = 0;
     },
     channelOpened(state, action: PayloadAction<string | null>) {
       state.channelId = action.payload;
       state.messages = [];
       state.hasMore = true;
+      state.onlineCount = 0;
+    },
+    presenceChanged(state, action: PayloadAction<{ channelId: string; count: number }>) {
+      if (action.payload.channelId !== state.channelId) return;
+
+      state.onlineCount = action.payload.count;
     },
     historyLoaded(state, action: PayloadAction<{ channelId: string; messages: Message[]; hasMore: boolean }>) {
       if (action.payload.channelId !== state.channelId) return;
@@ -52,6 +61,7 @@ const messagesSlice = createSlice({
     },
     connectionFailed(state, action: PayloadAction<string>) {
       state.isConnected = false;
+      state.onlineCount = 0;
       state.error = action.payload;
     },
   },
@@ -63,6 +73,7 @@ export const {
   connectionOpened,
   connectionClosed,
   channelOpened,
+  presenceChanged,
   messageReceived,
   connectionFailed,
   historyLoaded,

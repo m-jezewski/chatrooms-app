@@ -8,6 +8,7 @@ import {
   channelOpened,
   messageReceived,
   historyLoaded,
+  presenceChanged,
 } from './messagesSlice.ts';
 import { roomJoined, membershipRefused } from '../chatrooms/roomMembershipSlice.ts';
 import { api } from '../../services/api.ts';
@@ -52,6 +53,10 @@ export const addRoomSocketListeners = (startListening: AppStartListening) => {
 
       socket.on('newMessage', (message: Message) => {
         listenerApi.dispatch(messageReceived(message));
+      });
+
+      socket.on('presence', (presence: { channelId: string; count: number }) => {
+        listenerApi.dispatch(presenceChanged(presence));
       });
 
       socket.on('roomClosed', () => {

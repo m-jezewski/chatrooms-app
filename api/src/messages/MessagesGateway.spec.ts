@@ -18,13 +18,17 @@ describe('MessagesGateway join authorization', () => {
     };
     handshake.session = { joinedChannels: atHandshake, reload };
 
-    return { handshake, join: jest.fn(), emit: jest.fn() } as unknown as Socket;
+    return { handshake, data: {}, join: jest.fn(), emit: jest.fn() } as unknown as Socket;
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
     getChannelMessagePage.mockResolvedValue({ messages: [], hasMore: false });
     gateway = new MessagesGateway(messagesService);
+    gateway.server = {
+      in: jest.fn().mockReturnValue({ fetchSockets: jest.fn().mockResolvedValue([]) }),
+      to: jest.fn().mockReturnValue({ emit: jest.fn() }),
+    } as unknown as Server;
   });
 
   it('lets in a room joined after the socket connected', async () => {
@@ -94,7 +98,10 @@ describe('MessagesGateway sending and leaving', () => {
     jest.clearAllMocks();
     createMessage.mockResolvedValue({ id: 'message-1', ...outgoing });
     gateway = new MessagesGateway(messagesService);
-    gateway.server = { to: jest.fn().mockReturnValue({ emit: broadcast }) } as unknown as Server;
+    gateway.server = {
+      to: jest.fn().mockReturnValue({ emit: broadcast }),
+      in: jest.fn().mockReturnValue({ fetchSockets: jest.fn().mockResolvedValue([]) }),
+    } as unknown as Server;
   });
 
   it('refuses a message for a channel the socket never entered', async () => {
@@ -126,12 +133,99 @@ describe('MessagesGateway sending and leaving', () => {
     expect(client.emit).toHaveBeenCalledWith('error', { message: 'Failed to send message' });
   });
 
-  it('takes the socket out of the channel it asked to leave', () => {
+  it('takes the socket out of the channel it asked to leave', async () => {
     const client = clientInRooms('channel_room-1');
 
-    gateway.handleLeaveChannel({ channelId: 'room-1' }, client);
+    await gateway.handleLeaveChannel({ channelId: 'room-1' }, client);
 
     expect(client.leave).toHaveBeenCalledWith('channel_room-1');
     expect(client.emit).toHaveBeenCalledWith('leftChannel', { message: 'Left channel room-1' });
+  });
+});
+
+describe('MessagesGateway presence', () => {
+  const getChannelMessagePage = jest.fn();
+  const messagesService = { getChannelMessagePage } as unknown as MessagesService;
+  const broadcast = jest.fn();
+  const fetchSockets = jest.fn();
+  let gateway: MessagesGateway;
+
+  const inTheRoom = (...sessionIds: string[]) =>
+    sessionIds.map((sessionId, index) => ({ id: `socket-${index + 1}`, data: { sessionId } }));
+
+  const clientOfSession = (sessionID: string) => {
+    const handshake: Record<string, unknown> = { sessionID };
+    handshake.session = { joinedChannels: ['room-1'], reload: (done: () => void) => done() };
+
+    return {
+      handshake,
+      data: {},
+      rooms: new Set<string>(),
+      join: jest.fn(),
+      leave: jest.fn(),
+      emit: jest.fn(),
+    } as unknown as Socket;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    getChannelMessagePage.mockResolvedValue({ messages: [], hasMore: false });
+    fetchSockets.mockResolvedValue([]);
+    gateway = new MessagesGateway(messagesService);
+    gateway.server = {
+      on: jest.fn(),
+      in: jest.fn().mockReturnValue({ fetchSockets }),
+      to: jest.fn().mockReturnValue({ emit: broadcast }),
+    } as unknown as Server;
+  });
+
+  it('tells the room how many people are in it once somebody joins', async () => {
+    fetchSockets.mockResolvedValue(inTheRoom('session-a', 'session-b'));
+
+    await gateway.handleJoinChannel({ channelId: 'room-1' }, clientOfSession('session-b'));
+
+    expect(gateway.server.in).toHaveBeenCalledWith('channel_room-1');
+    expect(broadcast).toHaveBeenCalledWith('presence', { channelId: 'room-1', count: 2 });
+  });
+
+  it('counts a second tab of the same person once', async () => {
+    fetchSockets.mockResolvedValue(inTheRoom('session-a', 'session-a'));
+
+    await gateway.handleJoinChannel({ channelId: 'room-1' }, clientOfSession('session-a'));
+
+    expect(broadcast).toHaveBeenCalledWith('presence', { channelId: 'room-1', count: 1 });
+  });
+
+  it('marks the socket with its session so the count has something to group by', async () => {
+    const client = clientOfSession('session-a');
+
+    await gateway.handleJoinChannel({ channelId: 'room-1' }, client);
+
+    expect(client.data.sessionId).toBe('session-a');
+  });
+
+  it('counts the room again when somebody leaves', async () => {
+    fetchSockets.mockResolvedValue(inTheRoom('session-a'));
+
+    await gateway.handleLeaveChannel({ channelId: 'room-1' }, clientOfSession('session-b'));
+
+    expect(broadcast).toHaveBeenCalledWith('presence', { channelId: 'room-1', count: 1 });
+  });
+
+  it('leaves out a socket that is on its way out but still sitting in the room', async () => {
+    gateway.afterInit(gateway.server);
+    const onConnection = (gateway.server.on as unknown as jest.Mock).mock.calls.find(
+      ([event]) => event === 'connection',
+    )[1];
+    const leaving = { id: 'socket-1', rooms: new Set(['socket-1', 'channel_room-1']), on: jest.fn() };
+
+    onConnection(leaving);
+    const onDisconnecting = leaving.on.mock.calls.find(([event]) => event === 'disconnecting')[1];
+    fetchSockets.mockResolvedValue(inTheRoom('session-a', 'session-b'));
+
+    onDisconnecting();
+    await new Promise((resolve) => setImmediate(resolve));
+
+    expect(broadcast).toHaveBeenCalledWith('presence', { channelId: 'room-1', count: 1 });
   });
 });

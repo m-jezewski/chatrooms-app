@@ -223,6 +223,37 @@ describe('when the server closes the room', () => {
   });
 });
 
+describe('counting who is in the room', () => {
+  it('takes the number the server broadcasts', async () => {
+    const store = await openRoom('room-1');
+    sockets[0].connect();
+
+    sockets[0].fire('presence', { channelId: 'room-1', count: 3 });
+
+    expect(store.getState().messages.onlineCount).toBe(3);
+  });
+
+  it('ignores a count that belongs to another room', async () => {
+    const store = await openRoom('room-1');
+    sockets[0].connect();
+    sockets[0].fire('presence', { channelId: 'room-1', count: 3 });
+
+    sockets[0].fire('presence', { channelId: 'room-2', count: 9 });
+
+    expect(store.getState().messages.onlineCount).toBe(3);
+  });
+
+  it('forgets the count once the socket is gone', async () => {
+    const store = await openRoom('room-1');
+    sockets[0].connect();
+    sockets[0].fire('presence', { channelId: 'room-1', count: 3 });
+
+    sockets[0].drop();
+
+    expect(store.getState().messages.onlineCount).toBe(0);
+  });
+});
+
 describe('sending a message', () => {
   const outgoing = { channelId: 'room-1', payload: 'cipher-out', senderId: 'sender-1' };
 

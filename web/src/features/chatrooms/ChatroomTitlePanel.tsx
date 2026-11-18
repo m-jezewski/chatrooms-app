@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { Chatroom, RoomEntry } from '../../interfaces.ts';
+import { RootState } from '../../store.ts';
 import { selectLoggedUser } from '../auth/authSlice.ts';
 import { EditChatroomForm } from './EditChatroomForm.tsx';
 import { EditRoomTtlForm } from './EditRoomTtlForm.tsx';
@@ -28,6 +29,7 @@ export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelPro
   const { roomId } = useParams();
   const navigate = useNavigate();
   const loggedUser = useSelector(selectLoggedUser);
+  const onlineCount = useSelector((state: RootState) => state.messages.onlineCount);
   const { clearKey } = useRoomKeyContext();
 
   const [rotateInviteCode] = useRotateInviteCodeMutation();
@@ -97,7 +99,11 @@ export const ChatroomTitlePanel = ({ entry, channelData }: ChatroomTitlePanelPro
           <span className={styles.hash}>#</span>
           <h1>{entry?.name}</h1>
         </div>
-        <div className={styles.loggedUsersInfo}>1 user online {/* TODO */}</div>
+        {onlineCount > 0 && (
+          <div className={styles.loggedUsersInfo}>
+            {onlineCount} {onlineCount === 1 ? 'person' : 'people'} online
+          </div>
+        )}
       </div>
       <div className={styles.ownerBar}>
         {isOwner && (
